@@ -3,7 +3,7 @@
 return array(
     'puzzles' => array(
         // 問題ファイルを格納する場所
-	'path_to_puzzles' => APPPATH.'ctfadmin/puzzles/',
+	'path_to_puzzles' => DOCROOT.'../ctfadmin/puzzles/',
         // 添付ファイルを格納するサブディレクトリ名
         'attachment_dir' => 'attachments',
 	// 問題解答時に表示する画像
@@ -78,7 +78,7 @@ return array(
     ),
     'rule' => array(
 	// 競技ルールを記載するファイル
-	'rule_file' => APPPATH.'ctfadmin/rule/rule.html',
+	'rule_file' => DOCROOT.'../ctfadmin/rule/rule.html',
     ),
 );
 

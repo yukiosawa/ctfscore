@@ -5,5 +5,5 @@ APP=/var/www/ctfscore
 
 # update ctf start and end times
 cd $APP
-php oil r ctfscore:update_times ./fuel/app/ctfadmin/batch/times.php
+php oil r ctfscore:update_times ./ctfadmin/batch/times.php
 

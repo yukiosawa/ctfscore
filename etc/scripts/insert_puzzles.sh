@@ -5,5 +5,5 @@ APP=/var/www/ctfscore
 
 # insert ctf puzzles
 cd $APP
-php oil r ctfscore:insert_puzzles ./fuel/app/ctfadmin/batch/puzzles.php
+php oil r ctfscore:insert_puzzles ./ctfadmin/batch/puzzles.php
 
