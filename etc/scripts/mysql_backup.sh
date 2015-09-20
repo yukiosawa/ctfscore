@@ -1,7 +1,7 @@
 #!/bin/bash
 
-MYSQL_ADMIN_USER=admin
-MYSQL_ADMIN_PASSWD=mypasswd
+MYSQL_ADMIN_USER=ChangeHereOnYourEnv
+MYSQL_ADMIN_PASSWD=ChangeHereOnYourEnv
 HOST=localhost
 
 # dump without lock (lock only for taking snapshot)

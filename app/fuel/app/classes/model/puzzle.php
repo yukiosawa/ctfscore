@@ -227,6 +227,7 @@ class Model_Puzzle extends Model
             {
                 // dir直下のファイルすべて
                 $files = File::read_dir($dir, 1, array(
+		    '!^\.', // 隠しファイルは除く
                     '!.*' => 'dir', // ディレクトリは除く
                 ));
                 if (count($files) > 0)
@@ -313,6 +314,7 @@ class Model_Puzzle extends Model
         {
             // dir直下のファイルすべて
             $files = File::read_dir($dir, 1, array(
+		'!^\.', // 隠しファイルは除く
                 '!.*' => 'dir', // ディレクトリは除く
             ));
             if (count($files) > 0)

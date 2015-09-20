@@ -8,6 +8,8 @@ apache, mysql and php
 $ sudo apt-get install -y apache2 mysql-server php5 php5-mysql
 
 ### FuelPHP
+GitHub APIのtokenを求められるかも -> GitHubのアカウントが必要
+
 (方法1)
 $ curl get.fuelphp.com/oil | sh
 $ cd /var/www
@@ -20,7 +22,6 @@ $ sudo git clone --recursive git://github.com/fuel/fuel.git ctfscore
 $ cd ctfscore
 $ php composer.phar self-update
 $ php composer.phar update
-GitHub APIのtokenを求められるかも -> GitHubのアカウントが必要
 $ php oil refine install
 
 ### apache Document Root
@@ -52,6 +53,8 @@ $ sudo /var/www/ctfscore/composer.phar install
 
 ### アプリケーションの配置と初期化
 $ sudo cp -r app/* /var/www/ctfscore/.
+mysqlユーザパスワードを設定しておく！
+$ vi etc/scripts/setup_mysql.sh
 $ sudo etc/scripts/setup_mysql.sh
 $ 
 $ etc/scripts/init_db.sh
