@@ -18,7 +18,8 @@ $puzzles = array(
 	// 問題タイトル[必須]
 	'title' => '問題1',
 	// 問題本文[任意]
-	'content' => 'フラグは flag1 です。',
+	//'content' => '本文1',
+	'content' => File::read(DOCROOT.'/ctfadmin/batch/p1.html', true),
 	// flag[必須] (複数可)
 	'flag' => array(
 	    'flag1',
@@ -38,7 +39,8 @@ $puzzles = array(
 	'bonus_point' => 1,
 	'category' => 'カテゴリ1',
 	'title' => '問題2',
-	'content' => 'フラグは flag2 です。',
+	//'content' => '本文2',
+	'content' => File::read(DOCROOT.'/ctfadmin/batch/p2.html', true),
 	'flag' => array(
 	    'flag2',
 	),
@@ -54,7 +56,8 @@ $puzzles = array(
 	'bonus_point' => 1,
 	'category' => 'カテゴリ2',
 	'title' => '問題3',
-	'content' => 'フラグは flag3 です。',
+	//'content' => '本文3',
+	'content' => File::read(DOCROOT.'/ctfadmin/batch/p3.html', true),
 	'flag' => array(
 	    'flag3',
 	),
@@ -70,7 +73,8 @@ $puzzles = array(
 	'bonus_point' => 1,
 	'category' => 'カテゴリ2',
 	'title' => '問題4',
-	'content' => 'フラグは flag4 です。',
+	//'content' => '本文4',
+	'content' => File::read(DOCROOT.'/ctfadmin/batch/p4.html', true),
 	'flag' => array(
 	    'flag4',
 	),
@@ -86,7 +90,8 @@ $puzzles = array(
 	'bonus_point' => 1,
 	'category' => 'カテゴリ3',
 	'title' => '問題5',
-	'content' => 'フラグは flag5 です。',
+	//'content' => '本文5',
+	'content' => File::read(DOCROOT.'/ctfadmin/batch/p5.html', true),
 	'flag' => array(
 	    'flag5',
 	),
@@ -102,7 +107,8 @@ $puzzles = array(
 	'bonus_point' => 1,
 	'category' => 'カテゴリ3',
 	'title' => '問題6',
-	'content' => 'フラグは flag6 です。',
+	//'content' => '本文6',
+	'content' => File::read(DOCROOT.'/ctfadmin/batch/p6.html', true),
 	'flag' => array(
 	    'flag6',
 	),

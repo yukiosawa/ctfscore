@@ -65,8 +65,8 @@ foreach ($puzzles as $puzzle) {
 
     echo "<div class='modal-body'>";
     // 本文, 添付ファイル
-    //echo "<p>".$puzzle['content']."</p>";
-    echo "<p>".nl2br($puzzle['content'])."</p>";
+    echo "<p>".$puzzle['content']."</p>";
+    //echo "<p>".n2br($puzzle['content'])."</p>";
     foreach ($puzzle['attachments'] as $filename => $val)
     {
 	// ダウンロードページへのリンク

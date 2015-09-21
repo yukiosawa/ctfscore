@@ -2,11 +2,11 @@
 
 # root password
 MYSQL_ROOT_USER=root
-MYSQL_ROOT_PASSWD=ChangeHereOnYourEnv
+MYSQL_ROOT_PASSWD=ChangeMyPassword
 
 # administrator
-MYSQL_ADMIN_USER=ChangeHereOnYourEnv
-MYSQL_ADMIN_PASSWD=ChangeHereOnYourEnv
+MYSQL_ADMIN_USER=ChangeMyName
+MYSQL_ADMIN_PASSWD=ChangeMyPassword
 
 # app installed
 APP=/var/www/ctfscore

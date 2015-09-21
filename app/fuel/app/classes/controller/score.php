@@ -198,9 +198,13 @@ class Controller_Score extends Controller_Template
 	Controller_Auth::redirectIfNotAuth();
 
 	// 問題一覧
-	$data['puzzles'] = Model_Puzzle::get_puzzles_addinfo();
+	// puzzleの内容はhtmlで書くのでエスケープせずにviewへ渡す
+	//$data['puzzles'] = Model_Puzzle::get_puzzles_addinfo();
+	$puzzles = Model_Puzzle::get_puzzles_addinfo();
 	$this->template->title = '問題一覧';
-	$this->template->content = View::forge('score/puzzle', $data);
+	//$this->template->content = View::forge('score/puzzle', $data);
+	$this->template->content = View::forge('score/puzzle');
+	$this->template->content->set_safe('puzzles', $puzzles);
 	$this->template->footer = '';
     }
 
