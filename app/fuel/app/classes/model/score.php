@@ -607,7 +607,7 @@ class Model_Score extends Model
 	    DB::start_transaction();
 	    DB::update('gained_levels')->set(array(
 		'is_current' => false,
-	    ))->where('category', $category)
+	    ))->where('uid', $uid)->where('category', $category)
 	      ->where('is_current', true)->execute();
 	    DB::insert('gained_levels')->set(array(
 		'uid' => $uid,

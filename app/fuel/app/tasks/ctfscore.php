@@ -707,73 +707,89 @@ class Ctfscore
 	}
     }
     
-
-    /* Insert puzzles from the php file specified by argument. */
-    public function insert_puzzles($puzzlelist = NULL)
+    
+    /* Update puzzles from the php file specified by argument. */
+    public function update_puzzles($puzzlelist = NULL)
     {
         if ($puzzlelist == NULL){
-            echo "Usage: php oil r ctfscore:insert_puzzles file\n";
+            echo "Usage: php oil r ctfscore:update_puzzles file\n";
             return;
         }
 	require $puzzlelist;
 	foreach ($puzzles as $puzzle) {
-	    $this->insert_puzzle($puzzle);
+	    $this->update_puzzle($puzzle);
 	}
     }
 
 
-    /* Insert the puzzle specified by arguments. */
-    public function insert_puzzle($puzzle = NULL)
+    /* Update the puzzle specified by arguments. */
+    public function update_puzzle($puzzle = NULL)
     {
-        if ($puzzle == NULL){
-            echo "Usage: php oil r ctfscore:insert_puzzle puzzle_id flag point\n";
-            return;
-        }
+	$puzzle_id = $puzzle['puzzle_id'];
 	try
 	{
 	    \DB::start_transaction();
-	    
-	    \DB::insert('puzzles')->set(array(
-		'puzzle_id' => $puzzle['puzzle_id'],
-		'point' => $puzzle['point'],
-		'bonus_point' => $puzzle['bonus_point'],
-		'category' => $puzzle['category'],
-		'title' => $puzzle['title'],
-		'content' => $puzzle['content'],
+
+	    // 既に登録があれば更新、なければ新規
+	    $q1 = '';
+	    if (count(\DB::select()->from('puzzles')->where('puzzle_id', $puzzle_id)->execute()) > 0)
+	    {
+		$q1 = \DB::update('puzzles');
+		$q1->where('puzzle_id', $puzzle_id);
+	    }
+	    else
+	    {
+		$q1 = \DB::insert('puzzles');
+	    }
+	    $q1->set(array(
+		    'puzzle_id' => $puzzle_id,
+		    'point' => $puzzle['point'],
+		    'bonus_point' => $puzzle['bonus_point'],
+		    'category' => $puzzle['category'],
+		    'title' => $puzzle['title'],
+		    'content' => $puzzle['content'],
 	    ))->execute();
 	    
 	    // flagは複数可能
+	    // 既に登録済のデータは全削除したあと、新規登録
+	    \DB::delete('flags')->where('puzzle_id', $puzzle_id)->execute();
 	    foreach ($puzzle['flag'] as $flag)
 	    {
 		\DB::insert('flags')->set(array(
-		    'puzzle_id' => $puzzle['puzzle_id'],
+		    'puzzle_id' => $puzzle_id,
 		    'flag' => $flag,
 		))->execute();
 	    }
 	    
 	    // 添付ファイルは複数可能
+	    // 既に登録済のデータは全削除したあと、新規登録
+	    \DB::delete('attachment')->where('puzzle_id', $puzzle_id)->execute();
 	    foreach ($puzzle['attachment'] as $attach)
 	    {
 		\DB::insert('attachment')->set(array(
-		    'puzzle_id' => $puzzle['puzzle_id'],
+		    'puzzle_id' => $puzzle_id,
 		    'filename' => $attach,
 		))->execute();
 	    }
 	    
 	    // 正解時に表示する画像ファイル
+	    // 既に登録済のデータは全削除したあと、新規登録
+	    \DB::delete('success_image')->where('puzzle_id', $puzzle_id)->execute();
 	    if ($puzzle['success_image'])
 	    {
 		\DB::insert('success_image')->set(array(
-		    'puzzle_id' => $puzzle['puzzle_id'],
+		    'puzzle_id' => $puzzle_id,
 		    'filename' => $puzzle['success_image'],
 		))->execute();
 	    }
 	    
 	    // 正解時に表示するテキストメッセージ
+	    // 既に登録済のデータは全削除したあと、新規登録
+	    \DB::delete('success_text')->where('puzzle_id', $puzzle_id)->execute();
 	    if ($puzzle['success_text'])
 	    {
 		\DB::insert('success_text')->set(array(
-		    'puzzle_id' => $puzzle['puzzle_id'],
+		    'puzzle_id' => $puzzle_id,
 		    'text' => $puzzle['success_text'],
 		))->execute();
 	    }
@@ -785,10 +801,10 @@ class Ctfscore
             throw $e;
 	}
 
-        echo "Puzzle inserted: ".$puzzle['puzzle_id'].":".$puzzle['point'].":".$puzzle['bonus_point'].":".$puzzle['category'].":".$puzzle['title'].":".$puzzle['content']."\n";
+        echo "Puzzle updated: ".$puzzle_id.":".$puzzle['point'].":".$puzzle['bonus_point'].":".$puzzle['category'].":".$puzzle['title'].":".$puzzle['content']."\n";
     }
-    
-    
+
+
     /* Insert users from the php file specified by argument. */
     public function insert_users($userlist = NULL)
     {
@@ -864,30 +880,68 @@ class Ctfscore
     }
 
     
-    /* Insert levels from the php file specified by argument. */
-    public function insert_levels($levellist = NULL)
+    /* Update levels from the php file specified by argument. */
+    public function update_levels($levellist = NULL)
     {
         if ($levellist == NULL){
-            echo "Usage: php oil r ctfscore:insert_levels file\n";
+            echo "Usage: php oil r ctfscore:update_levels file\n";
             return;
         }
         require $levellist;
         foreach ($levels as $level){
-            $this->insert_level($level);
+            $this->update_level($level);
 	}
     }
 
 
-    /* Insert the level specified by arguments */
-    public function insert_level($level = NULL)
+    /* Update the level specified by arguments */
+    public function update_level($level = NULL)
     {
-	\DB::insert('levels')->set(array(
-	    'category' => $level['category'],
-	    'level' => $level['level'],
+	// 既に登録があれば更新、なければ新規
+	$c = $level['category'];
+	$l = $level['level'];
+	$query = '';
+	if (count(\DB::select()->from('levels')->where('category', $c)->where('level', $l)->execute()) > 0)
+	{
+	    $query = \DB::update('levels');
+	    $query->where('category', $c)->where('level', $l);
+	}
+	else
+	{
+	    $query = \DB::insert('levels');
+	}
+	$query->set(array(
+	    'category' => $c,
+	    'level' => $l,
 	    'name' => $level['name'],
 	    'criteria' => $level['criteria'],
 	))->execute();
-	echo "Level inserted: ".$level['category'].":".$level['level'].":".$level['name'].":".$level['criteria']."\n";
+
+	echo "Level updated: ".$c.":".$l.":".$level['name'].":".$level['criteria']."\n";
+    }
+    
+    
+    /* Refresh gained levels based on the levels table */
+    public function refresh_gained_levels()
+    {
+	// 全ての獲得済レベルをクリアする
+	\DB::update('gained_levels')->value('is_current', false)
+				    ->where('is_current', true)
+				    ->execute();
+	// ユーザごとにレベルを再計算
+	$users = \DB::select()->from('users')->execute()->as_array();
+	foreach ($users as $user)
+	{
+	    $uid = $user['id'];
+	    $username = $user['username'];
+	    $updated_levels = \Model_Score::set_level_gained($uid);
+	    echo "Level refreshed: ".$username;
+	    foreach ($updated_levels as $category => $name)
+	    {
+		echo ":".$category."=>".$name;
+	    }
+	    echo "\n";
+	}
     }
 
 }
