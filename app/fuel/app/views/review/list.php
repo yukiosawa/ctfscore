@@ -1,5 +1,25 @@
 <?php echo Asset::js('jquery.raty.js'); ?>
 <?php echo Asset::js('ctfscore-raty.js'); ?>
+<?php echo Asset::js('jquery.tablesorter.min.js'); ?>
+
+<script>
+ $(function(){
+     $('#review-table').tablesorter({
+	 headers: {
+	     // コメント列(3,7列目)とボタン列(6列目)はソート対象外とする
+	     2: {
+		 sorter: false
+	     },
+	     5: {
+		 sorter: false
+	     },
+	     6: {
+		 sorter: false
+	     }
+	 }
+     });
+ });
+</script>
 
 <?php $is_admin_url = Controller_Auth::is_admin_url(); ?>
 
@@ -24,11 +44,11 @@
 
 
 <div class="row">
-<table class="table table-hover">
+<table id="review-table" class="table table-hover tablesorter">
   <thead>
     <tr>
       <?php if($is_admin_url): ?>
-      <th class="col-md-2">問題タイトル</th><th class="col-md-2">評価</th><th class="col-md-3">公開コメント</th><th class="col-md-3">管理者へのメッセージ</th><th class="col-md-1">評価者</th><th class="col-md-1">更新日時</th><th class="col-md-1"></th>
+      <th class="col-md-2">問題タイトル</th><th class="col-md-2">評価</th><th class="col-md-3">公開コメント</th><th class="col-md-1">評価者</th><th class="col-md-1">更新日時</th><th class="col-md-1"></th><th class="col-md-3">管理者へのメッセージ</th>
       <?php else: ?>
       <th class="col-md-2">問題タイトル</th><th class="col-md-2">評価</th><th class="col-md-5">公開コメント</th><th class="col-md-1">評価者</th><th class="col-md-1">更新日時</th><th class="col-md-1"></th>
       <?php endif; ?>
@@ -38,11 +58,8 @@
     <?php foreach ($reviews as $item): ?>
     <tr>
       <td><?php echo $item['puzzle_id'].': '.$item['puzzle_title']; ?></td>
-      <td><div class="review" data-number="<?php echo \Config::get('ctfscore.review.max_data_number');?>" data-score="<?php echo $item['score']; ?>"><div></td>
+      <td><div class="review" data-number="<?php echo \Config::get('ctfscore.review.max_data_number');?>" data-score="<?php echo $item['score']; ?>"><span style="display:none"><?php echo $item['score']; ?></span></div></td>
       <td><?php echo nl2br($item['comment']); ?></td>
-      <?php if($is_admin_url): ?>
-	<td><?php echo nl2br($item['secret_comment']); ?></td>
-      <?php endif; ?>
       <td><?php echo $item['username']; ?></td>
       <td><?php echo $item['updated_at']; ?></td>
       <td>
@@ -61,6 +78,9 @@
 	  <!-- <a href="<?php echo $del_path; ?>" class="btn btn-primary" onclick="return confirm('削除しますか？')">削除</a> -->
 	<?php endif; ?>
       </td>
+      <?php if($is_admin_url): ?>
+	<td><?php echo nl2br($item['secret_comment']); ?></td>
+      <?php endif; ?>
     </tr>
     <?php endforeach; ?>
   </tbody>

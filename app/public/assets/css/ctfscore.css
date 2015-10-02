@@ -10,3 +10,24 @@ body {
     word-wrap: break-word;
 }
 
+
+table.tablesorter thead tr .header {
+    background-image: url(../js/images/tablesorter/bg.gif);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+
+table.tablesorter .headerSortUp {
+    background-image: url(../js/images/tablesorter/asc.gif);
+    background-repeat: no-repeat;
+}
+table.tablesorter .headerSortDown {
+    background-image: url(../js/images/tablesorter/desc.gif);
+    background-repeat: no-repeat;
+}
+
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+    background-color: #8dbdd8;
+}
+

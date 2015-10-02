@@ -13,6 +13,17 @@
   <p class='alert alert-info h4'><?php echo nl2br($text); ?></p>
 <?php endif; ?>
 
+<!-- レベルアップメッセージ -->
+<?php if (!empty($levels)): ?>
+  <p class='alert alert-success h4'>
+    <?php
+    foreach ($levels as $level) {
+	echo '<b>'.$level.'</b>にレベルアップしました！　';
+    }
+    ?>
+  </p>
+<?php endif; ?>
+
 <div class="row">
   <div class="col-md-5">
     <?php

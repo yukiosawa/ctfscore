@@ -6,19 +6,30 @@
 <div id="errmsg"></div>
 
 <div class="row">
-  <div class="col-md-4">
+  <div class="col-md-7">
     <div class="h3">
       <span id="my_username"><?php echo $profile['username'] ?></span>
-      <span>さん</span>
     </div>
+    <?php if (!empty($profile['levels'])): ?>
+      <div>
+	またの名を
+	<span class="h3">
+	  <?php
+	  foreach ($profile['levels'] as $level) {
+	      echo "　".$level;
+	  }
+	  ?>
+	</span>
+      </div>
+    <?php endif; ?>
   </div>
-  <div class="col-md-6">
-    <div class="col-md-8">
-      <input id="username" type='text' class="form-control col-md-8" placeholder="比較したいユーザ名を入力"></input>
+  <div class="col-md-5">
+    <div class="col-md-6">
+      <input id="username" type='text' class="form-control col-md-8" placeholder="比較したいユーザ"></input>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
     <button onclick="update_chart();" class="btn btn-primary">比較</button>
-    <button onclick="$('#username').val(''); location.reload();" class="btn btn-primary">消去</button>
+    <button onclick="$('#username').val(''); location.reload();" class="btn btn-primary">リセット</button>
     </div>
   </div>
 </div>

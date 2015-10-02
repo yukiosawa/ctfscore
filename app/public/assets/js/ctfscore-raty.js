@@ -1,5 +1,5 @@
 $(function(){
-    $.fn.raty.defaults.path = "/assets/js/images";
+    $.fn.raty.defaults.path = "/assets/js/images/raty";
     $.fn.raty.defaults.hints = null;
     
     $(".review").raty({

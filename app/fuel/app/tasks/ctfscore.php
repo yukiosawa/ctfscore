@@ -46,6 +46,8 @@ class Ctfscore
     public function init_all_tables()
     {
 	/* delete all tables */
+	$this->delete_gained_levels_table();
+	$this->delete_levels_table();
 	$this->delete_reviews_table();
 	$this->delete_gained_table();
         $this->delete_history_table();
@@ -71,6 +73,8 @@ class Ctfscore
 	$this->create_gained_table();
         $this->create_history_table();
 	$this->create_reviews_table();
+	$this->create_levels_table();
+	$this->create_gained_levels_table();
     }
 
 
@@ -430,8 +434,11 @@ class Ctfscore
 	    array(
 		'uid' => array('type' => 'int'),
 		'puzzle_id' => array('type' => 'int'),
-		'gained_at' => array('type' => 'datetime'),
+		'point' => array('type' => 'int'),
+		'bonus_point' => array('type' => 'int'),
+		'category' => array('type' => 'varchar', 'constraint' => 255),
 		'totalpoint' => array('type' => 'int'),
+		'gained_at' => array('type' => 'datetime'),
 	    ),
 	    /* primary_keys */
 	    array('uid', 'puzzle_id'),
@@ -457,6 +464,91 @@ class Ctfscore
     public function delete_gained_table()
     {
         $table = 'gained';
+	\DBUtil::drop_table($table);
+	echo "Table deleted: ".$table."\n";
+    }
+
+
+    public function create_gained_levels_table()
+    {
+	$table = 'gained_levels';
+
+	// only do this if it doesn't exist yet
+	if (\DBUtil::table_exists($table))
+	{
+	    return;
+	}
+
+        \DBUtil::create_table(
+	    $table,
+	    /* fields */
+	    array(
+		'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
+		'uid' => array('type' => 'int'),
+		'category' => array('type' => 'varchar', 'constraint' => 255),
+		'level' => array('type' => 'int'),
+		'gained_at' => array('type' => 'datetime'),
+		'is_current' => array('type' => 'int'),
+	    ),
+	    /* primary_keys */
+	    array('id'),
+	    true, false, NULL,
+	    /* foreign_keys */
+	    array(
+		array(
+		    'key' => 'uid',
+		    'reference' => array(
+			'table' => 'users',
+			'column' => 'id',
+		    ),
+		    'on_update' => 'CASCADE',
+		    'on_delete' => 'CASCADE',
+		),
+	    )
+	);
+
+	echo "Table created: ".$table."\n";
+    }
+
+    
+    public function delete_gained_levels_table()
+    {
+        $table = 'gained_levels';
+	\DBUtil::drop_table($table);
+	echo "Table deleted: ".$table."\n";
+    }
+
+
+    public function create_levels_table()
+    {
+	$table = 'levels';
+
+	// only do this if it doesn't exist yet
+	if (\DBUtil::table_exists($table))
+	{
+	    return;
+	}
+
+        \DBUtil::create_table(
+	    $table,
+	    /* fields */
+	    array(
+		'category' => array('type' => 'varchar', 'constraint' => 255),
+		'level' => array('type' => 'int'),
+		'name' => array('type' => 'varchar', 'constraint' => 50),
+		'criteria' => array('type' => 'int'),
+	    ),
+	    /* primary_keys */
+	    array('category', 'level')
+	);
+
+	echo "Table created: ".$table."\n";
+    }
+
+
+    public function delete_levels_table()
+    {
+        $table = 'levels';
 	\DBUtil::drop_table($table);
 	echo "Table deleted: ".$table."\n";
     }
@@ -504,6 +596,7 @@ class Ctfscore
             array(
                 'uid' => array('type' => 'int', 'constraint' => 11),
                 'posted_at' => array('type' => 'datetime'),
+		'posted_answer' => array('type' => 'varchar', 'constraint' => 255),
 		'result' => array('type' => 'varchar', 'constraint' => 10)
             ),
             /* primary_keys */
@@ -769,5 +862,33 @@ class Ctfscore
 	))->execute();
 	echo "Random text inserted: ".$table.":".$text."\n";
     }
+
+    
+    /* Insert levels from the php file specified by argument. */
+    public function insert_levels($levellist = NULL)
+    {
+        if ($levellist == NULL){
+            echo "Usage: php oil r ctfscore:insert_levels file\n";
+            return;
+        }
+        require $levellist;
+        foreach ($levels as $level){
+            $this->insert_level($level);
+	}
+    }
+
+
+    /* Insert the level specified by arguments */
+    public function insert_level($level = NULL)
+    {
+	\DB::insert('levels')->set(array(
+	    'category' => $level['category'],
+	    'level' => $level['level'],
+	    'name' => $level['name'],
+	    'criteria' => $level['criteria'],
+	))->execute();
+	echo "Level inserted: ".$level['category'].":".$level['level'].":".$level['name'].":".$level['criteria']."\n";
+    }
+
 }
 /* End of file tasks/ctfscore.php */

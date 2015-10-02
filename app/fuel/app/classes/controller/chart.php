@@ -19,7 +19,7 @@ class Controller_Chart extends Controller_Rest
         // 認証済みユーザのみ許可
         Controller_Auth::redirectIfNotAuth();
 
-	$chart_data = Model_Score::get_profile_chart($username);
+	$chart_data = Model_Score::get_profile_answered_category($username);
 	return $this->response($chart_data);
     }
 }

@@ -69,8 +69,8 @@ class Controller_Score extends Controller_Template
 	// 自分のユーザ名
 	$data['my_name'] = Auth::get_screen_name();
 
-	// puzzle一覧
-	$data['all_puzzles'] = Model_Puzzle::get_puzzles();
+	// カテゴリ一覧
+	$data['categories'] = Model_Puzzle::get_categories();
 
 	// 全ユーザの回答状況一覧
 	$data['scoreboard'] = Model_Score::get_scoreboard();
@@ -101,26 +101,31 @@ class Controller_Score extends Controller_Template
 	$answer = '';
 	$result = '';
 	$puzzle_id = '';
-	$point = '';
 	$error_msg = '';
 	$image_dir = '';
 	$image_name = '';
 	$text = '';
+	$levels = '';
 
 	// ユーザID
 	list($driver, $userid) = Auth::get_user_id();
 	$username = Auth::get_screen_name();
 
+	$answer = Input::post('answer');
+	
 	// 回数制限のチェック
 	if (Model_Score::is_over_attempt_limit($userid))
 	{
 	    $result = 'error';
-	    $error_msg = '連続回数制限に達しました。時間を空けてやり直してください。';
+	    $interval_seconds = Config::get('ctfscore.history.attempt_interval_seconds');
+	    $error_msg = '連続回数制限。'.$interval_seconds.'秒後にリトライしてください。';
+
+	    // 管理画面へ通知
+	    
 	}
 	elseif ($val->run())
 	{
 	    // POSTされた回答が正解かチェック
-	    $answer = $val->validated('answer');
 	    $puzzle_id = Model_Puzzle::get_puzzle_id($answer);
 	    if (!isset($puzzle_id))
 	    {
@@ -129,7 +134,7 @@ class Controller_Score extends Controller_Template
 
 		// 管理画面へ通知
 		$mgmt_msg = 'failed.';
-		Model_Score::emitToMgmtConsole('fail', $mgmt_msg);
+		Model_Score::emitToMgmtConsole('failure', $mgmt_msg);
 
 		// 表示するメッセージ(画像、テキスト)
 		$msg = Model_Puzzle::get_failure_messages();
@@ -150,21 +155,45 @@ class Controller_Score extends Controller_Template
 		{
 		    // 正解
 		    $result = 'success';
-		    $puzzle = Model_Puzzle::get_puzzles($puzzle_id)[0];
-		    $point = $puzzle['point'];
 
 		    // 獲得ポイントを更新
 		    Model_Puzzle::set_puzzle_gained($userid, $puzzle_id);
 
-		    // 管理画面へ通知
-		    $mgmt_msg = $username.' solved the puzzle '.$puzzle_id.'.';
-		    Model_Score::emitToMgmtConsole('success', $mgmt_msg);
+		    // 獲得レベルを更新
+		    $levels = Model_Score::set_level_gained($userid);
 
 		    // 表示するメッセージ(画像、テキスト)
 		    $msg = Model_Puzzle::get_success_messages($puzzle_id);
 		    // 取得できない場合はデフォルト値をセット
                     $text = (!empty($msg['text'])) ? $msg['text'] : '正解';
                     $image_name = $msg['image_name'];
+
+		    // 獲得レベルを更新
+		    if ($levels)
+		    {
+			// レベルアップ
+			// 管理画面へ通知
+			$level_string = '';
+			foreach ($levels as $level)
+			{
+			    $level_string = $level_string.' '.$level.' ';
+			}
+			$mgmt_msg = $username.' は'.$level_string.'にレベルアップしました！';
+			$image_url = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
+			$data = array('msg' => $mgmt_msg,
+				      'img_url' => $image_url);
+			Model_Score::emitToMgmtConsole('levelup', $data);
+		    }
+		    else
+		    {
+			// レベルそのまま
+			// 管理画面へ通知
+			$mgmt_msg = $username.' は puzzle#'.$puzzle_id.' を解きました！';
+			$image_url = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
+			$data = array('msg' => $mgmt_msg,
+				      'img_url' => $image_url);
+			Model_Score::emitToMgmtConsole('success', $data);
+		    }
 		}
 	    }
 	}
@@ -175,14 +204,13 @@ class Controller_Score extends Controller_Template
 	}
 
 	// 試行履歴を記録する
-        Model_Score::set_attempt_history($userid, $result);
+        Model_Score::set_attempt_history($userid, $answer, $result);
 
-	$data['answer'] = $answer;
 	$data['result'] = $result;
 	$data['puzzle_id'] = $puzzle_id;
-	$data['point'] = $point;
 	$data['image_name'] = $image_name;
 	$data['text'] = $text;
+	$data['levels'] = $levels;
 	$this->template->title = '回答結果';
 	$this->template->content = View::forge('score/submit', $data);
 	$this->template->content->set_safe('errmsg', $error_msg);

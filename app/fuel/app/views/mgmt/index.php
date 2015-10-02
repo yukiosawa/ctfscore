@@ -52,23 +52,30 @@
 	 console.log(data);
 	 playAudio('audio-success');
 	 showOverlay(data);
-	 addMessage('messageArea', 'success', data);
+	 addMessage('messageArea', 'success', data.msg);
      });
 
-     socket.on('fail', function (data) {
+     socket.on('levelup', function (data) {
 	 console.log(data);
-	 playAudio('audio-fail');
+	 playAudio('audio-levelup');
+	 showOverlay(data);
+	 addMessage('messageArea', 'levelup', data.msg);
+     });
+
+     socket.on('failure', function (data) {
+	 console.log(data);
+	 playAudio('audio-failure');
 	 //addMessage('messageArea', 'fail', data);
      });
 
-     function addMessage(targetName, className, data){
+     function addMessage(targetName, className, msg){
 	 var div = $('<div>');
 	 var span1 = $('<span>');
 	 var span2 = $('<span>');
 	 span1.attr('class', 'datetime');
 	 span1.text(new Date().toTimeString() + ': ');
 	 span2.attr('class', className);
-	 span2.text(data);
+	 span2.text(msg);
 	 div.append(span1).append(span2);
 	 $('#' + targetName).prepend(div);
 	 messageTextillate();
@@ -94,11 +101,18 @@
      function showOverlay(data){
 	 clearTimeout(overlayTimer);
 	 $('#overlayText').remove();
-	 var div = $('<div>').attr('id', 'overlayText').text(data);;
+	 $('#overlayImg').remove();
+	 var div = $('<div>').attr('id', 'overlayText').text(data.msg);
+	 var img = $('<img>').attr({
+	     id: 'overlayImg',
+	     src: data.img_url,
+	 });
+	 img.addClass('img-responsive');
 	 $('#overlay').append(div);
+	 $('#overlay').append(img);
 	 $('#overlay').fadeIn();
 	 $('#overlayText').textillate();
-	 overlayTimer = setTimeout('closeOverlay()', 5000);
+	 overlayTimer = setTimeout('closeOverlay()', 10000);
      }
      
      function closeOverlay(){
@@ -135,14 +149,17 @@
     </p>
 
     <?php
-    Config::load('ctfscore', true);
     if (Config::get('ctfscore.sound.is_active_on_success')){
 	$file = Config::get('ctfscore.sound.success_file');
 	echo Html::audio($file, 'id=audio-success');
     }
-    if (Config::get('ctfscore.sound.is_active_on_fail')){
-	$file = Config::get('ctfscore.sound.fail_file');
-	echo Html::audio($file, 'id=audio-fail');
+    if (Config::get('ctfscore.sound.is_active_on_failure')){
+	$file = Config::get('ctfscore.sound.failure_file');
+	echo Html::audio($file, 'id=audio-failure');
+    }
+    if (Config::get('ctfscore.sound.is_active_on_levelup')){
+	$file = Config::get('ctfscore.sound.levelup_file');
+	echo Html::audio($file, 'id=audio-levelup');
     }
     ?>
 

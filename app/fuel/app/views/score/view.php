@@ -1,3 +1,11 @@
+<?php echo Asset::js('jquery.tablesorter.min.js'); ?>
+
+<script>
+ $(function(){
+     $('#ranking-table').tablesorter();
+ });
+</script>
+
 <?php if (!($my_name == '' || $my_name == 'guest')): ?>
 
 <div class="row">
@@ -25,10 +33,16 @@
 <div id="ranking">
   <div class="row">
     <div class="col-md-12">
-    <table class="table table-condensed table-hover">
+      <table id="ranking-table" class="table table-condensed table-hover tablesorter">
       <thead>
-	<tr class="success">
-	  <th>ランク</th><th>ユーザ</th><th>ポイント</th><th>更新時刻</th>
+	<tr>
+	  <th>ランク</th><th>ユーザ</th><th>総スコア</th>
+	  <?php
+	  foreach ($categories as $category) {
+	      echo '<th>'.$category.'</th>';
+	  }
+	  ?>
+	  <th>更新時刻</th>
 	</tr>
       </thead>
       <tbody>
@@ -37,13 +51,16 @@
 	foreach ($scoreboard as $score) {
 	    /* 自分の行を強調表示 */
 	    if ($my_name == $score['username']) {
-		echo "<tr class='danger'>";
+		echo "<tr class='success'>";
 	    } else {
 		echo "<tr>";
 	    }
 	    echo "<td>" . $rank . "</td>";
 	    echo "<td><a href=/score/profile/" . $score['username'] . ">" . $score['username'] . "</a></td>";
 	    echo "<td>" . $score['totalpoint'] . "</td>";
+	    foreach ($categories as $category) {
+		echo "<td>".$score[$category]."</td>";
+	    }
 	    echo "<td>" . $score['pointupdated_at'] . "</td>";
 	    echo "</tr>\n";
 	    $rank++;

@@ -80,7 +80,29 @@ class Model_Puzzle extends Model
 
         return $puzzles;
     }
-    
+
+
+    // カテゴリ一覧を取得
+    public static function get_categories()
+    {
+	$query = DB::select('category')->from('puzzles')
+				       ->group_by('category');
+	$query->order_by('category', 'asc');
+	$result = $query->execute()->as_array('category');
+	return array_keys($result);
+    }
+
+
+    // カテゴリごとの獲得スコアを取得
+    public static function get_category_point($uid = NULL)
+    {
+	$query = DB::select(
+	    'category', DB::expr('SUM(point) + SUM(bonus_point) as point')
+	)->from('gained')->where('uid', $uid)->group_by('category');
+	$result = $query->execute()->as_array('category');
+	return $result;
+    }
+
     
     public static function is_answered_puzzle($uid = NULL, $puzzle_id = NULL)
     {
@@ -110,23 +132,24 @@ class Model_Puzzle extends Model
 			->from('users')->where('id', $uid)
 			->execute()->as_array()[0]['totalpoint'];
 	// 更新後の総ポイント
-	$puzzle = Model_Puzzle::get_puzzles($puzzle_id);
+	$puzzle = Model_Puzzle::get_puzzles($puzzle_id)[0];
+	$bonus_point = 0;
 	if (Model_Score::is_first_winner($puzzle_id))
 	{
 	    // 最初の正解者はボーナスポイント加点
-            $newpoint = $totalpoint + $puzzle[0]['point'] + $puzzle[0]['bonus_point'];
+            $bonus_point = $puzzle['bonus_point'];
 	}
-	else
-	{
-            $newpoint = $totalpoint + $puzzle[0]['point'];
-	}
-        try {
+        $newpoint = $totalpoint + $puzzle['point'] + $bonus_point;
+	try {
           DB::start_transaction();
           DB::insert('gained')->set(array(
 		'uid' => $uid,
 		'puzzle_id' => $puzzle_id,
-		'gained_at' => $now,
-		'totalpoint' => $newpoint
+		'point' => $puzzle['point'],
+		'bonus_point' => $bonus_point,
+		'category' => $puzzle['category'],
+		'totalpoint' => $newpoint,
+		'gained_at' => $now
             ))->execute();
           DB::update('users')->set(array(
 		'totalpoint' => $newpoint,

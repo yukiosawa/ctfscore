@@ -25,9 +25,13 @@ return array(
 	// 問題正解時に鳴らす音源ファイル[DOCROOTからの相対パス]
 	'success_file' => '/audio/Doorbell-cheap-dingdong.ogg',
 	// trueの場合、問題不正解時で音を鳴らす
-	'is_active_on_fail' => true,
+	'is_active_on_failure' => true,
 	// 問題不正解時にならす音源ファイル[DOCROOTからの相対パス]
-	'fail_file' => '/audio/Buzzer.ogg',
+	'failure_file' => '/audio/Buzzer.ogg',
+	// trueの場合、レベルアップ時に音を鳴らす
+	'is_active_on_levelup' => true,
+	// レベルアップ時に鳴らす音源ファイル[DOCROOTからの相対パス]
+	'levelup_file' => '/audio/Mobile_phone_ring.ogg',
     ),
     'chart' => array(
 	// グラフ描画の対象とする最大人数(下にあるcolorsの数以下とすること)
@@ -55,10 +59,13 @@ return array(
 	    'silver',
 	    'lime',
 	),
-	// グラフをプロットする間隔(秒)
-	'plot_interval_seconds' => 3600,
-	// グラフをプロットする最大数
-	'plot_max_steps' => 10000,
+        // グラフをプロットする間隔(秒)
+        // 1 hour = 3600 sec
+        // 1 day  = 86400 sec
+        //'plot_interval_seconds' => 3600 * 3,
+        'plot_interval_seconds' => 86400,
+        // グラフをプロットする最大数
+        'plot_max_steps' => 10000,
     ),
     'history' => array(
 	// 試行回数を制限する間隔(秒)
@@ -79,6 +86,14 @@ return array(
     'rule' => array(
 	// 競技ルールを記載するファイル
 	'rule_file' => DOCROOT.'../ctfadmin/rule/rule.html',
+    ),
+    'level' => array(
+        // trueの場合、全体のレベルを有効にする
+	'is_active_total_level' => true,
+        // trueの場合、カテゴリごとのレベルを有効にする
+	'is_active_category_level' => true,
+        // 全体のダミーカテゴリ名（各カテゴリ名と重複しないこと)
+	'dummy_name_total' => '__total__',
     ),
 );
 
