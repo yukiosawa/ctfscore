@@ -63,6 +63,9 @@ class Controller_Review extends Controller_Template
 		    if($result)
 		    {
 			// 管理画面へ通知
+			$username = Auth::get_screen_name();
+			$mgmt_msg = $username.' はレビューを更新しました。';
+			Model_Score::emitToMgmtConsole('notice', $mgmt_msg);
 
 			// 成功画面へ転送
 			$data['review'] = Model_Review::get_reviews($id)[0];
@@ -170,7 +173,9 @@ class Controller_Review extends Controller_Template
 		if ($id)
 		{
 		    // 管理画面へ通知
-
+		    $username = Auth::get_screen_name();
+		    $mgmt_msg = $username.' はレビューを投稿しました。';
+		    Model_Score::emitToMgmtConsole('notice', $mgmt_msg);
 
 		    $data['review'] = Model_Review::get_reviews($id)[0];
 		    $data['msg'] = '作成しました。';

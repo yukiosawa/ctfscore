@@ -32,6 +32,10 @@ return array(
 	'is_active_on_levelup' => true,
 	// レベルアップ時に鳴らす音源ファイル[DOCROOTからの相対パス]
 	'levelup_file' => '/audio/Mobile_phone_ring.ogg',
+	// trueの場合、その他通知時に音を鳴らす
+	'is_active_on_notice' => true,
+	// その他通知時に鳴らす音源ファイル[DOCROOTからの相対パス]
+	'notice_file' => '/audio/D-Day_cricket.ogg',
     ),
     'chart' => array(
 	// グラフ描画の対象とする最大人数(下にあるcolorsの数以下とすること)

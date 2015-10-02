@@ -68,6 +68,12 @@
 	 //addMessage('messageArea', 'fail', data);
      });
 
+     socket.on('notice', function (data) {
+	 console.log(data);
+	 playAudio('audio-notice');
+	 addMessage('messageArea', 'notice', data);
+     });
+
      function addMessage(targetName, className, msg){
 	 var div = $('<div>');
 	 var span1 = $('<span>');
@@ -75,7 +81,8 @@
 	 span1.attr('class', 'datetime');
 	 span1.text(new Date().toTimeString() + ': ');
 	 span2.attr('class', className);
-	 span2.text(msg);
+	 //span2.text(msg);
+	 span2.text(msg + ' [' + className + ']');
 	 div.append(span1).append(span2);
 	 $('#' + targetName).prepend(div);
 	 messageTextillate();
@@ -160,6 +167,10 @@
     if (Config::get('ctfscore.sound.is_active_on_levelup')){
 	$file = Config::get('ctfscore.sound.levelup_file');
 	echo Html::audio($file, 'id=audio-levelup');
+    }
+    if (Config::get('ctfscore.sound.is_active_on_notice')){
+	$file = Config::get('ctfscore.sound.notice_file');
+	echo Html::audio($file, 'id=audio-notice');
     }
     ?>
 

@@ -41,7 +41,6 @@
   
   <body>
     <div class="container">
-
       <nav class="navbar navbar-inverse">
 	<ul class="nav navbar-nav">
 	  <li><a href="/score/view">スコア</a></li>
@@ -49,7 +48,6 @@
 	  <li><a href="/review/list">レビュー</a></li>
 	  <?php if ($ctf_time): ?>
 	    <li><a href="/score/chart">グラフ</a></li>
-	    <li><a href="/score/status">実施状況</a></li>
 	  <?php endif; ?>
 	  <li><a href="/score/rule">ルール</a></li>
 	</ul>
@@ -62,6 +60,7 @@
 	      <ul class="dropdown-menu">
 		<li><a href="/admin/review/list">レビュー(管理者モード)</a></li>
 		<li><a href="/mgmt/" target="_blank">管理コンソール</a></li>
+		<li><a href="/score/status">実施状況</a></li>
 	      </ul>
 	    </li>
 	  <?php endif; ?>

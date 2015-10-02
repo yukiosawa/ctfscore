@@ -121,7 +121,8 @@ class Controller_Score extends Controller_Template
 	    $error_msg = '連続回数制限。'.$interval_seconds.'秒後にリトライしてください。';
 
 	    // 管理画面へ通知
-	    
+	    $mgmt_msg = $username.':'.$error_msg;
+	    Model_Score::emitToMgmtConsole('notice', $mgmt_msg);
 	}
 	elseif ($val->run())
 	{
