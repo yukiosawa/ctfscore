@@ -87,10 +87,6 @@ return array(
 	// 管理者ユーザのグループID
 	'admin_group_id' => 100,
     ),
-    'rule' => array(
-	// 競技ルールを記載するファイル
-	'rule_file' => DOCROOT.'../ctfadmin/rule/rule.html',
-    ),
     'level' => array(
         // trueの場合、全体のレベルを有効にする
 	'is_active_total_level' => true,
@@ -98,6 +94,12 @@ return array(
 	'is_active_category_level' => true,
         // 全体のダミーカテゴリ名（各カテゴリ名と重複しないこと)
 	'dummy_name_total' => '__total__',
+    ),
+    'static_page' => array(
+	// 競技ルールを記載するファイル
+	'rule_file' => DOCROOT.'../ctfadmin/html/rule.html',
+	// サイト説明を記載するファイル
+	'about_file' => DOCROOT.'../ctfadmin/html/about.html',
     ),
 );
 

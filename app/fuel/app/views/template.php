@@ -50,6 +50,7 @@
 	    <li><a href="/score/chart">グラフ</a></li>
 	  <?php endif; ?>
 	  <li><a href="/score/rule">ルール</a></li>
+	  <li><a href="/score/about">About</a></li>
 	</ul>
 	<ul class="nav navbar-nav navbar-right">
 	  <?php if ($is_admin): ?>

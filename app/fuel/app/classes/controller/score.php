@@ -258,9 +258,18 @@ class Controller_Score extends Controller_Template
 
     public function action_rule()
     {
-	$data['rule_file'] = Config::get('ctfscore.rule.rule_file');
+	$data['file'] = Config::get('ctfscore.static_page.rule_file');
 	$this->template->title = 'ルール';
-	$this->template->content = View::forge('score/rule', $data);
+	$this->template->content = View::forge('score/static_page', $data);
+	$this->template->footer = '';
+    }
+
+    
+    public function action_about()
+    {
+	$data['file'] = Config::get('ctfscore.static_page.about_file');
+	$this->template->title = 'About';
+	$this->template->content = View::forge('score/static_page', $data);
 	$this->template->footer = '';
     }
 
