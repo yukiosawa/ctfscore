@@ -38,7 +38,7 @@ class Controller_Download extends Controller
     // 問題回答後の画像ファイルをダウンロードする
     public function get_image()
     {
-	// id、type(success/fail)、file名をgetで受け付ける
+	// id、type(success/failure)、file名をgetで受け付ける
 	$puzzle_id = basename(Input::get('id'));
 	$type = basename(Input::get('type'));
 	$file_name = basename(Input::get('file'));
@@ -48,7 +48,7 @@ class Controller_Download extends Controller
 	{
 	    // 回答済みの場合のみ画像を返す
 	    list($driver, $userid) = Auth::get_user_id();
-	    if (Model_Puzzle::is_answered_puzzle($userid, $puzzle_id))
+	    if (Model_Puzzle::is_answered_puzzle($userid, $puzzle_id) || Controller_Auth::is_admin())
 	    {
 		// 正解画像のパスをセット(問題により異なる)
 		$dir = Model_Puzzle::get_success_image_dir($puzzle_id);

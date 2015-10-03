@@ -59,7 +59,7 @@
 	      </a>
 	      <ul class="dropdown-menu">
 		<li><a href="/admin/review/list">レビュー(管理者モード)</a></li>
-		<li><a href="/mgmt/" target="_blank">管理コンソール</a></li>
+		<li><a href="/admin/mgmt/" target="_blank">管理コンソール</a></li>
 		<li><a href="/score/status">実施状況</a></li>
 	      </ul>
 	    </li>
