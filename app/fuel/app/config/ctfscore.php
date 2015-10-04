@@ -101,6 +101,10 @@ return array(
 	// サイト説明を記載するファイル
 	'about_file' => DOCROOT.'../ctfadmin/html/about.html',
     ),
+    'images' => array(
+	// 初回回答者のボーナス画像(DOCROOT.'assets/img/に設置すること)
+	'first_bonus_img' => 'hatsu-taoshi-medium.png',
+    ),
 );
 
 /* End of file ctfscore.php */

@@ -102,10 +102,10 @@ class Controller_Score extends Controller_Template
 	$result = '';
 	$puzzle_id = '';
 	$error_msg = '';
-	$image_dir = '';
-	$image_name = '';
+	$image_names = array();
 	$text = '';
 	$levels = '';
+	$first_bonus_img = '';
 
 	// ユーザID
 	list($driver, $userid) = Auth::get_user_id();
@@ -141,7 +141,7 @@ class Controller_Score extends Controller_Template
 		$msg = Model_Puzzle::get_failure_messages();
                 // 取得できない場合はデフォルト値をセット
                 $text = (!empty($msg['text'])) ? $msg['text'] : '不正解';
-                $image_name = $msg['image_name'];
+                $image_names[] = $msg['image_name'];
 	    }
 	    else
 	    {
@@ -157,6 +157,12 @@ class Controller_Score extends Controller_Template
 		    // 正解
 		    $result = 'success';
 
+		    // 初回回答者は特別画像
+		    if (Model_Score::is_first_winner($puzzle_id))
+		    {
+			$first_bonus_img = '/assets/img/'.Config::get('ctfscore.images.first_bonus_img');
+		    }
+		    
 		    // 獲得ポイントを更新
 		    Model_Puzzle::set_puzzle_gained($userid, $puzzle_id);
 
@@ -167,7 +173,7 @@ class Controller_Score extends Controller_Template
 		    $msg = Model_Puzzle::get_success_messages($puzzle_id);
 		    // 取得できない場合はデフォルト値をセット
                     $text = (!empty($msg['text'])) ? $msg['text'] : '正解';
-                    $image_name = $msg['image_name'];
+                    $image_names[] = $msg['image_name'];
 
 		    // 獲得レベルを更新
 		    if ($levels)
@@ -180,9 +186,16 @@ class Controller_Score extends Controller_Template
 			    $level_string = $level_string.' '.$level.' ';
 			}
 			$mgmt_msg = $username.' は'.$level_string.'にレベルアップしました！';
-			$image_url = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
+			$image_urls = array();
+			foreach ($image_names as $image_name)
+			{
+			    $image_urls[] = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
+			}
+			//$image_url = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
 			$data = array('msg' => $mgmt_msg,
-				      'img_url' => $image_url);
+				      'img_urls' => $image_urls,
+				      'first_bonus_img' => $first_bonus_img,
+			);
 			Model_Score::emitToMgmtConsole('levelup', $data);
 		    }
 		    else
@@ -190,9 +203,15 @@ class Controller_Score extends Controller_Template
 			// レベルそのまま
 			// 管理画面へ通知
 			$mgmt_msg = $username.' は puzzle#'.$puzzle_id.' を解きました！';
-			$image_url = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
+			$image_urls = array();
+			foreach ($image_names as $image_name)
+			{
+			    $image_urls[] = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
+			}
 			$data = array('msg' => $mgmt_msg,
-				      'img_url' => $image_url);
+				      'img_urls' => $image_urls,
+				      'first_bonus_img' => $first_bonus_img,
+			);
 			Model_Score::emitToMgmtConsole('success', $data);
 		    }
 		}
@@ -209,9 +228,10 @@ class Controller_Score extends Controller_Template
 
 	$data['result'] = $result;
 	$data['puzzle_id'] = $puzzle_id;
-	$data['image_name'] = $image_name;
+	$data['image_names'] = $image_names;
 	$data['text'] = $text;
 	$data['levels'] = $levels;
+	$data['first_bonus_img'] = $first_bonus_img;
 	$this->template->title = '回答結果';
 	$this->template->content = View::forge('score/submit', $data);
 	$this->template->content->set_safe('errmsg', $error_msg);

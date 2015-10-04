@@ -27,12 +27,15 @@
 <div class="row">
   <div class="col-md-5">
     <?php
+    // 初回回答者のボーナス画像
+    if (!empty($first_bonus_img)) {
+	echo "<p><image src='".$first_bonus_img."' class='img-responsive' /></p>\n";
+    }
     // 問題ごとのカスタム画像
-    if (!empty($image_name))
-    {
+    foreach ($image_names as $image_name) {
 	echo "<p><image src='/download/image?id=".$puzzle_id.
-		 "&type=".$result."&file=".$image_name.
-		 "' class='img-responsive' /></p>\n";
+	     "&type=".$result."&file=".$image_name.
+	     "' class='img-responsive' /></p>\n";
     }
     ?>
   </div>

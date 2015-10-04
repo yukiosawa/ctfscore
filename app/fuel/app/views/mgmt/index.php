@@ -2,14 +2,18 @@
   <head>
     <meta charset="utf-8">
     <title>管理コンソール</title>
+    <?php echo Asset::css('bootstrap.css'); ?>
     <?php echo Asset::js('jquery-2.1.1.min.js'); ?>
     <?php echo Asset::js('socket.io.js'); ?>
-
     <?php echo Asset::css('animate.css'); ?>
     <?php echo Asset::js('jquery.lettering-0.6.min.js'); ?>
     <?php echo Asset::js('jquery.textillate.js'); ?>
 
     <style type='text/css'>
+     .img-responsive-overwrite{
+       margin: 0 auto;
+     }
+
      #overlay{
        display : none;
        width: 100%;
@@ -17,16 +21,27 @@
        text-align: center;
        position: fixed;
        top: 0;
-       /* z-index: 100; */
+       z-index: 50;
        background: rgba(0,0,0,1);
      }
 
      #overlayText{
-       font-size: 60px;
+       font-size: 30px;
        color: rgba(255,0,0,1);
        padding-top: 100px;
        vertical-align: middle;
        font-weight: bold;
+     }
+
+     #overlay2{
+       display : none;
+       width: 100%;
+       height: 100%;
+       text-align: center;
+       position: fixed;
+       top: 0;
+       z-index: 100;
+       background: rgba(0,0,0,1);
      }
 
      body{
@@ -42,6 +57,7 @@
     <script>
      var socket = io(<?php echo '"http://'.$_SERVER['SERVER_NAME'].':8080"'; ?>);
      var overlayTimer;
+     var overlayTimer2;
 
      socket.on('message', function (data) {
 	 console.log(data);
@@ -81,12 +97,10 @@
 	 span1.attr('class', 'datetime');
 	 span1.text(new Date().toTimeString() + ': ');
 	 span2.attr('class', className);
-	 //span2.text(msg);
 	 span2.text(msg + ' [' + className + ']');
 	 div.append(span1).append(span2);
 	 $('#' + targetName).prepend(div);
 	 messageTextillate();
-	 //setTimeout('messageTextillate()', 5000);
      }
      
      function sendMessage(){
@@ -110,20 +124,45 @@
 	 $('#overlayText').remove();
 	 $('#overlayImg').remove();
 	 var div = $('<div>').attr('id', 'overlayText').text(data.msg);
-	 var img = $('<img>').attr({
-	     id: 'overlayImg',
-	     src: data.img_url,
-	 });
-	 img.addClass('img-responsive');
 	 $('#overlay').append(div);
-	 $('#overlay').append(img);
+	 var div2 = $('<div>').attr('id', 'overlayImg');
+	 for (var i=0; i<data.img_urls.length; i++) {
+	     var img = $('<img>').attr({
+		 src: data.img_urls[i],
+	     });
+	     img.addClass('img-responsive');
+	     img.addClass('img-responsive-overwrite');
+	     div2.append(img);
+	 }
+	 $('#overlay').append(div2);
 	 $('#overlay').fadeIn();
 	 $('#overlayText').textillate();
 	 overlayTimer = setTimeout('closeOverlay()', 10000);
+	 showOverlay2(data);
      }
      
      function closeOverlay(){
 	 $('#overlay').fadeOut();
+     }
+
+     function showOverlay2(data){
+	 clearTimeout(overlayTimer2);
+	 $('#overlayImg2').remove();
+	 if (data.first_bonus_img != '') {
+	     var img = $('<img>').attr({
+		 id: 'overlayImg2',
+		 src: data.first_bonus_img,
+	     });
+	     img.addClass('img-responsive');
+	     img.addClass('img-responsive-overwrite');
+	     $('#overlay2').append(img);
+	     $('#overlay2').fadeIn();
+	     overlayTimer2 = setTimeout('closeOverlay2()', 5000);
+	 }
+     }
+     
+     function closeOverlay2(){
+	 $('#overlay2').fadeOut();
      }
 
      function messageTextillate(){
@@ -175,6 +214,7 @@
     ?>
 
     <div id='overlay'></div>
+    <div id='overlay2'></div>
 
   </body>
 </html>
