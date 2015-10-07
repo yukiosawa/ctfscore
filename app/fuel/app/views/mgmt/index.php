@@ -8,6 +8,7 @@
     <?php echo Asset::css('animate.css'); ?>
     <?php echo Asset::js('jquery.lettering-0.6.min.js'); ?>
     <?php echo Asset::js('jquery.textillate.js'); ?>
+    <?php echo Asset::js('jquery.bgswitcher.js'); ?>
 
     <style type='text/css'>
      .img-responsive-overwrite{
@@ -49,7 +50,9 @@
      }
 
      #messageArea{
-       color: #32CD32;
+       /* color: #32CD32; */
+       font-size: 20px;
+       color: black;
        font-weight: bold;
      }
     </style>
@@ -100,7 +103,8 @@
 	 span2.text(msg + ' [' + className + ']');
 	 div.append(span1).append(span2);
 	 $('#' + targetName).prepend(div);
-	 messageTextillate();
+	 // テキストが増えてくると重くなるのでやめとく
+	 //messageTextillate();
      }
      
      function sendMessage(){
@@ -184,7 +188,11 @@
     </script>
   </head>
 
+  <?php require(APPPATH.'views/_templateheader.php'); ?>
+
   <body>
+    <?php echo Asset::img($logo_image, array('class' => 'img-responsive')); ?>
+
     <div id='messageArea'></div>
 
     <p>

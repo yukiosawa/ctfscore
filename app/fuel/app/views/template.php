@@ -7,40 +7,14 @@
     <?php echo Asset::css('ctfscore.css'); ?>
     <?php echo Asset::js('jquery-2.1.1.min.js'); ?>
     <?php echo Asset::js('bootstrap.min.js'); ?>
+    <?php echo Asset::js('jquery.bgswitcher.js'); ?>
   </head>
 
-  <?php
-  $logined = false;
-  $my_name = '';
-  $is_admin = false;
-  $ctf_time = false;
-  // ログイン状態の情報
-  if (Auth::check())
-  {
-      $logined = true;
-      $my_name = Auth::get_screen_name();
-      $is_admin = Controller_Auth::is_admin();
-  }
-  else
-  {
-      $logined = false;
-      $my_name = '';
-      $is_admin = false;
-  }
-  // CTF時間の設定状況
-  $status = Model_Score::get_ctf_time_status();
-  if ($status['no_use'])
-  {
-      $ctf_time = false;
-  }
-  else
-  {
-      $ctf_time = true;
-  }
-  ?>
-  
+  <?php require('_templateheader.php'); ?>
+
   <body>
     <div class="container">
+      <?php echo Asset::img($logo_image, array('class' => 'img-responsive')); ?>
       <nav class="navbar navbar-inverse">
 	<ul class="nav navbar-nav">
 	  <li><a href="/score/view">スコア</a></li>

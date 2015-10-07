@@ -158,9 +158,12 @@ class Controller_Score extends Controller_Template
 		    $result = 'success';
 
 		    // 初回回答者は特別画像
-		    if (Model_Score::is_first_winner($puzzle_id))
+		    if (Config::get('ctfscore.puzzles.images.is_active_on_bonus'))
 		    {
-			$first_bonus_img = '/assets/img/'.Config::get('ctfscore.images.first_bonus_img');
+			if (Model_Score::is_first_winner($puzzle_id))
+			{
+			    $first_bonus_img = Config::get('ctfscore.puzzles.images.first_bonus_img');
+			}
 		    }
 		    
 		    // 獲得ポイントを更新
