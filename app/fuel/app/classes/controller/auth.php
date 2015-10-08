@@ -143,8 +143,9 @@ class Controller_Auth extends Controller_Template
     public function action_create()
     {
 	// ユーザー作成
+        $data['file'] = Config::get('ctfscore.static_page.agreement_file');
 	$this->template->title = 'ユーザー作成';
-	$this->template->content = View::forge('auth/create');
+	$this->template->content = View::forge('auth/create', $data);
 	$this->template->content->set_safe('errmsg', '');
 	$this->template->footer = View::forge('auth/footer');
     }
@@ -192,8 +193,9 @@ class Controller_Auth extends Controller_Template
 	    $error_msg = $val->show_errors();
 	}
 
+        $data['file'] = Config::get('ctfscore.static_page.agreement_file');
 	$this->template->title = 'ユーザー作成';
-	$this->template->content = View::forge('auth/create');
+	$this->template->content = View::forge('auth/create', $data);
 	$this->template->content->set_safe('errmsg', $error_msg);
 	$this->template->footer = View::forge('auth/footer');
     }

@@ -26,15 +26,15 @@ if (!empty($errmsg)) {
       <input class="form-control" id="password" type="password" name="password" value="" />
     </div>
   </div>
-<!-- <div> -->
-<!-- Ｅメール&nbsp;&nbsp;&nbsp;：<input type-"text" name="email" value="" /> -->
-<!-- </div> -->
+
+  <!-- 遵守事項 -->
+  <p><?php File::read($file, false); ?></p>
+
   <div class="form-group">
     <div class="col-md-offset-2 col-md-4">
-      <button type="submit" class="btn btn-primary">ユーザ作成</button>
+      <!-- <button type="submit" class="btn btn-primary">ユーザ作成</button> -->
+      <button type="submit" class="btn btn-primary">上記に同意してユーザ作成する</button>
     </div>
   </div>
 </form>
-
-
 

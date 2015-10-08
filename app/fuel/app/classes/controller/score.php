@@ -141,7 +141,10 @@ class Controller_Score extends Controller_Template
 		$msg = Model_Puzzle::get_failure_messages();
                 // 取得できない場合はデフォルト値をセット
                 $text = (!empty($msg['text'])) ? $msg['text'] : '不正解';
-                $image_names[] = $msg['image_name'];
+		if (!empty($msg['image_name']))
+		{
+		    $image_names[] = $msg['image_name'];
+		}
 	    }
 	    else
 	    {
@@ -176,7 +179,10 @@ class Controller_Score extends Controller_Template
 		    $msg = Model_Puzzle::get_success_messages($puzzle_id);
 		    // 取得できない場合はデフォルト値をセット
                     $text = (!empty($msg['text'])) ? $msg['text'] : '正解';
-                    $image_names[] = $msg['image_name'];
+		    if (!empty($msg['image_name']))
+		    {
+			$image_names[] = $msg['image_name'];
+		    }
 
 		    // 獲得レベルを更新
 		    if ($levels)

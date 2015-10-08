@@ -46,13 +46,13 @@
      }
 
      body{
-       background: rgba(0,0,0,0.8);
+       background: rgba(0,100,0,1);
      }
 
      #messageArea{
        /* color: #32CD32; */
        font-size: 20px;
-       color: black;
+       color: rgba(0,0,0,0.9);
        font-weight: bold;
      }
     </style>
@@ -115,8 +115,12 @@
 	 addMessage('messageArea', 'message', msg);
      }
 
-     function playAudio(id){
-	 var target = $('#'+id).get(0);
+     function playAudio(className){
+	 // var target = $('#'+id).get(0);
+	 // ランダム再生とする
+	 var targets = $('.' + className);
+	 var index = Math.floor(Math.random() * targets.length);
+	 var target = targets[index];
 	 if (target){
 	     target.currentTime = 0;
 	     target.play();
@@ -203,21 +207,17 @@
     </p>
 
     <?php
-    if (Config::get('ctfscore.sound.is_active_on_success')){
-	$file = Config::get('ctfscore.sound.success_file');
-	echo Html::audio($file, 'id=audio-success');
+    foreach ($success_files as $file) {
+	echo Html::audio($file, 'class=audio-success');
     }
-    if (Config::get('ctfscore.sound.is_active_on_failure')){
-	$file = Config::get('ctfscore.sound.failure_file');
-	echo Html::audio($file, 'id=audio-failure');
+    foreach ($failure_files as $file) {
+	echo Html::audio($file, 'class=audio-failure');
     }
-    if (Config::get('ctfscore.sound.is_active_on_levelup')){
-	$file = Config::get('ctfscore.sound.levelup_file');
-	echo Html::audio($file, 'id=audio-levelup');
+    foreach ($levelup_files as $file) {
+	echo Html::audio($file, 'class=audio-levelup');
     }
-    if (Config::get('ctfscore.sound.is_active_on_notice')){
-	$file = Config::get('ctfscore.sound.notice_file');
-	echo Html::audio($file, 'id=audio-notice');
+    foreach ($notice_files as $file) {
+	echo Html::audio($file, 'class=audio-notice');
     }
     ?>
 

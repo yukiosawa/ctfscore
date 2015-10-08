@@ -26,20 +26,20 @@ return array(
     'sound' => array(
 	// trueの場合、問題正解時に音を鳴らす
 	'is_active_on_success' => true,
-	// 問題正解時に鳴らす音源ファイル[DOCROOTからの相対パス]
-	'success_file' => '/audio/Doorbell-cheap-dingdong.ogg',
+	// 正解音を置くディレクトリ[DOCROOTからの相対パス]
+	'success_dir' => '/audio/success',
 	// trueの場合、問題不正解時で音を鳴らす
 	'is_active_on_failure' => true,
-	// 問題不正解時にならす音源ファイル[DOCROOTからの相対パス]
-	'failure_file' => '/audio/Buzzer.ogg',
+	// 不正解音を置くディレクトリ[DOCROOTからの相対パス]
+	'failure_dir' => '/audio/failure',
 	// trueの場合、レベルアップ時に音を鳴らす
 	'is_active_on_levelup' => true,
-	// レベルアップ時に鳴らす音源ファイル[DOCROOTからの相対パス]
-	'levelup_file' => '/audio/Mobile_phone_ring.ogg',
+	// レベルアップ音を置くディレクトリ[DOCROOTからの相対パス]
+	'levelup_dir' => '/audio/levelup',
 	// trueの場合、その他通知時に音を鳴らす
 	'is_active_on_notice' => true,
-	// その他通知時に鳴らす音源ファイル[DOCROOTからの相対パス]
-	'notice_file' => '/audio/D-Day_cricket.ogg',
+	// その他通知音を置くディレクトリ[DOCROOTからの相対パス]
+	'notice_dir' => '/audio/notice',
     ),
     'chart' => array(
 	// グラフ描画の対象とする最大人数(下にあるcolorsの数以下とすること)
@@ -104,6 +104,8 @@ return array(
 	'rule_file' => DOCROOT.'../ctfadmin/html/rule.html',
 	// サイト説明を記載するファイル
 	'about_file' => DOCROOT.'../ctfadmin/html/about.html',
+	// 利用者の遵守事項を記載するファイル
+	'agreement_file' => DOCROOT.'../ctfadmin/html/agreement.html',
     ),
     'background' => array(
 	// メインの背景画像[DOCROOTからの相対パス]
