@@ -7,7 +7,7 @@
     <?php echo Asset::css('ctfscore.css'); ?>
     <?php echo Asset::js('jquery-2.1.1.min.js'); ?>
     <?php echo Asset::js('bootstrap.min.js'); ?>
-    <?php echo Asset::js('jquery.bgswitcher.js'); ?>
+    <?php echo Asset::js('jquery.bgswitcher-mod.js'); ?>
   </head>
 
   <?php require('_templateheader.php'); ?>

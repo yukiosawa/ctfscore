@@ -8,7 +8,7 @@
     <?php echo Asset::css('animate.css'); ?>
     <?php echo Asset::js('jquery.lettering-0.6.min.js'); ?>
     <?php echo Asset::js('jquery.textillate.js'); ?>
-    <?php echo Asset::js('jquery.bgswitcher.js'); ?>
+    <?php echo Asset::js('jquery.bgswitcher-mod.js'); ?>
 
     <style type='text/css'>
      .img-responsive-overwrite{
