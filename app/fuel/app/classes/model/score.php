@@ -319,11 +319,11 @@ class Model_Score extends Model
 	{
 	    $val->add('password', '新パスワード')
 	        ->add_rule('required')
-		->add_rule('min_length', 6)
+		->add_rule('min_length', 4)
 		->add_rule('max_length', 20);
 	    $val->add('old_password', '旧パスワード')
 	        ->add_rule('required')
-		->add_rule('min_length', 6)
+		->add_rule('min_length', 4)
 		->add_rule('max_length', 20);
 	}
 	else if ($factory == 'score_submit')

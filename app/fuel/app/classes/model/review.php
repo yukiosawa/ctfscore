@@ -239,9 +239,9 @@ class Model_Review extends Model
 		->add_rule('numeric_max', 10)
 		->add_rule('numeric_min', 0);
 	    $val->add('comment', '公開コメント')
-		->add_rule('max_length', 255);
+		->add_rule('max_length', 1000);
 	    $val->add('secret_comment', '管理者へのメッセージ')
-		->add_rule('max_length', 255);
+		->add_rule('max_length', 1000);
 	}
 	else if ($factory == 'delete')
 	{

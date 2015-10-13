@@ -152,7 +152,7 @@ class Ctfscore
 		'bonus_point' => array('type' => 'int'),
 		'category' => array('type' => 'varchar', 'constraint' => 255),
 		'title' => array('type' => 'varchar', 'constraint' => 255),
-		'content' => array('type' => 'varchar', 'constraint' => 255),
+		'content' => array('type' => 'varchar', 'constraint' => 1000),
 	    ),
 	    /* primary_keys */
 	    array('puzzle_id')
@@ -645,8 +645,8 @@ class Ctfscore
 		'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
 		'puzzle_id' => array('type' => 'int'),
 		'score' => array('type' => 'int', 'constraint' => 4),
-		'comment' => array('type' => 'varchar', 'constraint' => 255),
-		'secret_comment' => array('type' => 'varchar', 'constraint' => 255),
+		'comment' => array('type' => 'varchar', 'constraint' => 1000),
+		'secret_comment' => array('type' => 'varchar', 'constraint' => 1000),
                 'uid' => array('type' => 'int', 'constraint' => 11),
 		'updated_at' => array('type' => 'datetime'),
             ),
