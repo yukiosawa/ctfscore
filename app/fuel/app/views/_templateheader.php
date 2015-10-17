@@ -28,9 +28,28 @@
       $ctf_time = true;
   }
   // 背景画像
-  $bg_image = Config::get('ctfscore.background.image');
-  // 背景画像切替設定
-  $bg_switch = Config::get('ctfscore.background.bg_switch.is_active');
+  $bg_image_dir = Config::get('ctfscore.background_image_dir');
+  $image_paths = array();
+  $bg_image = '';
+  try {
+      // dir直下のファイルすべて
+      $files = File::read_dir(DOCROOT.$bg_image_dir, 1, array(
+          '!^\.', // 隠しファイルは除く
+          '!.*' => 'dir', // ディレクトリは除く
+      ));
+      foreach ($files as $file) {
+	  $image_paths[] = $bg_image_dir.'/'.$file;
+      }
+  }
+  catch (InvalidPathException $e)
+  {
+      // 無視する
+  }
+  if (count($image_paths) > 0) {
+      $rand = rand() % count($image_paths);
+      $bg_image = $image_paths[$rand];
+  }
+
   // ロゴ画像
   $logo_image = Config::get('ctfscore.logo_image');
   ?>
@@ -44,38 +63,3 @@
     </style>
   <?php endif; ?>
 
-  <?php if ($bg_switch): ?>
-    <?php
-    $bg_wait = Config::get('ctfscore.background.bg_switch.time_before_start');
-    $bg_image_dir = Config::get('ctfscore.background.bg_switch.image_dir');
-    $bg_interval = Config::get('ctfscore.background.bg_switch.interval');
-    $image_paths = array();
-    try {
-	// dir直下のファイルすべて
-	$files = File::read_dir(DOCROOT.$bg_image_dir, 1, array(
-            '!^\.', // 隠しファイルは除く
-            '!.*' => 'dir', // ディレクトリは除く
-	));
-	foreach ($files as $file) {
-	    $image_paths[] = $bg_image_dir.'/'.$file;
-	}
-    }
-    catch (InvalidPathException $e)
-    {
-	// 無視する
-    }
-    ?>
-    <script>
-     $(function(){
-	 setTimeout('startBgswitch()', <?php echo $bg_wait; ?>);
-     });
-
-     function startBgswitch(){
-	     $('body').bgswitcher({
-		 images: <?php echo json_encode($image_paths, JSON_UNESCAPED_SLASHES); ?>,
-		 interval: <?php echo $bg_interval; ?>,
-		 shuffle: true,
-	     });
-     }
-    </script>
-  <?php endif; ?>

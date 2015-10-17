@@ -105,8 +105,12 @@ class Controller_Score extends Controller_Template
 	$image_names = array();
 	$text = '';
 	$levels = '';
+	$is_first_winner = false;
 	$first_bonus_img = '';
 
+	$image_urls = array();
+
+	
 	// ユーザID
 	list($driver, $userid) = Auth::get_user_id();
 	$username = Auth::get_screen_name();
@@ -134,8 +138,8 @@ class Controller_Score extends Controller_Template
 		$result = 'failure';
 
 		// 管理画面へ通知
-		$mgmt_msg = 'failed.';
-		Model_Score::emitToMgmtConsole('failure', $mgmt_msg);
+//		$mgmt_msg = '不正解です。';
+//		Model_Score::emitToMgmtConsole('failure', $mgmt_msg);
 
 		// 表示するメッセージ(画像、テキスト)
 		$msg = Model_Puzzle::get_failure_messages();
@@ -145,6 +149,10 @@ class Controller_Score extends Controller_Template
 		{
 		    $image_names[] = $msg['image_name'];
 		}
+
+		// 管理画面への通知メッセージ
+		$mgmt_msg = $text;
+
 	    }
 	    else
 	    {
@@ -154,20 +162,15 @@ class Controller_Score extends Controller_Template
 		    // 既に正解済み
 		    $result = 'duplicate';
 		    $text = '既に回答済み';
+		    $mgmt_msg = $username.':'.$text;
 		}
 		else
 		{
 		    // 正解
 		    $result = 'success';
 
-		    // 初回回答者は特別画像
-		    if (Config::get('ctfscore.puzzles.images.is_active_on_bonus'))
-		    {
-			if (Model_Score::is_first_winner($puzzle_id))
-			{
-			    $first_bonus_img = Config::get('ctfscore.puzzles.images.first_bonus_img');
-			}
-		    }
+		    // 初回回答者チェック
+		    $is_first_winner = Model_Score::is_first_winner($puzzle_id);
 		    
 		    // 獲得ポイントを更新
 		    Model_Puzzle::set_puzzle_gained($userid, $puzzle_id);
@@ -184,47 +187,52 @@ class Controller_Score extends Controller_Template
 			$image_names[] = $msg['image_name'];
 		    }
 
-		    // 獲得レベルを更新
+		    // 初回回答者は特別画像
+		    if ($is_first_winner)
+		    {
+			if (Config::get('ctfscore.puzzles.images.is_active_on_bonus'))
+			{
+			    $first_bonus_img = Config::get('ctfscore.puzzles.images.first_bonus_img');
+			}
+		    }
+
+		    // 管理画面への通知メッセージ
 		    if ($levels)
 		    {
+			$result = 'levelup';
 			// レベルアップ
-			// 管理画面へ通知
 			$level_string = '';
 			foreach ($levels as $level)
 			{
 			    $level_string = $level_string.' '.$level.' ';
 			}
 			$mgmt_msg = $username.' は'.$level_string.'にレベルアップしました！';
-			$image_urls = array();
-			foreach ($image_names as $image_name)
-			{
-			    $image_urls[] = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
-			}
-			//$image_url = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
-			$data = array('msg' => $mgmt_msg,
-				      'img_urls' => $image_urls,
-				      'first_bonus_img' => $first_bonus_img,
-			);
-			Model_Score::emitToMgmtConsole('levelup', $data);
 		    }
 		    else
 		    {
 			// レベルそのまま
-			// 管理画面へ通知
 			$mgmt_msg = $username.' は puzzle#'.$puzzle_id.' を解きました！';
-			$image_urls = array();
-			foreach ($image_names as $image_name)
-			{
-			    $image_urls[] = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
-			}
-			$data = array('msg' => $mgmt_msg,
-				      'img_urls' => $image_urls,
-				      'first_bonus_img' => $first_bonus_img,
-			);
-			Model_Score::emitToMgmtConsole('success', $data);
 		    }
 		}
+
+
 	    }
+
+
+	    // 管理画面へ通知(正解、不正解)
+	    $image_urls = array();
+	    foreach ($image_names as $image_name)
+	    {
+		$image_urls[] = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
+	    }
+	    $data = array('msg' => $mgmt_msg,
+			  'img_urls' => $image_urls,
+			  'is_first_winner' => $is_first_winner,
+			  'first_bonus_img' => $first_bonus_img,
+	    );
+	    Model_Score::emitToMgmtConsole($result, $data);
+
+
 	}
         else
         {
@@ -238,11 +246,18 @@ class Controller_Score extends Controller_Template
 	$data['result'] = $result;
 	$data['puzzle_id'] = $puzzle_id;
 	$data['image_names'] = $image_names;
+
+//	$data['image_urls'] = $image_urls;
+
 	$data['text'] = $text;
 	$data['levels'] = $levels;
+	$data['is_first_winner'] = $is_first_winner;
 	$data['first_bonus_img'] = $first_bonus_img;
 	$this->template->title = '回答結果';
 	$this->template->content = View::forge('score/submit', $data);
+
+	$this->template->content->set_safe('image_urls', $image_urls);
+
 	$this->template->content->set_safe('errmsg', $error_msg);
 	$this->template->footer = View::forge('score/footer');
     }

@@ -167,7 +167,7 @@ class Model_Puzzle extends Model
     // 問題解答時の画像表示
     public static function is_image_active($event = null)
     {
-	if ($event == 'success')
+	if ($event == 'success' || $event == 'levelup')
 	{
 	    return Config::get('ctfscore.puzzles.images.is_active_on_success');
 	}

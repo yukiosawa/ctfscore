@@ -1,3 +1,26 @@
+<?php echo Asset::css('animate.css'); ?>
+<?php echo Asset::js('jquery.lettering-0.6.min.js'); ?>
+<?php echo Asset::js('jquery.textillate.js'); ?>
+<?php echo Asset::js('ctfscore-overlay.js'); ?>
+
+<script>
+ function overlay(){
+     var img_urls = <?php echo json_encode($image_urls, JSON_UNESCAPED_SLASHES); ?>;
+     if (img_urls) {
+	 var text = "<?php echo $text; ?>";
+	 var msg = $("#levelup-msg").text() ? $("#levelup-msg").text() : text;
+	 var data = {
+	     msg: msg,
+	     img_urls: img_urls,
+	     is_first_winner: "<?php echo $is_first_winner; ?>",
+	     first_bonus_img: "<?php echo $first_bonus_img; ?>"
+	 };
+	 showOverlay(data);
+     }
+ }
+</script>
+
+
 <?php
     if (!empty($errmsg)) {
 	echo "<div class='alert alert-danger'>$errmsg</div>";
@@ -5,7 +28,12 @@
 ?>
 
 <!-- メッセージ -->
-<?php if ($result == 'success'): ?>
+<?php if ($result == 'success' || $result == 'levelup'): ?>
+  <script>
+    $(function(){
+	overlay();
+    });
+  </script>
   <p class='alert alert-success h4'><?php echo nl2br($text); ?></p>
 <?php elseif ($result == 'failure'): ?>
   <p class='alert alert-danger h4'><?php echo nl2br($text); ?></p>
@@ -14,8 +42,8 @@
 <?php endif; ?>
 
 <!-- レベルアップメッセージ -->
-<?php if (!empty($levels)): ?>
-  <p class='alert alert-success h4'>
+<?php if ($result == 'levelup' && !empty($levels)): ?>
+  <p class='alert alert-success h4' id='levelup-msg'>
     <?php
     foreach ($levels as $level) {
 	echo '<b>'.$level.'</b>にレベルアップしました！　';
@@ -32,13 +60,14 @@
 	echo "<p><image src='".$first_bonus_img."' class='img-responsive' /></p>\n";
     }
     // 問題ごとのカスタム画像
-    foreach ($image_names as $image_name) {
-	echo "<p><image src='/download/image?id=".$puzzle_id.
-	     "&type=".$result."&file=".$image_name.
-	     "' class='img-responsive' /></p>\n";
+    foreach ($image_urls as $image_url) {
+	echo "<p><image src='".$image_url."' class='img-responsive' /></p>\n";
     }
     ?>
   </div>
 </div>
 
+
+<div id='overlay'></div>
+<div id='overlay2'></div>
 

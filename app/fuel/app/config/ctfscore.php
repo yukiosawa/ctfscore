@@ -18,7 +18,7 @@ return array(
             // 不正解時に表示する画像ファイルを格納するディレクトリ
             'failure_random_image_dir' => 'images_random_on_failure',
 	    // trueの場合、初回回答時にボーナス画像表示する
-	    'is_active_on_bonus' => 'false',
+	    'is_active_on_bonus' => 'true',
 	    // 初回回答者のボーナス画像(DOCROOTからの相対パス)
 	    'first_bonus_img' => '',
 	),
@@ -28,6 +28,8 @@ return array(
 	'is_active_on_success' => true,
 	// 正解音を置くディレクトリ[DOCROOTからの相対パス]
 	'success_dir' => '/audio/success',
+	// 初回正解音を置くディレクトリ[DOCROOTからの相対パス]
+	'first_winner_dir' => '/audio/first_winner',
 	// trueの場合、問題不正解時で音を鳴らす
 	'is_active_on_failure' => true,
 	// 不正解音を置くディレクトリ[DOCROOTからの相対パス]
@@ -107,21 +109,8 @@ return array(
 	// 利用者の遵守事項を記載するファイル
 	'agreement_file' => DOCROOT.'../ctfadmin/html/agreement.html',
     ),
-    'background' => array(
-	// メインの背景画像[DOCROOTからの相対パス]
-	'image' => '',
-	// 背景の自動切替
-	'bg_switch' => array(
-	    // trueの場合、背景画像切り替えを有効にする
-	    'is_active' => false,
-	    // 画像切り替え開始までの待ち時間(ミリ秒)
-	    'time_before_start' => 900000,
-	    // 画像を置くディレクトリ[DOCROOTからの相対パス]
-	    'image_dir' => '/assets/img/background',
-	    // 次画像へ切り替える間隔(ミリ秒)
-	    'interval' => 900000,
-	)
-    ),
+    // 背景画像を置くディレクトリ[DOCROOTからの相対パス]
+    'background_image_dir' => '/assets/img/background',
     // ロゴ画像[DOCROOT/assets/img/配下]
     'logo_image' => ''
 );

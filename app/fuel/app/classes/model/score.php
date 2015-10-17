@@ -350,6 +350,7 @@ class Model_Score extends Model
 	$query->where('posted_at', '>', $subed_time);
 	// 正解時のポストは除外しておく
 	$query->where('result', '!=', 'success');
+	$query->where('result', '!=', 'levelup');
 	$result = $query->execute();
 
 	if (count($result) >= $limit_times)

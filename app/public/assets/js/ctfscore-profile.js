@@ -1,5 +1,10 @@
 // ctfscore.js
 
+// レベル名を装飾
+$(function(){
+    $('#level_name').textillate();
+});
+
 
 // 複数ユーザでグラフの比較
 function update_chart() {

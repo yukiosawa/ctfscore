@@ -3,52 +3,15 @@
     <meta charset="utf-8">
     <title>管理コンソール</title>
     <?php echo Asset::css('bootstrap.css'); ?>
+    <?php echo Asset::css('ctfscore.css'); ?>
     <?php echo Asset::js('jquery-2.1.1.min.js'); ?>
     <?php echo Asset::js('socket.io.js'); ?>
     <?php echo Asset::css('animate.css'); ?>
     <?php echo Asset::js('jquery.lettering-0.6.min.js'); ?>
     <?php echo Asset::js('jquery.textillate.js'); ?>
-    <?php echo Asset::js('jquery.bgswitcher-mod.js'); ?>
+    <?php echo Asset::js('ctfscore-overlay.js'); ?>
 
     <style type='text/css'>
-     .img-responsive-overwrite{
-       margin: 0 auto;
-     }
-
-     #overlay{
-       display : none;
-       width: 100%;
-       height: 100%;
-       text-align: center;
-       position: fixed;
-       top: 0;
-       z-index: 50;
-       background: rgba(0,0,0,1);
-     }
-
-     #overlayText{
-       font-size: 30px;
-       color: rgba(255,0,0,1);
-       padding-top: 100px;
-       vertical-align: middle;
-       font-weight: bold;
-     }
-
-     #overlay2{
-       display : none;
-       width: 100%;
-       height: 100%;
-       text-align: center;
-       position: fixed;
-       top: 0;
-       z-index: 100;
-       background: rgba(0,0,0,1);
-     }
-
-     body{
-       background: rgba(0,100,0,1);
-     }
-
      #messageArea{
        /* color: #32CD32; */
        font-size: 20px;
@@ -59,17 +22,20 @@
 
     <script>
      var socket = io(<?php echo '"http://'.$_SERVER['SERVER_NAME'].':8080"'; ?>);
-     var overlayTimer;
-     var overlayTimer2;
 
-     socket.on('message', function (data) {
-	 console.log(data);
-	 addMessage('messageArea', 'message', data);
+     socket.on('message', function (msg) {
+	 console.log(msg);
+	 addMessage('messageArea', 'message', msg);
      });
 
      socket.on('success', function (data) {
 	 console.log(data);
-	 playAudio('audio-success');
+	 if (data.is_first_winner) {
+	     playAudio('audio-first_winner');
+	 }
+	 else {
+	     playAudio('audio-success');
+	 }
 	 showOverlay(data);
 	 addMessage('messageArea', 'success', data.msg);
      });
@@ -84,13 +50,19 @@
      socket.on('failure', function (data) {
 	 console.log(data);
 	 playAudio('audio-failure');
-	 //addMessage('messageArea', 'fail', data);
+	 //addMessage('messageArea', 'failure', data.msg);
      });
 
-     socket.on('notice', function (data) {
+     socket.on('duplicate', function (data) {
 	 console.log(data);
 	 playAudio('audio-notice');
-	 addMessage('messageArea', 'notice', data);
+	 addMessage('messageArea', 'notice', data.msg);
+     });
+
+     socket.on('notice', function (msg) {
+	 console.log(msg);
+	 playAudio('audio-notice');
+	 addMessage('messageArea', 'notice', msg);
      });
 
      function addMessage(targetName, className, msg){
@@ -127,52 +99,6 @@
 	 }
      }
 
-     function showOverlay(data){
-	 clearTimeout(overlayTimer);
-	 $('#overlayText').remove();
-	 $('#overlayImg').remove();
-	 var div = $('<div>').attr('id', 'overlayText').text(data.msg);
-	 $('#overlay').append(div);
-	 var div2 = $('<div>').attr('id', 'overlayImg');
-	 for (var i=0; i<data.img_urls.length; i++) {
-	     var img = $('<img>').attr({
-		 src: data.img_urls[i],
-	     });
-	     img.addClass('img-responsive');
-	     img.addClass('img-responsive-overwrite');
-	     div2.append(img);
-	 }
-	 $('#overlay').append(div2);
-	 $('#overlay').fadeIn();
-	 $('#overlayText').textillate();
-	 overlayTimer = setTimeout('closeOverlay()', 10000);
-	 showOverlay2(data);
-     }
-     
-     function closeOverlay(){
-	 $('#overlay').fadeOut();
-     }
-
-     function showOverlay2(data){
-	 clearTimeout(overlayTimer2);
-	 $('#overlayImg2').remove();
-	 if (data.first_bonus_img != '') {
-	     var img = $('<img>').attr({
-		 id: 'overlayImg2',
-		 src: data.first_bonus_img,
-	     });
-	     img.addClass('img-responsive');
-	     img.addClass('img-responsive-overwrite');
-	     $('#overlay2').append(img);
-	     $('#overlay2').fadeIn();
-	     overlayTimer2 = setTimeout('closeOverlay2()', 5000);
-	 }
-     }
-     
-     function closeOverlay2(){
-	 $('#overlay2').fadeOut();
-     }
-
      function messageTextillate(){
 	 var tlt = $('#messageArea > *').textillate({
 	     loop: true,
@@ -207,6 +133,9 @@
     </p>
 
     <?php
+    foreach ($first_winner_files as $file) {
+	echo Html::audio($file, 'class=audio-first_winner');
+    }
     foreach ($success_files as $file) {
 	echo Html::audio($file, 'class=audio-success');
     }

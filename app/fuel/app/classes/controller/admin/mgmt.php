@@ -38,6 +38,7 @@ class Controller_Admin_Mgmt extends Controller
     public function action_index()
     {
 	// 各種音源ファイル
+	$first_winner_files = '';
 	$success_files = '';
 	$failure_files = '';
 	$levelup_files = '';
@@ -46,6 +47,8 @@ class Controller_Admin_Mgmt extends Controller
 	{
 	    $success_dir = Config::get('ctfscore.sound.success_dir');
 	    $success_files = Controller_Admin_Mgmt::read_audio_paths($success_dir);
+	    $first_winner_dir = Config::get('ctfscore.sound.first_winner_dir');
+	    $first_winner_files = Controller_Admin_Mgmt::read_audio_paths($first_winner_dir);
 	}
 	if (Config::get('ctfscore.sound.is_active_on_failure'))
 	{
@@ -62,6 +65,7 @@ class Controller_Admin_Mgmt extends Controller
 	    $notice_dir = Config::get('ctfscore.sound.notice_dir');
 	    $notice_files = Controller_Admin_Mgmt::read_audio_paths($notice_dir);
 	}
+	$data['first_winner_files'] = $first_winner_files;
 	$data['success_files'] = $success_files;
 	$data['failure_files'] = $failure_files;
 	$data['levelup_files'] = $levelup_files;

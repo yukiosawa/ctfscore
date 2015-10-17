@@ -2,6 +2,9 @@
 <?php echo Asset::js('ctfscore-profile.js'); ?>
 <?php echo Asset::js('jquery.raty.js'); ?>
 <?php echo Asset::js('ctfscore-raty.js'); ?>
+<?php echo Asset::css('animate.css'); ?>
+<?php echo Asset::js('jquery.lettering-0.6.min.js'); ?>
+<?php echo Asset::js('jquery.textillate.js'); ?>
 
 <div id="errmsg"></div>
 
@@ -11,9 +14,10 @@
       <span id="my_username"><?php echo $profile['username'] ?></span>
     </div>
     <?php if (!empty($profile['levels'])): ?>
-      <div>
+      <div id='level_name' class="h3">
 	またの名を
-	<span class="h3">
+	<!-- <span class="h3"> -->
+	<span>
 	  <?php
 	  foreach ($profile['levels'] as $level) {
 	      echo "　".$level;

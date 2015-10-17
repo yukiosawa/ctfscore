@@ -44,7 +44,7 @@ class Controller_Download extends Controller
 	$file_name = basename(Input::get('file'));
 	$path =  '';
 
-	if ($type == 'success')
+	if ($type == 'success' || $type == 'levelup')
 	{
 	    // 回答済みの場合のみ画像を返す
 	    list($driver, $userid) = Auth::get_user_id();
