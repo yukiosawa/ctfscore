@@ -50,6 +50,7 @@
      socket.on('failure', function (data) {
 	 console.log(data);
 	 playAudio('audio-failure');
+	 showOverlay(data);
 	 //addMessage('messageArea', 'failure', data.msg);
      });
 
@@ -125,12 +126,14 @@
 
     <div id='messageArea'></div>
 
+<!-- デバッグ用
     <p>
     <form>
       <input type='text' name='chatMessage'></input>
       <input onclick='sendMessage(); return false;' type='submit' value='Send'></input>
     </form>
     </p>
+-->
 
     <?php
     foreach ($first_winner_files as $file) {
