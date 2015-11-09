@@ -85,7 +85,7 @@ return array(
     ),
     'review' => array(
 	// 最大評価点
-	'max_data_number' => 10,
+	'max_data_number' => 5,
 	// 未回答の問題へのレビュー投稿を許可
 	'allow_unanswered_puzzle' => false,
     ),
@@ -108,6 +108,8 @@ return array(
 	'about_file' => DOCROOT.'../ctfadmin/html/about.html',
 	// 利用者の遵守事項を記載するファイル
 	'agreement_file' => DOCROOT.'../ctfadmin/html/agreement.html',
+	// レベル説明を記載するファイル
+	'level_file' => DOCROOT.'../ctfadmin/html/level.html',
     ),
     // 背景画像を置くディレクトリ[DOCROOTからの相対パス]
     'background_image_dir' => '/assets/img/background',

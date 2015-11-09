@@ -318,6 +318,15 @@ class Controller_Score extends Controller_Template
     }
 
     
+    public function action_level()
+    {
+        $data['file'] = Config::get('ctfscore.static_page.level_file');
+        $this->template->title = 'Level';
+        $this->template->content = View::forge('score/static_page', $data);
+        $this->template->footer = '';
+    }
+
+
     public function action_profile($username)
     {
 	// CTF開始前は許可しない

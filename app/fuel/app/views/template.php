@@ -23,6 +23,8 @@
 	    <li><a href="/score/chart">グラフ</a></li>
 	  <?php endif; ?>
 	  <li><a href="/score/rule">ルール</a></li>
+	  <li><a href="/score/level">レベル</a></li>
+	  <li><a href="/news/list">お知らせ</a></li>
 	  <li><a href="/score/about">About</a></li>
 	</ul>
 	<ul class="nav navbar-nav navbar-right">
@@ -32,7 +34,8 @@
 		管理者
 	      </a>
 	      <ul class="dropdown-menu">
-		<li><a href="/admin/review/list">レビュー(管理者モード)</a></li>
+		<li><a href="/admin/review/list">レビュー管理</a></li>
+		<li><a href="/admin/news/list">お知らせ管理</a></li>
 		<li><a href="/admin/mgmt/" target="_blank">管理コンソール</a></li>
 		<li><a href="/score/status">実施状況</a></li>
 	      </ul>

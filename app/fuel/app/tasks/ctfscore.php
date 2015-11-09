@@ -51,6 +51,7 @@ class Ctfscore
 	$this->delete_reviews_table();
 	$this->delete_gained_table();
         $this->delete_history_table();
+	$this->delete_news_table();
 	$this->delete_users_table();
 	$this->delete_attachment_table();
 	$this->delete_success_image_table();
@@ -75,6 +76,7 @@ class Ctfscore
 	$this->create_reviews_table();
 	$this->create_levels_table();
 	$this->create_gained_levels_table();
+	$this->create_news_table();
     }
 
 
@@ -674,6 +676,54 @@ class Ctfscore
     public function delete_reviews_table()
     {
         $table = 'reviews';
+        \DBUtil::drop_table($table);
+        echo "Table deleted: ".$table."\n";
+    }
+
+
+    public function create_news_table()
+    {
+        $table = 'news';
+
+        // only do this if it doesn't exist yet
+        if (\DBUtil::table_exists($table))
+        {
+            return;
+        }
+
+        \DBUtil::create_table(
+            $table,
+            /* fields */
+            array(
+		'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
+		'comment' => array('type' => 'varchar', 'constraint' => 1000),
+                'uid' => array('type' => 'int', 'constraint' => 11),
+		'updated_at' => array('type' => 'datetime'),
+            ),
+            /* primary_keys */
+            array('id'),
+            true, false, NULL,
+            /* foreign_keys */
+            array(
+                array(
+                    'key' => 'uid',
+                    'reference' => array(
+                        'table' => 'users',
+                        'column' => 'id',
+                    ),
+                    'on_update' => 'CASCADE',
+                    'on_delete' => 'CASCADE',
+                ),
+            )
+        );
+
+        echo "Table created: ".$table."\n";
+    }
+
+    
+    public function delete_news_table()
+    {
+        $table = 'news';
         \DBUtil::drop_table($table);
         echo "Table deleted: ".$table."\n";
     }
