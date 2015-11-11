@@ -3,6 +3,12 @@ if (!empty($errmsg)) {
   echo "<div class='alert alert-danger'>$errmsg</div>";
 }
 ?>
+
+<ul class="nav nav-tabs">
+  <li role="presentation" class="active"><a href="#">ログイン</a></li>
+  <li role="presentation"><a href="/auth/create">新規ユーザー作成</a></li>
+</ul>
+<br>
   
 <form class="form-horizontal" action="/auth/login" method="POST">
   <!-- CSRF対策 -->
@@ -25,10 +31,3 @@ if (!empty($errmsg)) {
     </div>
   </div>
 </form>
-
-<div class="row">
-  <div class="col-md-offset-2 col-md-4 text-right">
-    <a href="/auth/create" >新規ユーザー作成</a>
-  </div>
-</div>
-

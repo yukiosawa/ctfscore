@@ -62,7 +62,7 @@
     <table class="table table-hover">
       <thead>
 	<tr>
-	  <th>カテゴリ</th><th>ポイント</th><th>タイトル</th>
+	  <th>カテゴリ</th><th>ポイント</th><th>タイトル</th><th>回答時刻</th>
 	</tr>
       </thead>
       <tbody>
@@ -76,6 +76,8 @@
 	    echo "<td>".$puzzle['point']."</td>";
 	    // タイトル
 	    echo "<td>".$puzzle['puzzle_id'].":".$puzzle['title']."</td>";
+        // 回答時刻
+	    echo "<td>".$puzzle['gained_at']."</td>";
 	    echo "</tr>\n";
 	}
 	?>

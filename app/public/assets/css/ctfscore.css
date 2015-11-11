@@ -2,14 +2,23 @@ body {
     background: rgba(0,0,0,0.2);
 }
 
+.navbar-inverse {
+    background-color: rgba(0,0,0,0.8);
+}
+
 .container {
-    background: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.5);
 }
 
 .table {
     width: 100%;
     table-layout: fixed;
     word-wrap: break-word;
+}
+
+.table .min {
+    width: 0.1%;
+    white-space: nowrap;
 }
 
 
@@ -48,6 +57,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
     height: 100%;
     text-align: center;
     position: fixed;
+    left: 0;
     top: 0;
     z-index: 2000;
     background: rgba(0,0,0,1);
@@ -68,6 +78,7 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
     text-align: center;
     position: fixed;
     top: 0;
+    left: 0;
     z-index: 2010;
     background: rgba(0,0,0,1);
 }

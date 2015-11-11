@@ -4,6 +4,7 @@
   $my_name = '';
   $is_admin = false;
   $ctf_time = false;
+  $sound_on = Cookie::get('sound_on', '1') === '1';
   // ログイン状態の情報
   if (Auth::check())
   {
@@ -57,8 +58,11 @@
   <?php if ($bg_image): ?>
     <style type='text/css'>
      body {
-       Background-image: url(<?php echo $bg_image; ?>);
-       background-size: 100%, auto;
+       background-image: url(<?php echo $bg_image; ?>);
+       background-size: cover;
+       background-position: center center;
+       background-attachment: fixed;
+       background-repeat: no-repeat;
      }
     </style>
   <?php endif; ?>

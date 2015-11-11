@@ -4,6 +4,12 @@ if (!empty($errmsg)) {
 }
 ?>
 
+<ul class="nav nav-tabs">
+  <li role="presentation"><a href="/auth/login">ログイン</a></li>
+  <li role="presentation" class="active"><a href="#">新規ユーザー作成</a></li>
+</ul>
+<br>
+
 <p class='h4'>
   新規ユーザ登録します。
 </p>

@@ -114,7 +114,9 @@ return array(
     // 背景画像を置くディレクトリ[DOCROOTからの相対パス]
     'background_image_dir' => '/assets/img/background',
     // ロゴ画像[DOCROOT/assets/img/配下]
-    'logo_image' => ''
+    'logo_image' => '',
+    // 登録時音声[DOCROOTからの相対パス]
+    'register_sound' => ''
 );
 
 /* End of file ctfscore.php */

@@ -1,2 +1,4 @@
 *~
 
+/app/fuel/app/logs
+*.swp
