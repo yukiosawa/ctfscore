@@ -92,6 +92,8 @@ return array(
     'admin' => array(
 	// 管理者ユーザのグループID
 	'admin_group_id' => 100,
+        // 管理コンソールを有効にする
+        'management_console' => true,
     ),
     'level' => array(
         // trueの場合、全体のレベルを有効にする

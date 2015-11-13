@@ -141,10 +141,6 @@ class Controller_Score extends Controller_Template
                 // 不正解
                 $result = 'failure';
 
-                // 管理画面へ通知
-                //		$mgmt_msg = '不正解です。';
-                //		Model_Score::emitToMgmtConsole('failure', $mgmt_msg);
-
                 // 表示するメッセージ(画像、テキスト)
                 $msg = Model_Puzzle::get_failure_messages();
                 // 取得できない場合はデフォルト値をセット
@@ -230,7 +226,7 @@ class Controller_Score extends Controller_Template
                 'is_first_winner' => $is_first_winner,
                 'first_bonus_img' => $first_bonus_img,
             );
-            //Model_Score::emitToMgmtConsole($result, $data);
+            Model_Score::emitToMgmtConsole($result, $data);
         }
         else
         {
@@ -244,9 +240,6 @@ class Controller_Score extends Controller_Template
         $data['result'] = $result;
         $data['puzzle_id'] = $puzzle_id;
         $data['image_names'] = $image_names;
-
-        //	$data['image_urls'] = $image_urls;
-
         $data['text'] = $text;
         $data['levels'] = $levels;
         $data['is_first_winner'] = $is_first_winner;

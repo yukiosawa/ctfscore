@@ -54,6 +54,10 @@ class Model_Score extends Model
     // 管理画面へイベントを通知
     public static function emitToMgmtConsole($event = NULL, $msg = NULL)
     {
+        if (!Config::get('ctfscore.admin.management_console'))
+        {
+            return;
+        }
         require(DOCROOT.'../nodejs/socket.io-php-emitter/vendor/autoload.php');
         require(DOCROOT.'../nodejs/socket.io-php-emitter/src/Emitter.php');
         // Below initialization will create a  phpredis client, or a TinyRedisClient depending on what is installed
