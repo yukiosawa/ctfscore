@@ -190,7 +190,7 @@ class Ctfscore
             array(
                 'id' => array('type' => 'int', 'auto_increment' => true),
                 'puzzle_id' => array('type' => 'int'),
-                'flag' => array('type' => 'varchar', 'constraint' => 255),
+                'flag' => array('type' => 'varchar', 'constraint' => 255, 'charset' => 'binary'),
             ),
             /* primary_keys */
             array('id'),
