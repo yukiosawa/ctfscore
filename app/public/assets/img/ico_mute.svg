@@ -10,8 +10,8 @@
    xml:space="preserve"
    version="1.0"
    id="layer1"
-   width="400pt"
-   height="400pt"
+   width="14pt"
+   height="14pt"
    viewBox="0 0 75 75"
    inkscape:version="0.48.3.1 r9886"
    sodipodi:docname="Mute_Icon.svg"><defs
@@ -57,18 +57,18 @@
    id="g1"><polygon
    id="polygon1"
    points="39.389,13.769 22.235,28.606 6,28.606 6,47.699 21.989,47.699 39.389,62.75 39.389,13.769"
-   style="stroke:#111111;stroke-width:5;stroke-linejoin:round;fill:#111111;" />
+   style="stroke:#999999;stroke-width:5;stroke-linejoin:round;fill:#999999;" />
 
 <path
    id="path3003"
    d="M 48.651772,50.269646 69.395223,25.971024"
-   style="fill:none;stroke:#111111;stroke-width:5;stroke-linecap:round"
+   style="fill:none;stroke:#999999;stroke-width:5;stroke-linecap:round"
    inkscape:connector-curvature="0"
    sodipodi:nodetypes="cc" />
 <path
    id="path3003-1"
    d="M 69.395223,50.269646 48.651772,25.971024"
-   style="fill:none;stroke:#111111;stroke-width:5;stroke-linecap:round"
+   style="fill:none;stroke:#999999;stroke-width:5;stroke-linecap:round"
    inkscape:connector-curvature="0"
    sodipodi:nodetypes="cc" /></g>
 </svg>
