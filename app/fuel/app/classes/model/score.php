@@ -298,37 +298,50 @@ class Model_Score extends Model
     {
         $val = Validation::forge($factory);
 
-        if (($factory == 'login') || ($factory == 'create'))
+        if ($factory == 'login')
         {
             $val->add('username', 'ユーザー名')
                 ->add_rule('required')
                 ->add_rule('max_length', 15)
-                ->add_rule('valid_string',
-                    array(
-                        'alpha',
-                        'numeric',
-                        'punctuation',
-                        'dashes',
-                        'quotes',
-                        'brackets',
-                        'braces',
-                        'utf8'
-                    ));
+                // 英数字
+                ->add_rule('match_pattern', '/^[a-zA-Z0-9]+$/');
             $val->add('password', 'パスワード')
                 ->add_rule('required')
                 ->add_rule('min_length', 4)
-                ->add_rule('max_length', 20);
+                ->add_rule('max_length', 20)
+                // 半角文字全て(英数字、記号) !(0x21) - ~(0x7e)
+                ->add_rule('match_pattern', '/^[!-~]+$/');
+        }
+        else if ($factory == 'create')
+        {
+            $val->add('username', 'ユーザー名')
+                ->add_rule('required')
+                ->add_rule('max_length', 15)
+                // 英数字
+                ->add_rule('match_pattern', '/^[a-zA-Z0-9]+$/');
+            $val->add('password', 'パスワード')
+                ->add_rule('required')
+                ->add_rule('min_length', 4)
+                ->add_rule('max_length', 20)
+                // 半角文字全て(英数字、記号) !(0x21) - ~(0x7e)
+                ->add_rule('match_pattern', '/^[!-~]+$/');
+            $val->add('password-confirm', 'パスワード確認')
+                ->add_rule('match_field', 'password');
         }
         else if ($factory == 'update')
         {
             $val->add('password', '新パスワード')
                 ->add_rule('required')
                 ->add_rule('min_length', 4)
-                ->add_rule('max_length', 20);
+                ->add_rule('max_length', 20)
+                // 半角文字全て(英数字、記号) !(0x21) - ~(0x7e)
+                ->add_rule('match_pattern', '/^[!-~]+$/');
             $val->add('old_password', '旧パスワード')
                 ->add_rule('required')
                 ->add_rule('min_length', 4)
-                ->add_rule('max_length', 20);
+                ->add_rule('max_length', 20)
+                // 半角文字全て(英数字、記号) !(0x21) - ~(0x7e)
+                ->add_rule('match_pattern', '/^[!-~]+$/');
         }
         else if ($factory == 'score_submit')
         {
