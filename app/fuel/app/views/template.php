@@ -5,8 +5,11 @@
     <title><?php echo $title; ?></title>
     <?php echo Asset::css('bootstrap.css'); ?>
     <?php echo Asset::css('ctfscore.css'); ?>
+    <?php echo Asset::css('flipclock.css'); ?>
     <?php echo Asset::js('jquery-2.1.1.min.js'); ?>
     <?php echo Asset::js('bootstrap.min.js'); ?>
+    <?php echo Asset::js('flipclock.min.js'); ?>
+    <?php echo Asset::js('ctfscore-flipclock.js'); ?>
   </head>
 
   <?php require('_templateheader.php'); ?>
@@ -14,6 +17,15 @@
   <body>
     <div class="container">
       <?php echo Asset::img($logo_image, array('class' => 'img-responsive')); ?>
+      <?php if ($countdown): ?>
+        <div id="countdown" class="row"></div>
+        <script>
+         $(function () {
+             // 秒 -> ミリ秒
+             startCountdown(<?php echo $ctf_end_time * 1000; ?>);
+         });
+        </script>
+      <?php endif; ?>
       <nav class="navbar navbar-inverse">
         <ul class="nav navbar-nav">
           <li><a href="/score/view">スコア</a></li>

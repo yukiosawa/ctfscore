@@ -28,6 +28,8 @@
   {
       $ctf_time = true;
   }
+  // CTF終了時刻
+  $ctf_end_time = Model_Score::get_ctf_end_time();
   // 背景画像
   $bg_image_dir = Config::get('ctfscore.background_image_dir');
   $image_paths = array();
@@ -53,6 +55,9 @@
 
   // ロゴ画像
   $logo_image = Config::get('ctfscore.logo_image');
+
+  // カウントダウン
+  $countdown = Config::get('ctfscore.countdown');
   ?>
 
   <?php if ($bg_image): ?>

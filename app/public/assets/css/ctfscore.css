@@ -90,3 +90,17 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
     font-weight: bold;
 }
 
+
+/* flipclock.js plugin */
+div#countdown {
+   margin: 0 auto;
+   width: 620px;
+   zoom: 0.6;
+   -moz-transform: scale(0.6);
+}
+.flip-clock-label {
+    font-size: 24px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important;
+    font-weight: bold;
+}
+

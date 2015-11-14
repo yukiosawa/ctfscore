@@ -438,6 +438,18 @@ class Model_Score extends Model
     }
 
 
+    // CTF終了時刻 unixtime
+    public static function get_ctf_end_time()
+    {
+        $times = DB::select()->from('times')->execute()->as_array();
+        if (count($times) < 1)
+        {
+            return null;
+        }
+        return strtotime($times[0]['end_time']);
+    }
+
+    
     // 回答済問題数に応じてレベルを更新する
     public static function set_level_gained($uid = NULL)
     {
