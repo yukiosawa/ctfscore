@@ -120,7 +120,9 @@ return array(
     // カウントダウンタイマー
     'countdown' => true,
     // 登録時音声[DOCROOTからの相対パス]
-    'register_sound' => ''
+    'register_sound' => '',
+    // 登録時画像[DOCROOTからの相対パス]
+    'register_image' => '',
 );
 
 /* End of file ctfscore.php */

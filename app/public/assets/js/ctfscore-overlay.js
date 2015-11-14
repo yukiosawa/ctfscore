@@ -1,5 +1,6 @@
 var overlayTimer;
 var overlayTimer2;
+var overlayTimer3;
 
 function showOverlay(data){
     clearTimeout(overlayTimer);
@@ -43,39 +44,27 @@ function showOverlay2(data){
     }
 }
 
-
 function closeOverlay2(){
     $('#overlay2').fadeOut();
 }
 
-
-
-
-/*
-function showOverlay(msg, img_urls){
-    clearTimeout(overlayTimer);
-    $('#overlayText').remove();
+function showOverlay3(img_url){
+    clearTimeout(overlayTimer3);
     $('#overlayImg').remove();
-    var div = $('<div>').attr('id', 'overlayText').text(msg);
-    $('#overlay').append(div);
-    var div2 = $('<div>').attr('id', 'overlayImg');
-    for (var i=0; i<img_urls.length; i++) {
-	var img = $('<img>').attr({
-	    src: img_urls[i],
-	});
-	img.addClass('img-responsive');
-	img.addClass('img-responsive-overwrite');
-	div2.append(img);
-    }
-    $('#overlay').append(div2);
-    $('#overlay').fadeIn();
-    //	 $('#overlayText').textillate();
-    overlayTimer = setTimeout('closeOverlay()', 10000);
-    //	 showOverlay2(data);
+    var div = $('<div>').attr('id', 'overlayImg');
+    var img = $('<img>').attr({
+        src: img_url,
+    });
+    img.addClass('img-responsive');
+    img.addClass('img-responsive-overwrite');
+    div.append(img);
+    $('#overlay3').append(div);
+    $('#overlay3').fadeIn();
+    overlayTimer3 = setTimeout('closeOverlay3()', 5000);
 }
 
-function closeOverlay(){
-    $('#overlay').fadeOut();
+function closeOverlay3(){
+    $('#overlay3').fadeOut();
 }
 
-*/
+

@@ -17,7 +17,7 @@
   <body>
     <div class="container">
       <?php echo Asset::img($logo_image, array('class' => 'img-responsive')); ?>
-      <?php if ($countdown): ?>
+      <?php if ($countdown && $ctf_end_time): ?>
         <div id="countdown" class="row"></div>
         <script>
          $(function () {
