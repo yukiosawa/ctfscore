@@ -24,10 +24,22 @@ class Model_Score extends Model
     {
         // 全員のスコア一覧 (管理者ユーザは表示しない)
         $admin_group_id = Config::get('ctfscore.admin.admin_group_id');
-        $scores = DB::select('id', 'username', 'totalpoint', 'pointupdated_at')
-            ->from('users')->where('group', '!=', $admin_group_id)
-            ->order_by('totalpoint', 'desc')
-            ->order_by('pointupdated_at', 'asc')
+        /* $scores = DB::select('id', 'username', 'totalpoint', 'pointupdated_at')
+           ->from('users')->where('group', '!=', $admin_group_id)
+           ->order_by('totalpoint', 'desc')
+           ->order_by('pointupdated_at', 'asc')
+           ->execute()->as_array(); */
+
+        $total_level = Config::get('ctfscore.level.dummy_name_total');
+        $scores = DB::select('users.id', 'users.username', 'users.totalpoint', 'levels.name')
+            ->from('users')
+            ->join('gained_levels', 'LEFT')->on('users.id', '=', 'gained_levels.uid')
+            ->join('levels', 'LEFT')->on('gained_levels.category', '=', 'levels.category')->on('gained_levels.level', '=', 'levels.level')
+            ->where('gained_levels.is_current', '=', true)
+            ->where('gained_levels.category', '=', $total_level)
+            ->where('users.group', '!=', $admin_group_id)
+            ->order_by('users.totalpoint', 'desc')
+            ->order_by('users.pointupdated_at', 'asc')
             ->execute()->as_array();
 
         // カテゴリごとのスコアを付加
