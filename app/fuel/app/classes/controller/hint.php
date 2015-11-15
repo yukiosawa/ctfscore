@@ -71,6 +71,10 @@ class Controller_Hint extends Controller_Rest
      */
     public function action_view($puzzle_id)
     {
+        if (!Controller_Auth::is_admin()) {
+            Response::redirect('auth/invalid');
+        }
+
         // 問題存在チェック
         if (!Model_Puzzle::get_puzzles($puzzle_id)) {
             $this->response(array('message' => '指定IDは存在しません'));

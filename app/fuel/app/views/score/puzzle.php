@@ -33,7 +33,9 @@
             }, 'json');
         });
 
-        $('.ctfscore-hint-view').click(function () {
+<?php if ($is_admin): ?>
+        $('.ctfscore-hint-view').click(function (e) {
+            e.preventDefault();
             var self = $(this);
             $('#ctfscore-hint-modal').modal({}, {
                 'id': self.data('id'),
@@ -45,14 +47,19 @@
             var self = $(this);
             $.get('/hint/view/' + e.relatedTarget.id, function (response) {
                 $('.modal-header', self).text('ヒントリクエスト - ' + e.relatedTarget.title);
-                var body = '<table class="table"><tr><th>ユーザ</th><th>コメント</th></tr>';
+                var body = '<table class="table"><thead><tr><th>ユーザ</th><th>コメント</th></tr></thead><tbody>';
                 $(response).each(function (index, values) {
-                    body += '<tr><td>' + values['username'] + '</td><td>' + values['comment'] + '</td></tr>';
+                    body += '<tr><td>'
+                         +  $('<div/>').text(values['username']).html()
+                         +  '</td><td>'
+                         +  $('<div/>').text(values['comment']).html()
+                         +  '</td></tr>';
                 });
-                body += '</table>'
+                body += '</tbody></table>'
                 $('.modal-body', self).html(body);
             }, 'json');
         });
+<?php endif; ?>
    });
 </script>
 
