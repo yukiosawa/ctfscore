@@ -266,6 +266,7 @@ class Controller_Score extends Controller_Template
         Controller_Auth::redirectIfNotAuth();
 
         $data = array();
+        $data['my_name'] = Auth::get_screen_name();
         $data['is_admin'] = Controller_Auth::is_admin();
         // 問題一覧
         // puzzleの内容はhtmlで書くのでエスケープせずにviewへ渡す

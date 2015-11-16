@@ -5,28 +5,6 @@
     });
 </script>
 
-<?php if (!($my_name == '' || $my_name == 'guest')): ?>
-<div class="row">
-  <div class="col-md-9 col-md-offset-3">
-    <div id="send-answer">
-      <form class="form-inline" action="/score/submit" method="post">
-        <?php /*
-        <!-- CSRF対策 -->
-        <input type="hidden" name="<?php echo \Config::get('security.csrf_token_key');?>" value="<?php echo \Security::fetch_token();?>" />
-        */ ?>
-        <div class="form-group col-md-6">
-          <label class="sr-only" for="answertext">Answer</label>
-          <input class="form-control" id="answertext" name="answer" type="text" placeholder="flag を入力"></input>
-        </div>
-        <div class="col-md-3">
-          <button class="btn btn-primary" type="submit">回答する</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-<?php endif; ?>
-
 <p>
 <div id="ranking">
   <div class="row">
@@ -36,9 +14,9 @@
         <tr>
           <th style="width: 55px;">ランク</th><th style="width: 120px;">ユーザ</th><th>合計</th>
           <?php
-          $alias = array(
-              '超文書転送術' => '超文書<br>転送術'
-          );
+              $alias = array(
+                  '超文書転送術' => '超文書<br>転送術'
+              );
               foreach ($categories as $category) {
                   echo '<th>'.((isset($alias[$category]) === true) ? $alias[$category] : $category).'</th>';
               }

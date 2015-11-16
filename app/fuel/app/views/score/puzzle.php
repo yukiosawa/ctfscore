@@ -63,6 +63,25 @@
    });
 </script>
 
+<?php if (!($my_name == '' || $my_name == 'guest')): ?>
+<div class="row">
+  <div>
+    <div id="send-answer">
+      <form action="/score/submit" method="post">
+        <div class="clearfix">
+          <div id="answertext-container" class="pull-left">
+            <input id="answertext" name="answer" type="text" placeholder="flag を入力せよ"></input>
+          </div>
+          <div id="answersubmit-container" class="pull-left">
+            <button class="btn btn-primary btn-lg" type="submit">提出</button>
+          </div>
+         </div>
+      </form>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
+
 <!-- 問題一覧 -->
 <div class="row">
   <div class="col-md-12">
