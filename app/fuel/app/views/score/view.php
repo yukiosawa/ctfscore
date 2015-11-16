@@ -57,7 +57,8 @@
                 echo "<tr>";
             }
             echo "<td>" . $rank . "</td>";
-            echo "<td><a href=/score/profile/" . $score['username'] . ">" . $score['username'] . "</a><div>[" . $score['name'] . "]</div></td>";
+            $levelname = empty($score['name']) ? '****' : $score['name'];
+            echo "<td><a href=/score/profile/" . $score['username'] . ">" . $score['username'] . "</a><div>[" . $levelname . "]</div></td>";
             echo "<td>" . $score['totalpoint'] . "</td>";
             foreach ($categories as $category) {
                 echo "<td>".$score[$category]."</td>";

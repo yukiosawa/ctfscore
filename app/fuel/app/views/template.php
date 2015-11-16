@@ -56,7 +56,7 @@
           <?php if ($logined): ?>
             <li class="dropdown update">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <?php echo $my_name ?>としてログイン中<span class="caret"></span>
+                <?php echo $my_name ?><span class="caret"></span>
               </a>
               <ul class="dropdown-menu">
                 <li><a href="/score/profile/<?php echo $my_name ?>">プロフィール</a></li>
@@ -66,7 +66,7 @@
               </ul>
             </li>
           <?php else: ?>
-            <li><a href="/auth/login">ログインする</a></li>
+            <li><a href="/auth/login">ログイン</a></li>
           <?php endif; ?>
           <li>
             <?php if ($sound_on): ?>

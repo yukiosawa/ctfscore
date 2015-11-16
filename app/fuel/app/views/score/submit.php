@@ -42,8 +42,16 @@
   <script>
       $(function(){
           overlay();
+          /* レビューを書いてもらう */
+          setTimeout('goReview()', 13000);
       });
+
+      function goReview(){
+          location.href = '/review/create/<?php echo $puzzle_id; ?>';
+      }
   </script>
+
+  <button onclick='goReview();' class='btn btn-primary'>レビューを書く</button>
   <p class='alert alert-success h4'><?php echo nl2br($text); ?></p>
 <?php elseif ($result == 'failure'): ?>
   <p class='alert alert-danger h4'><?php echo nl2br($text); ?></p>

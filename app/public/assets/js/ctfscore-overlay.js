@@ -60,7 +60,13 @@ function showOverlay3(img_url){
     div.append(img);
     $('#overlay3').append(div);
     $('#overlay3').fadeIn();
-    overlayTimer3 = setTimeout('closeOverlay3()', 5000);
+    var btn = $('<button>').text('開始する').attr({
+        onclick: 'closeOverlay3();',
+        style: 'position: absolute; bottom: 20px; right: 20px;',
+    });
+    btn.addClass('btn btn-primary');
+    $('#overlay3').append(btn);
+//    overlayTimer3 = setTimeout('closeOverlay3()', 10000);
 }
 
 function closeOverlay3(){
