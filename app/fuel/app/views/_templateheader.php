@@ -55,9 +55,6 @@
 
   // ロゴ画像
   $logo_image = Config::get('ctfscore.logo_image');
-
-  // カウントダウン
-  $countdown = Config::get('ctfscore.countdown');
   ?>
 
   <?php if ($bg_image): ?>
