@@ -34,7 +34,7 @@
       <table id="ranking-table" class="table table-condensed table-hover tablesorter">
       <thead>
         <tr>
-          <th style="width: 52px;">ランク</th><th style="width: 98px;">ユーザ</th><th>合計</th>
+          <th style="width: 55px;">ランク</th><th style="width: 120px;">ユーザ</th><th>合計</th>
           <?php
           $alias = array(
               '超文書転送術' => '超文書<br>転送術'

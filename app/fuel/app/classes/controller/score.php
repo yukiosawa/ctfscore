@@ -196,6 +196,15 @@ class Controller_Score extends Controller_Template
                     }
 
                     // 管理画面への通知メッセージ
+                    $puzzle = Model_Puzzle::get_puzzles($puzzle_id);
+                    if (count($puzzle) > 0) {
+                        $title = $puzzle[0]['title'];
+                    }
+                    else
+                    {
+                        $title = '----';
+                    }
+                    $mgmt_msg = $username.' は puzzle#'.$puzzle_id.':'.$title.' を解きました！';
                     if ($levels)
                     {
                         $result = 'levelup';
@@ -205,12 +214,7 @@ class Controller_Score extends Controller_Template
                         {
                             $level_string = $level_string.' '.$level.' ';
                         }
-                        $mgmt_msg = $username.' は'.$level_string.'にレベルアップしました！';
-                    }
-                    else
-                    {
-                        // レベルそのまま
-                        $mgmt_msg = $username.' は puzzle#'.$puzzle_id.' を解きました！';
+                        $mgmt_msg .= $level_string.'にレベルアップしました！';
                     }
                 }
             }
