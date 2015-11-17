@@ -1,0 +1,152 @@
+body {
+    background: rgba(0,0,0,0.2);
+}
+
+.navbar-inverse {
+    background-color: rgba(0,0,0,0.8);
+}
+
+.container {
+    background: rgba(255,255,255,0.5);
+}
+
+.table {
+    width: 100%;
+    table-layout: fixed;
+    word-wrap: break-word;
+}
+
+.table .min {
+    width: 0.1%;
+    white-space: nowrap;
+}
+
+
+/* jquery tablesorter plugin */
+table.tablesorter thead tr .header {
+    background-image: url(../js/images/tablesorter/bg.gif);
+    background-repeat: no-repeat;
+    background-position: center right;
+    cursor: pointer;
+}
+
+table.tablesorter .headerSortUp {
+    background-image: url(../js/images/tablesorter/asc.gif);
+    background-repeat: no-repeat;
+}
+table.tablesorter .headerSortDown {
+    background-image: url(../js/images/tablesorter/desc.gif);
+    background-repeat: no-repeat;
+}
+
+table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp {
+    background-color: #8dbdd8;
+}
+
+
+
+/* for overlay window */
+.img-responsive-overwrite{
+    margin: 0 auto;
+    /*width: 50%;*/
+    max-height: 100vh;
+    max-width: 100vw;
+}
+
+#overlay{
+    display : none;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 2000;
+    background: rgba(0,0,0,1);
+    background-image: url(/assets/img/bg-overlay1/samurai-red-sun.jpg);
+    background-size: cover;
+}
+
+#overlayText{
+    font-size: 30px;
+    color: rgba(255,0,0,1);
+    padding-top: 100px;
+    vertical-align: middle;
+    font-weight: bold;
+}
+
+#overlay2{
+    display : none;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2010;
+    background: rgba(0,0,0,1);
+    background-image: url(/assets/img/bg-overlay2/samurai-wallpaper.jpg);
+    background-size: cover;
+}
+
+#overlay3{
+    display : none;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 2000;
+    background: rgba(0,0,0,1);
+}
+
+#messageArea{
+    /* color: #32CD32; */
+    font-size: 20px;
+    color: rgba(0,0,0,0.9);
+    font-weight: bold;
+}
+
+
+/* flipclock.js plugin */
+div#countdown {
+   margin: 0 auto;
+   width: 620px;
+   zoom: 0.6;
+   -moz-transform: scale(0.6);
+}
+.flip-clock-label {
+    font-size: 24px;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important;
+    font-weight: bold;
+}
+
+/* ctfscore-theme */
+#send-answer {
+    width: 570px;
+    margin: 0 auto 12px auto;
+}
+#answertext-container {
+    padding: 55px 45px 0 60px;
+    width: 500px;
+    height: 144px;
+    background-image: url(../img/bg_answertext.png);
+    background-repeat: no-repeat;
+}
+    #answertext-container input {
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid #c0c0c0;
+        width: 100%;
+        outline: none;
+    }
+    #answertext-container input:focus 
+    {
+        border-bottom: 1px solid #999;
+    }
+
+    #answersubmit-container {
+        padding-top: 45px;
+        width: 70px;
+    }
