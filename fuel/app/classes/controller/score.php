@@ -285,11 +285,24 @@ class Controller_Score extends Controller_Template
         // 認証済みユーザのみ許可
         Controller_Auth::redirectIfNotAuth();
 
-        $puzzle = Model_Puzzle::get_puzzles($id)[0];
+        $puzzle = Model_Puzzle::get_puzzles($id);
+
+        if (empty($puzzle) === true) {
+            return new Response(json_encode(array('message' => 'この問題は存在しません。')));
+        }
+
+        $puzzle = $puzzle[0];
+        list($driver, $userid) = Auth::get_user_id();
         $attachment = Model_Puzzle::get_attachment_names($id);
+        $is_hinted = Model_Hint::is_hinted($id, $userid);
         $data = array('content' => $puzzle['content'], 'attachment' => $attachment);
         $body = View::forge('score/puzzle_view')->set_safe($data)->__toString();
-        return new Response(json_encode(array('title' => $puzzle['title'], 'body' => $body)));
+
+        return new Response(json_encode(array(
+            'title'     => $puzzle['category'] . ' - ' . $puzzle['title'],
+            'body'      => $body,
+            'is_hinted' => $is_hinted
+        )));
     }
 
 

@@ -12,8 +12,9 @@
 
         $('#ctfscore-puzzle-modal').on('hidden.bs.modal', function (e) {
             var self = $(this);
-            $('.ctfscore-hint-container').hide();
+            $('.ctfscore-hint-container').hide()
             $('.ctfscore-hint-request').show();
+            $('.ctfscore-hint-form').hide();
             $('.modal-header', self).text('');
             $('.modal-body', self).text('');
         });
@@ -24,6 +25,10 @@
             $.get('/score/puzzle_view/' + active_id, function (response) {
                 $('.modal-header', self).text(response['title']);
                 $('.modal-body', self).html(response['body']);
+
+                if (response['is_hinted'] === false) {
+                    $('.ctfscore-hint-container').show();
+                }
             }, 'json');
         });
 
@@ -33,7 +38,7 @@
             var self = $(this);
             $.get('/hint/token', function (response) {
                 token = response['token'];
-                $('.ctfscore-hint-container').show();
+                $('.ctfscore-hint-form').show();
                 self.hide();
             });
         });
@@ -169,9 +174,9 @@
             <div class="modal-header"></div>
             <div class="modal-body"></div>
             <div class="modal-footer">
-                <div class="text-left">
+                <div class="text-left ctfscore-hint-container">
                     <a href="#" class="ctfscore-hint-request">この問題のヒントがほしいですか？</a>
-                    <div class="ctfscore-hint-container" style="display:none">
+                    <div class="ctfscore-hint-form" style="display:none">
                         <form class="form-inline ctfscore-hint">
                             <div class="input-group">
                                 <input name="comment" class="form-control" placeholder="コメント">

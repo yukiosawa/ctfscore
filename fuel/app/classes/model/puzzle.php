@@ -63,13 +63,12 @@ class Model_Puzzle extends Model
         $score_all = Model_Review::average_score_all();
         $gained_count = Model_Puzzle::get_puzzlue_gained_count();
         $hints_count = Model_Hint::get_hints_count();
-        $hinted_all = Model_Hint::get_hinted_all($userid);
 
         for ($i = 0; $i < count($puzzles); $i++)
         {
             // 添付ファイルのファイル名
-            $puzzles[$i] += array('attachments' =>
-                Model_Puzzle::get_attachment_names($puzzles[$i]['puzzle_id']));
+            //$puzzles[$i] += array('attachments' =>
+            //    Model_Puzzle::get_attachment_names($puzzles[$i]['puzzle_id']));
 
             // 回答済かどうかを付加する
             $puzzles[$i] += array('answered' => in_array($puzzles[$i]['puzzle_id'], $answered_all));
@@ -88,9 +87,6 @@ class Model_Puzzle extends Model
             $hints = (isset($hints_count[$puzzles[$i]['puzzle_id']]) === true) ?
                 $hints_count[$puzzles[$i]['puzzle_id']] : 0;
             $puzzles[$i] += array('hints' => $hints);
-
-            // ヒント送信済かどうかを付加する
-            $puzzles[$i] += array('hinted' => in_array($puzzles[$i]['puzzle_id'], $hinted_all));
         }
 
         return $puzzles;
