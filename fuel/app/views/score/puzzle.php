@@ -6,20 +6,34 @@
     $(function(){
         var token = '';
 
+        var active_id = '0';
+
         $('#puzzle-table').tablesorter();
 
-        $('.ctfscore-puzzle-modal').on('hidden.bs.modal', function () {
+        $('#ctfscore-puzzle-modal').on('hidden.bs.modal', function (e) {
             var self = $(this);
-            $('.ctfscore-hint-container-' + self.data('id')).hide();
-            $('.ctfscore-hint-request', self).show();
+            $('.ctfscore-hint-container').hide();
+            $('.ctfscore-hint-request').show();
+            $('.modal-header', self).text('');
+            $('.modal-body', self).text('');
         });
+
+        $('#ctfscore-puzzle-modal').on('show.bs.modal', function (e) {
+            var self = $(this);
+            active_id = $(e.relatedTarget).data('id');
+            $.get('/score/puzzle_view/' + active_id, function (response) {
+                $('.modal-header', self).text(response['title']);
+                $('.modal-body', self).html(response['body']);
+            }, 'json');
+        });
+
 
         $('.ctfscore-hint-request').click(function (e) {
             e.preventDefault();
             var self = $(this);
             $.get('/hint/token', function (response) {
                 token = response['token'];
-                $('.ctfscore-hint-container-' + self.data('id')).show();
+                $('.ctfscore-hint-container').show();
                 self.hide();
             });
         });
@@ -27,7 +41,7 @@
         $('.ctfscore-hint').submit(function (e) {
             e.preventDefault();
             var self = $(this);
-            var action = '/hint/create/' + self.data('id');
+            var action = '/hint/create/' + active_id;
             $.post(action, self.serialize() + '&<?php echo \Config::get('security.csrf_token_key');?>=' + token, function (response) {
                 response['status'] ? self.text(response['message']) : alert(response['message']);
             }, 'json');
@@ -115,7 +129,7 @@
         // カテゴリ
         echo "<td>".$puzzle['category']."</td>";
         // タイトル
-        echo "<td><a href='#puzzle".$puzzle_id."' data-toggle='modal'>".$puzzle['title']."</a></td>";
+        echo "<td><a href='#ctfscore-puzzle-modal' data-toggle='modal' data-id='" . $puzzle['puzzle_id'] . "'>" . $puzzle['title'] . "</a></td>";
         // ポイント
         echo "<td>".$puzzle['point']."</td>";
         // 回答者数
@@ -149,54 +163,28 @@
 </div>
 <?php endif; ?>
 
-<?php
-// 問題本文
-foreach ($puzzles as $puzzle) {
-    $puzzle_id = $puzzle['puzzle_id'];
-
-    echo "<div id='puzzle" . $puzzle_id . "' class='ctfscore-puzzle-modal modal fade' data-id='" . $puzzle_id . "'>";
-    echo "<div class='modal-dialog'>";
-    echo "<div class='modal-content'>";
-
-    echo "<div class='modal-header'>";
-    echo "<h4 class='modal-title'>";
-    // カテゴリ, ポイント
-    echo "<div>".$puzzle['category']." ".$puzzle['point']."</div>";
-    // タイトル
-    echo "<div>".$puzzle['title']."</div>";
-    echo "</h4>";
-    echo "</div>";
-
-    echo "<div class='modal-body'>";
-    // 本文, 添付ファイル
-    echo "<p>".$puzzle['content']."</p>";
-    //echo "<p>".n2br($puzzle['content'])."</p>";
-    foreach ($puzzle['attachments'] as $filename => $val)
-    {
-    // ダウンロードページへのリンク
-    echo "<p><a href='/download/puzzle?id=".$puzzle_id."&file=".$val."'>".$val."</a></p>";
-    }
-
-    // ヒント
-    if (!$puzzle['hinted'] && !$puzzle['answered']) {
-        echo '<hr><a href="#" class="ctfscore-hint-request" data-id="' . $puzzle_id . '">この問題のヒントがほしいですか？</a>';
-        echo '<div class="ctfscore-hint-container-' . $puzzle_id . '" style="display:none">';
-        echo '<form class="form-inline ctfscore-hint" data-id="' . $puzzle_id . '">';
-        echo '<div class="input-group"><input name="comment" class="form-control" placeholder="コメント">';
-        echo '<span class="input-group-btn"><input type="submit" class="btn btn-primary" value="ヒントリクエスト"></span></div>';
-        echo '</form></div>';
-    }
-
-    echo "</div>";
-
-    echo "<div class='modal-footer'>";
-    echo "<button class='btn btn-default' data-dismiss='modal'>閉じる</button>";
-    echo "</div>";
-
-    echo "</div>";
-    echo "</div>";
-    echo "</div>";
-    echo "\n\n";
-}
-?>
-
+<div class="modal fade" id="ctfscore-puzzle-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <div class="text-left">
+                    <a href="#" class="ctfscore-hint-request">この問題のヒントがほしいですか？</a>
+                    <div class="ctfscore-hint-container" style="display:none">
+                        <form class="form-inline ctfscore-hint">
+                            <div class="input-group">
+                                <input name="comment" class="form-control" placeholder="コメント">
+                                <span class="input-group-btn">
+                                    <input type="submit" class="btn btn-primary" value="ヒントリクエスト">
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                    <hr>
+                </div>
+                <button class='btn btn-default' data-dismiss='modal'>閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>

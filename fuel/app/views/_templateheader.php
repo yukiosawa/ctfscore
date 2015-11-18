@@ -59,7 +59,7 @@
 
   <?php if ($bg_image): ?>
     <style type='text/css'>
-     body {
+     body,.container-blur::before {
        background-image: url(<?php echo $bg_image; ?>);
        background-size: cover;
        background-position: center center;

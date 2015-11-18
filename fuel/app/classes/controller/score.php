@@ -278,6 +278,20 @@ class Controller_Score extends Controller_Template
         $this->template->footer = '';
     }
 
+    public function action_puzzle_view($id)
+    {
+        // CTF開始前は許可しない
+        $this->checkCTFStatus(true, false);
+        // 認証済みユーザのみ許可
+        Controller_Auth::redirectIfNotAuth();
+
+        $puzzle = Model_Puzzle::get_puzzles($id)[0];
+        $attachment = Model_Puzzle::get_attachment_names($id);
+        $data = array('content' => $puzzle['content'], 'attachment' => $attachment);
+        $body = View::forge('score/puzzle_view')->set_safe($data)->__toString();
+        return new Response(json_encode(array('title' => $puzzle['title'], 'body' => $body)));
+    }
+
 
     public function action_chart()
     {
