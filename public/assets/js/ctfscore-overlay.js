@@ -60,13 +60,11 @@ function showOverlay3(img_url){
     div.append(img);
     $('#overlay3').append(div);
     $('#overlay3').fadeIn();
-    var btn = $('<button>').text('開始する').attr({
+    var btn = $('<img>', {src: '/assets/img/btn_go.png', 'id': 'overlay3-close'}).text('開始する').attr({
         onclick: 'closeOverlay3();',
-        style: 'position: absolute; bottom: 20px; right: 20px;',
+        style: 'position: absolute; top: 0; bottom: 0; right: 0; left: 0; margin: auto; cursor: pointer;',
     });
-    btn.addClass('btn btn-primary');
     $('#overlay3').append(btn);
-//    overlayTimer3 = setTimeout('closeOverlay3()', 10000);
 }
 
 function closeOverlay3(){

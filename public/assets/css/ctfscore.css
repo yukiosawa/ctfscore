@@ -117,11 +117,17 @@ table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSo
 
 /* flipclock.js plugin */
 div#countdown {
-   margin: 0 auto;
-   width: 620px;
-   zoom: 0.6;
-   -moz-transform: scale(0.6);
+   margin: 40px auto 0 auto;
+   width: 740px;
 }
+    div#countdown::before {
+        content: "";
+        margin-top: 8px;
+        width: 120px;
+        height: 80px;
+        background: url(../img/bg_clock.png);
+        float: left;
+    }
 .flip-clock-label {
     font-size: 24px;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.6) !important;
