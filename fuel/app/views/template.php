@@ -42,8 +42,8 @@
                   <ul class="dropdown-menu">
                     <li><a href="/admin/review/list">レビュー管理</a></li>
                     <li><a href="/admin/news/list">お知らせ管理</a></li>
+                    <li><a href="/admin/bonus/list">ボーナス点管理</a></li>
                     <li><a href="/admin/mgmt/" target="_blank">管理コンソール</a></li>
-                    <li><a href="/score/status">実施状況</a></li>
                   </ul>
                 </li>
               <?php endif; ?>

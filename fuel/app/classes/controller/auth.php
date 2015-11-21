@@ -112,7 +112,7 @@ class Controller_Auth extends Controller_Template
                 if (Auth::login($username, $password))
                 {
                     // ログイン成功
-                    $this->redirectIfAuth();
+                    $this->redirectIfAuth('/score/puzzle');
                 }
                 $error_msg = 'ログインに失敗しました。';
             }

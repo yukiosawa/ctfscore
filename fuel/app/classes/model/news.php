@@ -103,7 +103,7 @@ class Model_News extends Model
 	{
 	    $val->add('id', 'ID')
 		->add_rule('required')
-		->add_rule('numeric_max', 255)
+		->add_rule('numeric_max', 10000)
 		->add_rule('numeric_min', 1);
 	}
 

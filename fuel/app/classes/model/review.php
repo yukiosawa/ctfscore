@@ -247,13 +247,14 @@ class Model_Review extends Model
 
         if ($factory == 'create' || $factory == 'edit')
         {
+            $max_data_number = Config::get('ctfscore.review.max_data_number');
             $val->add('puzzle_id', '問題番号')
                 ->add_rule('required')
-                ->add_rule('numeric_max', 255)
+                ->add_rule('numeric_max', 10000)
                 ->add_rule('numeric_min', 1);
             $val->add('score', '評価点')
                 ->add_rule('required')
-                ->add_rule('numeric_max', 10)
+                ->add_rule('numeric_max', $max_data_number)
                 ->add_rule('numeric_min', 0);
             $val->add('comment', '公開コメント')
                 ->add_rule('max_length', 1000);
@@ -264,7 +265,7 @@ class Model_Review extends Model
         {
             $val->add('review_id', 'レビューID')
                 ->add_rule('required')
-                ->add_rule('numeric_max', 255)
+                ->add_rule('numeric_max', 10000)
                 ->add_rule('numeric_min', 1);
         }
 
