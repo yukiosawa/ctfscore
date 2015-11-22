@@ -134,6 +134,7 @@ class Controller_Auth extends Controller_Template
         // 認証済みユーザのみ許可
         $this->redirectIfNotAuth();
         Auth::logout();
+        Session::destroy();
         $this->template->title = 'ログアウト';
         $this->template->content = View::forge('auth/logout');
         $this->template->footer = View::forge('auth/footer');

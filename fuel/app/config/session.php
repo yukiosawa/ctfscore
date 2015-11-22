@@ -53,12 +53,11 @@ return array(
 	'encrypt_cookie'	=> true,
 
 	// if true, the session expires when the browser is closed (optional, default = false)
-	//'expire_on_close'	=> false,
-	'expire_on_close'	=> true,
+	'expire_on_close'	=> false,
 
 	// session expiration time, <= 0 means 2 years! (optional, default = 2 hours)
 	//'expiration_time'	=> 7200,
-	'expiration_time'	=> 0,
+	'expiration_time'	=> 3600 * 24 * 7,
 
 	// session ID rotation time  (optional, default = 300) Set to false to disable rotation
 	'rotation_time'		=> 300,
