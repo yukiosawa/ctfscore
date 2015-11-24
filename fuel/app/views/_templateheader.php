@@ -5,6 +5,7 @@
   $is_admin = false;
   $ctf_time = false;
   $sound_on = Cookie::get('sound_on', '1') === '1';
+  $is_sp = preg_match('/android|iphone/i', $_SERVER['HTTP_USER_AGENT']) === 1;
   // ログイン状態の情報
   if (Auth::check())
   {
@@ -59,13 +60,52 @@
 
   <?php if ($bg_image): ?>
     <style type='text/css'>
-     body,.container-blur::before {
-       background-image: url(<?php echo $bg_image; ?>);
-       background-size: cover;
-       background-position: center center;
-       background-attachment: fixed;
-       background-repeat: no-repeat;
-     }
+      body {
+        background-image: url(<?php echo $bg_image; ?>);
+        background-size: cover;
+        background-position: center center;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+      }
+      .container-main {
+          padding: 0 15px 15px 15px;
+          background: rgba(255, 255, 255, 0.8);
+          box-shadow: 0px 0px 9px 4px rgba(0, 0, 0, 0.2);
+      }
+      <?php if (!$is_sp): ?>
+      .container-blur {
+          position: relative;
+      }
+      .container-blur::before {
+         background-image: url(<?php echo $bg_image; ?>);
+         background-size: cover;
+         background-position: center center;
+         background-attachment: fixed;
+         background-repeat: no-repeat;
+       }
+      .container-blur::before {
+          content: "";
+          position: absolute;
+          background-clip: content-box;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          -webkit-filter: blur(5px);
+          -moz-filter: blur(5px);
+          filter: blur(5px);
+      }
+      .container-main {
+          position: relative;
+          background: rgba(255, 255, 255, 0.3);
+          -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99ffffff, endColorstr=#99ffffff)";
+      }
+      @media all and (-ms-high-contrast:none) {
+          .container-main {
+              background: rgba(255, 255, 255, 0.7);
+          }
+      }
+      <?php endif; ?>
     </style>
   <?php endif; ?>
 
