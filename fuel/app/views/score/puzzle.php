@@ -92,7 +92,7 @@
             <input id="answertext" name="answer" type="text" placeholder="flag を入力せよ"></input>
           </div>
           <div id="answersubmit-container" class="pull-left">
-            <button class="btn btn-primary btn-lg" type="submit">提出</button>
+            <input type="image" src="<?php echo Asset::get_file('btn_submit_on.png', 'img'); ?>" alt="">
           </div>
          </div>
       </form>

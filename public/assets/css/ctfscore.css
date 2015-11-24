@@ -140,7 +140,7 @@ div#countdown {
 }
 
 #send-answer {
-    width: 570px;
+    width: 713px;
     margin: 0 auto 12px auto;
 }
 #answertext-container {
@@ -163,6 +163,16 @@ div#countdown {
     }
 
     #answersubmit-container {
-        padding-top: 45px;
-        width: 70px;
+        width: 213px;
+    }
+
+    #answersubmit-container input[type="image"] {
+        outline: none;
+        transition: all 0.3s;
+        opacity: 1.0;
+    }
+
+    #answersubmit-container input[type="image"]:hover {
+        opacity: 0.6;
+        transition: all 0.3s;
     }
