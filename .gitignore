@@ -1,2 +1,10 @@
 *~
 *.swp
+.htaccess
+fuel/app/config
+public/assets/img
+public/audio
+ctfadmin/batch
+ctfadmin/html
+ctfadmin/puzzles
+
