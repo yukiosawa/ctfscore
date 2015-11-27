@@ -75,13 +75,16 @@ class Controller_Hint extends Controller_Rest
             Response::redirect('auth/invalid');
         }
 
+        $puzzle = Model_Puzzle::get_puzzles($puzzle_id);
+
         // 問題存在チェック
-        if (!Model_Puzzle::get_puzzles($puzzle_id)) {
+        if (empty($puzzle) === true) {
             $this->response(array('message' => '指定IDは存在しません'));
             return;
         }
 
-        $this->response(Model_Hint::get_hints($puzzle_id));
+        $puzzle = $puzzle[0];
+        $this->response(array('title' => $puzzle['title'], 'body' => Model_Hint::get_hints($puzzle_id)));
     }
 
     /**

@@ -5,6 +5,12 @@
 <?php echo Asset::css('animate.css'); ?>
 <?php echo Asset::js('jquery.lettering-0.6.min.js'); ?>
 <?php echo Asset::js('jquery.textillate.js'); ?>
+<?php echo Asset::js('jquery.tablesorter.min.js'); ?>
+<script>
+    $(function(){
+        $('#profile-solved-table').tablesorter();
+    });
+</script>
 
 <div id="errmsg"></div>
 
@@ -59,7 +65,7 @@
 <div class="row">
   <div class="col-md-6">
     <p class="h4">正解した問題</p>
-    <table class="table table-hover">
+    <table class="table table-hover tablesorter" id="profile-solved-table">
       <thead>
 	<tr>
 	  <th>カテゴリ</th><th>ポイント</th><th>タイトル</th><th>回答時刻</th>

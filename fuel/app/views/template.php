@@ -28,9 +28,11 @@
                 <li><a href="/score/chart">グラフ</a></li>
               <?php endif; ?>
               <li><a href="/score/status">実施状況</a></li>
-              <li><a href="/score/rule">ルール</a></li>
+              <li><a href="/score/rule">規則・禁止事項</a></li>
               <li><a href="/score/level">レベル</a></li>
-              <li><a href="/news/list">お知らせ</a></li>
+              <li><a href="/news/list">お知らせ
+                <?php if ($already_news): ?><span class="badge"><?php echo $already_news; ?></span><?php endif; ?>
+              </a></li>
               <li><a href="/score/about">場阿忍愚CTFについて</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">

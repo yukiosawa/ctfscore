@@ -72,8 +72,8 @@ class Controller_Score extends Controller_Template
         // カテゴリ一覧
         $ignore = array('練習');
         $data['categories'] = array_filter(
-            Model_Puzzle::get_categories(),
-            function ($var) use ($ignore) { return in_array($var, $ignore) === false; }
+            Model_Puzzle::get_categories_with_point(),
+            function ($var) use ($ignore) { return in_array($var['category'], $ignore) === false; }
         );
 
         // 全ユーザの回答状況一覧
@@ -305,6 +305,33 @@ class Controller_Score extends Controller_Template
         )));
     }
 
+    /**
+     * action_puzzle_solvers
+     * 
+     * @return void
+     */
+    public function action_puzzle_solvers($id)
+    {
+        // CTF開始前は許可しない
+        $this->checkCTFStatus(true, false);
+        // 認証済みユーザのみ許可
+        Controller_Auth::redirectIfNotAuth();
+
+        $puzzle = Model_Puzzle::get_puzzles($id);
+
+        if (empty($puzzle) === true) {
+            return new Response('この問題は存在しません。');
+        }
+
+        $puzzle = $puzzle[0];
+        $data = array();
+        $data['gained'] = Model_Puzzle::get_puzzle_gained($id);
+        return new Response(json_encode(array(
+            'title' => $puzzle['title'],
+            'body'  => View::forge('score/puzzle_solvers', $data)->__toString()
+        )));
+    }
+
 
     public function action_chart()
     {
@@ -327,7 +354,7 @@ class Controller_Score extends Controller_Template
     public function action_rule()
     {
         $data['file'] = Config::get('ctfscore.static_page.rule_file');
-        $this->template->title = 'ルール';
+        $this->template->title = '規則・禁止事項';
         $this->template->content = View::forge('score/static_page', $data);
         $this->template->footer = '';
     }

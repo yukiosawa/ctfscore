@@ -20,6 +20,15 @@ a {
     white-space: nowrap;
 }
 
+.table .anchor {
+    color: #157BD4;
+    cursor: pointer;
+}
+
+.table .anchor:hover {
+    text-decoration: underline;
+}
+
 
 /* jquery tablesorter plugin */
 table.tablesorter thead tr .header {
@@ -164,15 +173,20 @@ div#countdown {
 
     #answersubmit-container {
         width: 213px;
+        height: 144px;
+        background-image: url(../img/btn_submit_off.png);
+        background-repeat: no-repeat;
     }
 
-    #answersubmit-container input[type="image"] {
+    #answersubmit {
         outline: none;
-        transition: all 0.3s;
-        opacity: 1.0;
+        width: 213px;
+        height: 144px;
     }
 
-    #answersubmit-container input[type="image"]:hover {
-        opacity: 0.6;
-        transition: all 0.3s;
+#ranking-table td span {
+    font-weight: bold;
+}
+    #ranking-table td span.text-warning {
+        color: #666633;
     }

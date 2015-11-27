@@ -109,6 +109,7 @@ class Ctfscore
             'last_login' => array('type' => 'varchar', 'constraint' => 25),
             'login_hash' => array('type' => 'varchar', 'constraint' => 255),
             'profile_fields' => array('type' => 'text'),
+            'already_news_id' => array('type' => 'id', 'default' => 0),
             'created_at' => array('type' => 'int', 'constraint' => 11, 'default' => 0),
             'updated_at' => array('type' => 'int', 'constraint' => 11, 'default' => 0),
             'totalpoint' => array('type' => 'int', 'default' => 0),

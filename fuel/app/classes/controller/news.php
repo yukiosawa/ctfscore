@@ -2,7 +2,7 @@
 
 class Controller_News extends Controller_Template
 {
-    
+
     public function before()
     {
         parent::before();
@@ -16,10 +16,17 @@ class Controller_News extends Controller_Template
 
     public function action_list()
     {
-	$data['news'] = Model_News::get_news();
-	$this->template->title = 'News';
-	$this->template->content = View::forge('news/list', $data);
-	$this->template->footer = '';
+        list($driver, $userid) = Auth::get_user_id();
+        $news = Model_News::get_news();
+
+        if (count($news) > 0) {
+            Model_News::update_already($userid, $news[0]['id']);
+        }
+
+        $data['news'] = $news;
+        $this->template->title = 'News';
+        $this->template->content = View::forge('news/list', $data);
+        $this->template->footer = '';
     }
 
 

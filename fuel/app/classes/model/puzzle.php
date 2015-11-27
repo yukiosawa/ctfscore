@@ -61,7 +61,7 @@ class Model_Puzzle extends Model
         // 追加情報付与
         $answered_all = Model_Puzzle::is_answered_puzzle_all($userid);
         $score_all = Model_Review::average_score_all();
-        $gained_count = Model_Puzzle::get_puzzlue_gained_count();
+        $gained_count = Model_Puzzle::get_puzzle_gained_count();
         $hints_count = Model_Hint::get_hints_count();
 
         for ($i = 0; $i < count($puzzles); $i++)
@@ -101,6 +101,16 @@ class Model_Puzzle extends Model
         $query->order_by('category', 'asc');
         $result = $query->execute()->as_array('category');
         return array_keys($result);
+    }
+
+
+    // カテゴリ(+ポイント)一覧を取得
+    public static function get_categories_with_point()
+    {
+        $query = DB::select(DB::expr('category,SUM(point) as point'))->from('puzzles')
+            ->group_by('category');
+        $result = $query->execute()->as_array();
+        return $result;
     }
 
 
@@ -148,12 +158,30 @@ class Model_Puzzle extends Model
     }
 
     /**
-     * get_puzzlue_gained_count
+     * get_puzzle_gained
+     * 
+     * @param int $puzzle_id 
+     * @static
+     * @return array(array(username,gained_at),...)
+     */
+    public static function get_puzzle_gained($puzzle_id)
+    {
+        $result = DB::select(DB::expr('users.username,gained.gained_at'))->from('gained')
+            ->join('users')
+            ->on('gained.uid', '=', 'users.id')
+            ->where('puzzle_id', $puzzle_id)
+            ->order_by('gained_at', 'asc')
+            ->execute()->as_array();
+        return $result;
+    }
+
+    /**
+     * get_puzzle_gained_count
      * 
      * @static
      * @return array(array(puzzle_id => COUNT(puzzle_id)),...)
      */
-    public static function get_puzzlue_gained_count()
+    public static function get_puzzle_gained_count()
     {
         $result = DB::select(DB::expr('puzzle_id, COUNT(puzzle_id)'))->from('gained')
             ->group_by('puzzle_id')

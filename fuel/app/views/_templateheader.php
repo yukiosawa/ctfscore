@@ -9,15 +9,19 @@
   // ログイン状態の情報
   if (Auth::check())
   {
+      list($driver, $userid) = Auth::get_user_id();
       $logined = true;
       $my_name = Auth::get_screen_name();
       $is_admin = Controller_Auth::is_admin();
+      $already_news = Model_News::get_already($userid);
   }
   else
   {
+      $userid = 0;
       $logined = false;
       $my_name = '';
       $is_admin = false;
+      $already_news = 0;
   }
   // CTF時間の設定状況
   $status = Model_Score::get_ctf_time_status();
@@ -77,13 +81,6 @@
           position: relative;
       }
       .container-blur::before {
-         background-image: url(<?php echo $bg_image; ?>);
-         background-size: cover;
-         background-position: center center;
-         background-attachment: fixed;
-         background-repeat: no-repeat;
-       }
-      .container-blur::before {
           content: "";
           position: absolute;
           background-clip: content-box;
@@ -91,13 +88,18 @@
           height: 100%;
           top: 0;
           left: 0;
-          -webkit-filter: blur(5px);
-          -moz-filter: blur(5px);
-          filter: blur(5px);
+          -webkit-filter: blur(6px);
+          -moz-filter: blur(6px);
+          filter: blur(6px);
+          background-image: url(<?php echo $bg_image; ?>);
+          background-size: cover;
+          background-position: center center;
+          background-attachment: fixed;
+          background-repeat: no-repeat;
       }
       .container-main {
           position: relative;
-          background: rgba(255, 255, 255, 0.3);
+          background: rgba(255, 255, 255, 0.4);
           -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99ffffff, endColorstr=#99ffffff)";
       }
       @media all and (-ms-high-contrast:none) {

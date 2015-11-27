@@ -4,10 +4,6 @@
 
 <script>
     $(function(){
-        var token = '';
-
-        var active_id = '0';
-
         $('#puzzle-table').tablesorter();
 
         $('#ctfscore-puzzle-modal').on('hidden.bs.modal', function (e) {
@@ -21,8 +17,8 @@
 
         $('#ctfscore-puzzle-modal').on('show.bs.modal', function (e) {
             var self = $(this);
-            active_id = $(e.relatedTarget).data('id');
-            $.get('/score/puzzle_view/' + active_id, function (response) {
+            $('.ctfscore-hint').data('id', $(e.relatedTarget).data('id'));
+            $.get('/score/puzzle_view/' + $(e.relatedTarget).data('id'), function (response) {
                 $('.modal-header', self).text(response['title']);
                 $('.modal-body', self).html(response['body']);
 
@@ -32,13 +28,26 @@
             }, 'json');
         });
 
+        $('#ctfscore-puzzle-solvers-modal').on('hidden.bs.modal', function (e) {
+            var self = $(this);
+            $('.modal-header', self).text('');
+            $('.modal-body', self).text('');
+        });
+
+        $('#ctfscore-puzzle-solvers-modal').on('show.bs.modal', function (e) {
+            var self = $(this);
+            $.get('/score/puzzle_solvers/' + $(e.relatedTarget).data('id'), function (response) {
+                $('.modal-header', self).text('回答者 - ' + response['title']);
+                $('.modal-body', self).html(response['body']);
+            }, 'json');
+        });
 
         $('.ctfscore-hint-request').click(function (e) {
             e.preventDefault();
             var self = $(this);
             $.get('/hint/token', function (response) {
-                token = response['token'];
                 $('.ctfscore-hint-form').show();
+                $('input[name="<?php echo \Config::get('security.csrf_token_key');?>"]', '.ctfscore-hint-form').val(response['token']);
                 self.hide();
             });
         });
@@ -46,28 +55,25 @@
         $('.ctfscore-hint').submit(function (e) {
             e.preventDefault();
             var self = $(this);
-            var action = '/hint/create/' + active_id;
-            $.post(action, self.serialize() + '&<?php echo \Config::get('security.csrf_token_key');?>=' + token, function (response) {
+            var action = '/hint/create/' + self.data('id');
+            $.post(action, self.serialize(), function (response) {
                 response['status'] ? self.text(response['message']) : alert(response['message']);
             }, 'json');
         });
 
 <?php if ($is_admin): ?>
-        $('.ctfscore-hint-view').click(function (e) {
-            e.preventDefault();
+        $('#ctfscore-hint-modal').on('hidden.bs.modal', function (e) {
             var self = $(this);
-            $('#ctfscore-hint-modal').modal({}, {
-                'id': self.data('id'),
-                'title': self.data('title')
-            });
+            $('.modal-header', self).text('');
+            $('.modal-body', self).text('');
         });
 
         $('#ctfscore-hint-modal').on('show.bs.modal', function (e) {
             var self = $(this);
-            $.get('/hint/view/' + e.relatedTarget.id, function (response) {
-                $('.modal-header', self).text('ヒントリクエスト - ' + e.relatedTarget.title);
+            $.get('/hint/view/' + $(e.relatedTarget).data('id'), function (response) {
+                $('.modal-header', self).text('ヒントリクエスト - ' + response['title']);
                 var body = '<table class="table"><thead><tr><th>ユーザ</th><th>コメント</th></tr></thead><tbody>';
-                $(response).each(function (index, values) {
+                $(response['body']).each(function (index, values) {
                     body += '<tr><td>'
                          +  $('<div/>').text(values['username']).html()
                          +  '</td><td>'
@@ -79,6 +85,17 @@
             }, 'json');
         });
 <?php endif; ?>
+
+        $('<img>').attr('src', '<?php echo Asset::get_file('btn_submit_on.png', 'img')?>');
+        $('#answersubmit').bind('touchstart mouseover', function () {
+            $(this).fadeOut(0, function () {
+                $(this).attr('src', '<?php echo Asset::get_file('btn_submit_on.png', 'img')?>').fadeIn(300);
+            });
+        }).bind('touchend mouseout', function () {
+            $(this).fadeOut(300, function () {
+                $(this).attr('src', '<?php echo Asset::get_file('btn_submit_off.png', 'img')?>').fadeIn(0);
+            });
+        });
    });
 </script>
 
@@ -92,7 +109,7 @@
             <input id="answertext" name="answer" type="text" placeholder="flag を入力せよ"></input>
           </div>
           <div id="answersubmit-container" class="pull-left">
-            <input type="image" src="<?php echo Asset::get_file('btn_submit_on.png', 'img'); ?>" alt="">
+            <input type="image" id="answersubmit" src="<?php echo Asset::get_file('btn_submit_off.png', 'img'); ?>">
           </div>
          </div>
       </form>
@@ -134,16 +151,16 @@
         // カテゴリ
         echo "<td>".$puzzle['category']."</td>";
         // タイトル
-        echo "<td><a href='#ctfscore-puzzle-modal' data-toggle='modal' data-id='" . $puzzle['puzzle_id'] . "'>" . $puzzle['title'] . "</a></td>";
+        echo "<td data-target='#ctfscore-puzzle-modal' data-toggle='modal' data-id='" . $puzzle['puzzle_id'] . "' class='anchor'>" . $puzzle['title'] . "</td>";
         // ポイント
         echo "<td>".$puzzle['point']."</td>";
         // 回答者数
-        echo "<td>".$puzzle['gained']."</td>";
+        echo "<td data-target='#ctfscore-puzzle-solvers-modal' data-toggle='modal' data-id='" . $puzzle['puzzle_id'] . "' class='anchor'>" . $puzzle['gained'] . "</td>";
         // レビュー平均スコア
         echo "<td><a href='/review/list/".$puzzle_id."'><div class='review' data-number='".\Config::get('ctfscore.review.max_data_number')."' data-score='".$puzzle['avg_score']."'><span style='display:none'>".$puzzle['avg_score']."</span></div></a></td>";
 
         if ($is_admin) {
-            echo '<td><a href="#" class="ctfscore-hint-view" data-id="' . $puzzle_id . '" data-title="' . $puzzle['title'] . '">'. $puzzle['hints'] .'</a></td>';
+            echo '<td data-target="#ctfscore-hint-modal"  data-toggle="modal" data-id="' . $puzzle_id . '" class="anchor">'. $puzzle['hints'] .'</td>';
         }
 
         echo "</tr>\n";
@@ -177,9 +194,10 @@
                 <div class="text-left ctfscore-hint-container">
                     <a href="#" class="ctfscore-hint-request">この問題のヒントがほしいですか？</a>
                     <div class="ctfscore-hint-form" style="display:none">
-                        <form class="form-inline ctfscore-hint">
+                        <form class="form-inline ctfscore-hint" data-id="0">
                             <div class="input-group">
                                 <input name="comment" class="form-control" placeholder="コメント">
+                                <input type="hidden" name="<?php echo \Config::get('security.csrf_token_key');?>" value="">
                                 <span class="input-group-btn">
                                     <input type="submit" class="btn btn-primary" value="ヒントリクエスト">
                                 </span>
@@ -188,6 +206,18 @@
                     </div>
                     <hr>
                 </div>
+                <button class='btn btn-default' data-dismiss='modal'>閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ctfscore-puzzle-solvers-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"></div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
                 <button class='btn btn-default' data-dismiss='modal'>閉じる</button>
             </div>
         </div>
