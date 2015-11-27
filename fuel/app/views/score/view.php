@@ -29,7 +29,7 @@
             $rank = 1;
             $point_sum = (int)array_sum(array_map(function ($var) { return $var['point']; }, $categories));
             $score_decorate = function ($a, $b) {
-                if ($a === $b) {
+                if ($a >= $b) {
                     return sprintf('<span class="text-success">%s</span>', $a);
                 }
 
