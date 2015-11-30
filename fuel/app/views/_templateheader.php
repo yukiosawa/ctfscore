@@ -13,7 +13,7 @@
       $logined = true;
       $my_name = Auth::get_screen_name();
       $is_admin = Controller_Auth::is_admin();
-      $already_news = Model_News::get_already($userid);
+      $already_news = Model_News::get_already_count($userid);
   }
   else
   {

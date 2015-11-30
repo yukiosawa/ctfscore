@@ -86,42 +86,64 @@ class Model_News extends Model
         return DB::delete('news')->where('id', $id)->execute();
     }
 
-
-    public static function get_already($userid)
+    /**
+     * get_already_id
+     * 
+     * @param int $userid 
+     * @static
+     * @return int users.already_news_id
+     */
+    public static function get_already_id($userid)
     {
         $result = DB::select('already_news_id')->from('users')
             ->where('id', $userid)
             ->execute()->as_array();
-        $already = $result[0]['already_news_id'];
 
+        if (empty($result) === true) {
+            return 0;
+        }
+
+        return $result[0]['already_news_id'];
+    }
+
+    /**
+     * get_already_count
+     * 
+     * @param int $userid 
+     * @static
+     * @return int count
+     */
+    public static function get_already_count($userid)
+    {
+        $already_id = self::get_already_id($userid);
         $result = DB::select(DB::expr('COUNT(id)'))->from('news')
-            ->where('id', '>', $already)
+            ->where('id', '>', $already_id)
             ->execute()->as_array();
         return $result[0]['COUNT(id)'];
     }
 
-
+    /**
+     * update_already
+     * 
+     * @param int $userid 
+     * @param int $newsid 
+     * @static
+     * @return void
+     */
     public static function update_already($userid, $newsid)
     {
-        $result = DB::select('already_news_id')->from('users')
-            ->where('id', $userid)
-            ->execute()->as_array();
-        $already = $result[0]['already_news_id'];
-
-        if ($newsid > $already) {
-            try
-            {
-                DB::start_transaction();
-                $result = DB::update('users')->set(array(
-                    'already_news_id' => $newsid
-                ))->where('id', $userid)->execute();
-                DB::commit_transaction();
-            }
-            catch (Exception $e)
-            {
-                DB::rollback_transaction();
-                throw $e;
-            }
+        try
+        {
+            DB::start_transaction();
+            $result = DB::update('users')->set(array(
+                'already_news_id' => $newsid
+            ))->where('id', $userid)->execute();
+            DB::commit_transaction();
+        }
+        catch (Exception $e)
+        {
+            DB::rollback_transaction();
+            throw $e;
         }
     }
 

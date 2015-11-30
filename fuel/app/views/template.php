@@ -28,12 +28,20 @@
                 <li><a href="/score/chart">グラフ</a></li>
               <?php endif; ?>
               <li><a href="/score/status">実施状況</a></li>
-              <li><a href="/score/rule">規則・禁止事項</a></li>
-              <li><a href="/score/level">レベル</a></li>
               <li><a href="/news/list">お知らせ
                 <?php if ($already_news): ?><span class="badge"><?php echo $already_news; ?></span><?php endif; ?>
               </a></li>
-              <li><a href="/score/about">場阿忍愚CTFについて</a></li>
+
+              <li class="dropdown update">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                  制札<span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="/score/rule">規則・禁止事項</a></li>
+                  <li><a href="/score/level">レベルの説明</a></li>
+                  <li><a href="/score/about">場阿忍愚CTFについて</a></li>
+                </ul>
+              </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
               <?php if ($is_admin): ?>

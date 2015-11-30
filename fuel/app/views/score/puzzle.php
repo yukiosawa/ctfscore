@@ -1,10 +1,12 @@
 <?php echo Asset::js('jquery.raty.js'); ?>
 <?php echo Asset::js('ctfscore-raty.js'); ?>
 <?php echo Asset::js('jquery.tablesorter.min.js'); ?>
+<?php echo Asset::js('jquery.floatThead._.js'); ?>
+<?php echo Asset::js('jquery.floatThead.js'); ?>
 
 <script>
     $(function(){
-        $('#puzzle-table').tablesorter();
+        $('#puzzle-table').tablesorter().floatThead();
 
         $('#ctfscore-puzzle-modal').on('hidden.bs.modal', function (e) {
             var self = $(this);

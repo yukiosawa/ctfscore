@@ -46,6 +46,17 @@ class Model_Puzzle extends Model
     }
 
 
+    public static function get_puzzles_from_category($category)
+    {
+        $result = DB::select()->from('puzzles')
+            ->where('category', $category)
+            ->order_by('puzzle_id', 'asc')
+            ->execute()->as_array();
+
+        return $result;
+    }
+
+
     public static function get_puzzles_addinfo($userid = NULL)
     {
         // 全問題を取得

@@ -128,6 +128,48 @@ class Model_Review extends Model
         return $result;
     }
 
+    /**
+     * get_reviews_for_search
+     * 
+     * @param string $category 
+     * @param string $username
+     * @static
+     * @return array
+     */
+    public static function get_reviews_for_search($category = null, $username = null)
+    {
+        $query = DB::select(DB::expr('reviews.*,users.username,puzzles.title as puzzle_title'))->from('reviews')
+            ->join('users', 'LEFT')
+            ->on('reviews.uid', '=', 'users.id')
+            ->join('puzzles', 'LEFT')
+            ->on('reviews.puzzle_id', '=', 'puzzles.puzzle_id')
+            ->order_by('reviews.updated_at', 'desc');
+
+        if ($category) {
+            $query->where('puzzles.category', $category);
+        }
+
+        if ($username) {
+            $query->where('users.username', $username);
+        }
+
+        $result = $query->execute()->as_array();
+        return $result;
+    }
+
+    /**
+     * get_users
+     * 
+     * @static
+     * @return array(username,...)
+     */
+    public static function get_users()
+    {
+        $result = DB::select(DB::expr('username'))->from('users')
+            ->where(DB::expr('exists (select uid from reviews where users.id = reviews.uid)'))
+            ->execute()->as_array();
+        return array_map(function ($var) { return $var['username']; }, $result);
+    }
 
     public static function create_review($puzzle_id, $score, $comment, $secret_comment, $uid)
     {
