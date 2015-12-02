@@ -14,20 +14,31 @@ a {
     table-layout: fixed;
     word-wrap: break-word;
 }
+    .table .min {
+        width: 0.1%;
+        white-space: nowrap;
+    }
+    
+    .table .fix-min {
+        width: 55px;
+    }
 
-.table .min {
-    width: 0.1%;
-    white-space: nowrap;
-}
-
-.table .anchor {
-    color: #157BD4;
-    cursor: pointer;
-}
-
-.table .anchor:hover {
-    text-decoration: underline;
-}
+    .table .fix-md {
+        width: 95px;
+    }
+    
+    .table .fix-lg {
+        width: 135px;
+    }
+    
+    .table .anchor {
+        color: #157BD4;
+        cursor: pointer;
+    }
+    
+    .table .anchor:hover {
+        text-decoration: underline;
+    }
 
 
 /* jquery tablesorter plugin */
@@ -145,7 +156,7 @@ div#countdown {
 
 /* floatThead */
 .floatThead-container {
-    background: rgba(255, 255, 255, 0.75);
+    background: rgba(240, 240, 240, 0.9);
 }
 
 /* ctfscore-theme */

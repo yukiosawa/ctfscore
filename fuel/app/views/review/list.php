@@ -77,16 +77,16 @@
             <th class="col-md-2">評価</th>
             <th class="col-md-3">公開コメント</th>
             <th class="col-md-1">評価者</th>
-            <th class="col-md-1">更新日時</th>
-            <th class="col-md-1"></th>
+            <th class="fix-md">更新日時</th>
+            <th class="fix-min"></th>
             <th class="col-md-3">管理者へのメッセージ</th>
           <?php else: ?>
             <th class="col-md-2">問題タイトル</th>
             <th class="col-md-2">評価</th>
             <th class="col-md-5">公開コメント</th>
             <th class="col-md-1">評価者</th>
-            <th class="col-md-1">更新日時</th>
-            <th class="col-md-1"></th>
+            <th class="fix-md">更新日時</th>
+            <th class="fix-min"></th>
           <?php endif; ?>
         </tr>
       </thead>
