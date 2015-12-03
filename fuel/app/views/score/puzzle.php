@@ -160,14 +160,14 @@
         // タイトル
         echo "<td data-target='#ctfscore-puzzle-modal' data-toggle='modal' data-id='" . $puzzle['puzzle_id'] . "' class='anchor'>" . $puzzle['title'] . "</td>";
         // ポイント
-        echo "<td>".$puzzle['point']."点</td>";
+        echo '<td class="suffix-point">' . $puzzle['point'] . "</td>";
         // 回答者数
-        echo "<td data-target='#ctfscore-puzzle-solvers-modal' data-toggle='modal' data-id='" . $puzzle['puzzle_id'] . "' class='anchor'>" . $puzzle['gained'] . "人</td>";
+        echo '<td data-target="#ctfscore-puzzle-solvers-modal" data-toggle="modal" data-id="' . $puzzle['puzzle_id'] . '" class="anchor suffix-human">' . $puzzle['gained'] . '</td>';
         // レビュー平均スコア
         echo "<td><a href='/review/list/".$puzzle_id."'><div class='review' data-number='".\Config::get('ctfscore.review.max_data_number')."' data-score='".$puzzle['avg_score']."'><span style='display:none'>".$puzzle['avg_score']."</span></div></a></td>";
 
         if ($is_admin) {
-            echo '<td data-target="#ctfscore-hint-modal"  data-toggle="modal" data-id="' . $puzzle_id . '" class="anchor">'. $puzzle['hints'] .'件</td>';
+            echo '<td data-target="#ctfscore-hint-modal"  data-toggle="modal" data-id="' . $puzzle_id . '" class="anchor suffix-number">'. $puzzle['hints'] .'</td>';
         }
 
         echo "</tr>\n";

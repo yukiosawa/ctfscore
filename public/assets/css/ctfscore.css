@@ -40,6 +40,18 @@ a {
         text-decoration: underline;
     }
 
+.suffix-human:after {
+    content: "人";
+}
+
+.suffix-point:after {
+    content: "点";
+}
+
+.suffix-number:after {
+    content: "件";
+}
+
 
 /* jquery tablesorter plugin */
 table.tablesorter thead tr .header {
