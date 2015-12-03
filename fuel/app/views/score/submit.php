@@ -26,13 +26,17 @@
     }
 
     if ($sound_on) {
-        $files = File::read_dir(DOCROOT . '/audio/' . $result, 1, array(
-            '!^\.', // 隠しファイルは除く
-            '!.*' => 'dir', // ディレクトリは除く
-        ));
+        if ($complete_sound) {
+            printf('<audio src="%s" autoplay></audio>', $complete_sound);
+        } else {
+            $files = File::read_dir(DOCROOT . '/audio/' . $result, 1, array(
+                '!^\.', // 隠しファイルは除く
+                '!.*' => 'dir', // ディレクトリは除く
+            ));
 
-        if (count($files) > 0) {
-            printf('<audio src="%saudio/%s/%s" autoplay></audio>', Uri::base(false), $result, $files[array_rand($files)]);
+            if (count($files) > 0) {
+                printf('<audio src="%saudio/%s/%s" autoplay></audio>', Uri::base(false), $result, $files[array_rand($files)]);
+            }
         }
     }
 ?>

@@ -19,6 +19,20 @@ class Model_Score extends Model
         }
     }
 
+    public static function is_complete($userid)
+    {
+        $puzzle = DB::select(DB::expr('SUM(point)'))->from('puzzles')
+            ->execute()->as_array();
+        $puzzle_point = $puzzle[0]['SUM(point)'];
+
+        $gained = DB::select(DB::expr('SUM(point)'))->from('gained')
+            ->where('uid', $userid)
+            ->execute()->as_array();
+        $gained_point = $gained[0]['SUM(point)'];
+
+        return $gained_point >= $puzzle_point;
+    }
+
     // スコアボード全体を返す
     public static function get_scoreboard()
     {

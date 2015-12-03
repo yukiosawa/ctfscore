@@ -111,6 +111,8 @@ class Controller_Score extends Controller_Template
         $levels = '';
         $is_first_winner = false;
         $first_bonus_img = '';
+        $is_complete = false;
+        $complete_sound = '';
 
         $image_urls = array();
 
@@ -195,6 +197,14 @@ class Controller_Score extends Controller_Template
                         }
                     }
 
+                    // 全完時は特別画像
+                    $is_complete = Model_Score::is_complete($userid);
+                    if ($is_complete)
+                    {
+                        $first_bonus_img = Config::get('ctfscore.puzzles.images.complete_img');
+                        $complete_sound = Config::get('ctfscore.sound.complete_sound');
+                    }
+
                     // 管理画面への通知メッセージ
                     $puzzle = Model_Puzzle::get_puzzles($puzzle_id);
                     if (count($puzzle) > 0) {
@@ -248,6 +258,8 @@ class Controller_Score extends Controller_Template
         $data['levels'] = $levels;
         $data['is_first_winner'] = $is_first_winner;
         $data['first_bonus_img'] = $first_bonus_img;
+        $data['is_complete'] = $is_complete;
+        $data['complete_sound'] = $complete_sound;
         $data['sound_on'] = Cookie::get('sound_on', '1');
 
         $this->template->title = '回答結果';
