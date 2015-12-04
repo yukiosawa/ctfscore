@@ -2,6 +2,17 @@
 
 class Controller_Test extends Controller_Template
 {
+    public function before()
+    {
+        parent::before();
+
+        // 管理者グループのみ許可
+        if (!Controller_Auth::is_admin())
+        {
+            Response::redirect('auth/invalid');
+        }
+    }
+
     public function action_submit_complete()
     {
         $data = array();
