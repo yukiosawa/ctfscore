@@ -58,6 +58,10 @@
       $bg_image = $image_paths[$rand];
   }
 
+  if (Request::main()->controller === 'Controller_Score' && Request::main()->action === 'diploma') {
+    $bg_image = Asset::get_file('diploma.jpg', 'img');
+  }
+
   // ロゴ画像
   $logo_image = Config::get('ctfscore.logo_image');
   ?>
