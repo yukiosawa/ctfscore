@@ -18,17 +18,19 @@
   </table>
 </div>
 
-<?php $countdown = Config::get('ctfscore.countdown'); ?>
-<?php if ($countdown && $end_time): ?>
-  <div id="countdown" class="row"></div>
-  <script>
-    $(function () {
-        // 秒 -> ミリ秒
-        startCountdown(<?php echo strtotime($end_time) * 1000; ?>);
-    });
-  </script>
+<?php if ($status !== '終了しました'): ?>
+    <?php $countdown = Config::get('ctfscore.countdown'); ?>
+    <?php if ($countdown && $end_time): ?>
+      <div id="countdown" class="row"></div>
+      <script>
+        $(function () {
+            // 秒 -> ミリ秒
+            startCountdown(<?php echo strtotime($end_time) * 1000; ?>);
+        });
+      </script>
+    <?php endif; ?>
+    <br>
 <?php endif; ?>
-<br>
 <div class="row">
     <p class="lead text-center"><?php echo $status; ?></p>
 </div>

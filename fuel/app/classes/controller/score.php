@@ -404,4 +404,26 @@ class Controller_Score extends Controller_Template
         $this->template->content = View::forge('score/profile', $data);
         $this->template->footer = '';
     }
+
+    public function action_diploma($username = null)
+    {
+        // CTF終了後判定
+        $status = Model_Score::get_ctf_time_status();
+        if ($status['ended'] === false) {
+            Response::redirect('score/status');
+        }
+
+
+        $data['username'] = ($username === null) ? Auth::get_screen_name() : $username;
+        $profile = Model_Score::get_profile($data['username']);
+        if ($profile === null) {
+            Response::redirect('score/diploma');
+        }
+
+        $data['profile'] = $profile;
+        $data['score'] = Model_Score::get_score_ranking($data['username']);
+        $this->template->title = '場阿忍愚CTF賞状';
+        $this->template->content = View::forge('score/diploma', $data);
+        $this->template->footer = '';
+    }
 }

@@ -31,6 +31,7 @@
               <li><a href="/news/list">お知らせ
                 <?php if ($already_news): ?><span class="badge"><?php echo $already_news; ?></span><?php endif; ?>
               </a></li>
+              <?php if ($status['ended']): ?><li><a href="/score/diploma/<?php echo $my_name; ?>">賞状</a></li><?php endif; ?>
 
               <li class="dropdown update">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">

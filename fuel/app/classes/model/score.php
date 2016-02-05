@@ -183,6 +183,22 @@ class Model_Score extends Model
     }
 
 
+    /**
+     * get_ranking_user
+     * 
+     * @static
+     * @return void
+     */
+    public static function get_score_ranking($username)
+    {
+        $user = DB::select(DB::expr('(select count(*) + 1 from users as t where t.totalpoint > users.totalpoint or (t.totalpoint = users.totalpoint and t.pointupdated_at < users.pointupdated_at)) as rank'))
+            ->from('users')
+            ->where('username', $username)
+            ->execute()->as_array();
+        return $user[0]['rank'];
+    }
+
+
     // 個人プロファイル(カテゴリごとの獲得点数)を返す
     public static function get_profile_answered_category($username = NULL)
     {
@@ -693,5 +709,4 @@ class Model_Score extends Model
         $result = $query->execute()->as_array();
         return $result;
     }
-
 }
