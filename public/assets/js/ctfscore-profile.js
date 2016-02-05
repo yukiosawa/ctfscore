@@ -196,7 +196,7 @@ function draw_chartjs_profile(chart_data)
 	    pointLabelFontSize : 18,
 
 	    //String - Point label font colour
-	    pointLabelFontColor : "#666",
+	    pointLabelFontColor : "#333",
 
 	    //Boolean - Whether to show a dot for each point
 	    pointDot : true,
