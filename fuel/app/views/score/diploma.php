@@ -8,7 +8,7 @@
     }
 </style>
 
-<div id="overlay" style="display: block; background-position: center center; background-image: url(<?php echo Asset::get_file('diploma.jpg', 'img')?>);">
+<div id="overlay" style="overflow-y: auto; display: block; background-position: center center; background-image: url(<?php echo Asset::get_file('diploma.jpg', 'img')?>);">
     <div class="container">
         <div class="container-main">
             <div><?php echo Asset::img(Config::get('ctfscore.logo_image'), array('class' => 'img-responsive')); ?></div>
