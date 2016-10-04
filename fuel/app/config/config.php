@@ -306,7 +306,7 @@ return array(
 		 * If you don't want the config in a group use null as groupname.
 		 */
 		// 'config'  => array(),
-		'config' => array('ctfscore'),
+		'config' => array('ctfscore', 'asset'),
 
 		/**
 		 * Language files to autoload

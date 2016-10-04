@@ -1,4 +1,2 @@
-<?php
-File::read($file, false);
-?>
+<?php echo $page['content']; ?>
 

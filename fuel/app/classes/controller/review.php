@@ -19,9 +19,22 @@ class Controller_Review extends Controller_Template
         // 入力された文字列が数字のみで構成されるかチェック。
         if (!ctype_digit($puzzle_id)) $puzzle_id = null;
 
+        $data = array();
+
+        if ($puzzle_id !== null) {
+            $data['reviews'] = Model_Review::get_reviews(null, $puzzle_id);
+            $data['puzzle_id'] = $puzzle_id;
+        } else {
+            $search_category = (string)Input::get('category');
+            $search_user = (string)Input::get('user');
+            $data['search_category'] = $search_category;
+            $data['search_user'] = $search_user;
+            $data['select_categories'] = array_map(function ($var) { return $var['category']; }, Model_Category::get_categories());
+            $data['select_users'] = Model_Review::get_users();
+            $data['reviews'] = Model_Review::get_reviews_for_search($search_category, $search_user);
+        }
+
         $data['my_name'] = Auth::get_screen_name();
-        $data['reviews'] = Model_Review::get_reviews(null, $puzzle_id);
-        $data['puzzle_id'] = $puzzle_id;
         $this->template->title = 'Reviews';
         $this->template->content = View::forge('review/list', $data);
         $this->template->footer = '';

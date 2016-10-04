@@ -1,128 +1,361 @@
 <?php
 
 return array(
-    'puzzles' => array(
-        // 問題ファイルを格納する場所
-        'path_to_puzzles' => DOCROOT.'../ctfadmin/puzzles/',
-        // 添付ファイルを格納するサブディレクトリ名
-        'attachment_dir' => 'attachments',
-        // 問題解答時に表示する画像
-        'images' => array(
-            // trueの場合、正解時に画像表示する
-            'is_active_on_success' => true,
-            // 正解時に表示する画像ファイルを格納するサブディレクトリ名
-            'success_image_dir' => 'images_on_success',
-            'success_random_image_dir' => 'images_random_on_success',
-            // trueの場合、不正解時に画像表示する
-            'is_active_on_failure' => true,
-            // 不正解時に表示する画像ファイルを格納するディレクトリ
-            'failure_random_image_dir' => 'images_random_on_failure',
-            // trueの場合、初回回答時にボーナス画像表示する
-            'is_active_on_bonus' => 'true',
-            // 初回回答者のボーナス画像(DOCROOTからの相対パス)
-            'first_bonus_img' => '',
+    // 回答結果の種類
+    'answer_result' => array(
+        'success' => array(
+            'event' => 'success',
+            'description' => '正解'
+        ),
+        'failure' => array(
+            'event' => 'failure',
+            'description' => '不正解'
+        ),
+        'duplicate' => array(
+            'event' => 'duplicate',
+            'description' => '既に回答済み',
+        ),
+        /* 'levelup' => array(
+           'event' => 'levelup',
+           'description' => 'レベルアップ',
+           ), */
+        'over_limit' => array(
+            'event' => 'over_limit',
+            'description' => '回数制限オーバー',
+        ),
+        'validation_error' => array(
+            'event' => 'validation_error',
+            'description' => 'バリデーションエラー',
         ),
     ),
-    'sound' => array(
-        // trueの場合、問題正解時に音を鳴らす
-        'is_active_on_success' => true,
-        // 正解音を置くディレクトリ[DOCROOTからの相対パス]
-        'success_dir' => '/audio/success',
-        // 初回正解音を置くディレクトリ[DOCROOTからの相対パス]
-        'first_winner_dir' => '/audio/first_winner',
-        // trueの場合、問題不正解時で音を鳴らす
-        'is_active_on_failure' => true,
-        // 不正解音を置くディレクトリ[DOCROOTからの相対パス]
-        'failure_dir' => '/audio/failure',
-        // trueの場合、レベルアップ時に音を鳴らす
-        'is_active_on_levelup' => true,
-        // レベルアップ音を置くディレクトリ[DOCROOTからの相対パス]
-        'levelup_dir' => '/audio/levelup',
-        // trueの場合、その他通知時に音を鳴らす
-        'is_active_on_notice' => true,
-        // その他通知音を置くディレクトリ[DOCROOTからの相対パス]
-        'notice_dir' => '/audio/notice',
-    ),
-    'chart' => array(
-        // グラフ描画の対象とする最大人数(下にあるcolorsの数以下とすること)
-        'max_number_of_users' => 10,
-        // グラフ描画の色
-        'colors' => array(
-            'black',
-            'maroon',
-            'green',
-            'navy',
-            'gray',
-            'red',
-            'purple',
-            'olive',
-            'teal',
-            'yellow',
-            'coral',
-            'springgreen',
-            'orangered',
-            'lawngreen',
-            'pink',
-            'skyblue',
-            'brown',
-            'khaki',
-            'silver',
-            'lime',
+    
+    /**
+     * 各種設定の初期値を定義。
+     * これらの設定は初回起動時にDBに格納されて管理画面から変更可能。
+     **/
+    'default_values' => array(
+        // CTFの名称
+        array(
+           'type' => 'names',
+           'name' => 'ctf_name',
+           'value' => '',
+           'description' => 'CTFの名称。賞状に表示します。',
         ),
-        // グラフをプロットする間隔(秒)
-        // 1 hour = 3600 sec
-        // 1 day  = 86400 sec
-        //'plot_interval_seconds' => 3600 * 3,
-        'plot_interval_seconds' => 86400,
-        // グラフをプロットする最大数
-        'plot_max_steps' => 100,
+        // 機能のON/OFFに関するもの
+        array(
+           'type' => 'switches',
+           'name' => 'is_active_image',
+           'value' => 1,
+           'description' => '問題回答時に画像表示する　[0:無効, 1(0以外):有効]',
+        ),
+        array(
+           'type' => 'switches',
+           'name' => 'is_active_sound',
+           'value' => 1,
+           'description' => '問題回答時に音を鳴らす　[0:無効, 1(0以外):有効]',
+        ),
+        array(
+           'type' => 'switches',
+           'name' => 'is_active_countdown',
+           'value' => 1,
+           'description' => 'カウントダウンタイマーを表示する　[0:無効, 1(0以外):有効]',
+        ),
+        array(
+           'type' => 'switches',
+           'name' => 'is_active_level',
+           'value' => 1,
+           'description' => '問題正解数に応じたレベル表示　[0:無効, 1(0以外):有効]',
+        ),
+        array(
+           'type' => 'switches',
+           'name' => 'is_active_management_console',
+           'value' => 1,
+           'description' => '管理コンソールへの通知　[0:無効, 1(0以外):有効]',
+        ),
+        array(
+            'type' => 'switches',
+            'name' => 'is_active_management_diag_msg',
+            'value' => 1,
+            'description' => '管理コンソール間の診断メッセージ通知　[0:無効, 1(0以外):有効]',
+        ),
+        array(
+           'type' => 'switches',
+           'name' => 'is_active_force_review',
+           'value' => 1,
+           'description' => '問題正解時にレビュー画面へ遷移させる　[0:無効, 1(0以外):有効]',
+        ),
+
+        // グラフ描画に関する設定
+        array(
+           'type' => 'chart',
+           'name' => 'plot_interval_seconds',
+           'value' => '900',
+           'description' => 'ランキングをプロットする間隔[秒]　=> 900=15min, 3600=1h, 86400=24h',
+        ),
+        array(
+           'type' => 'chart',
+           'name' => 'plot_max_steps',
+           'value' => '100',
+           'description' => 'ランキングをプロットする最大数(時間軸)',
+        ),
+        array(
+           'type' => 'chart',
+           'name' => 'bubble_size_multiple_by',
+           'value' => '2',
+           'description' => 'バブルチャート（正解者数)の大きさ倍率',
+        ),
+        array(
+           'type' => 'chart',
+           'name' => 'bubble_color',
+           'value' => '#FF6384',
+           'description' => 'バブルチャート（正解者数)の色',
+        ),
+
+        // サブミット履歴に関する設定
+        array(
+              'type' => 'history',
+              'name' => 'submit_interval_seconds',
+              'value' => 60,
+              'description' => '試行回数を制限する間隔[秒]',
+        ),
+        array(
+              'type' => 'history',
+              'name' => 'submit_limit_times',
+              'value' => 10,
+              'description' => '試行回数の制限値[回]',
+        ),
+
+        // レビューに関する設定
+        array(
+              'type' => 'review',
+              'name' => 'max_review_score',
+              'value' => 5,
+              'description' => '最大評価点',
+        ),
+        array(
+              'type' => 'review',
+              'name' => 'allow_unanswered_review',
+              'value' => 0,
+              'description' => '未回答の問題へのレビュー投稿を許可 [0:不許可, 1(0以外):許可]',
+        ),
+        array(
+              'type' => 'review',
+              'name' => 'review_force_wait_seconds',
+              'value' => 13,
+              'description' => '問題正解時にレビュー画面へ遷移させるまでの時間[秒]',
+        ),
+
+        // システム関連
+        array(
+            'type' => 'system',
+            'name' => 'attachment_dir',
+            'value' => '../ctfadmin/attachments',
+            'description' => '問題の添付ファイルを格納するディレクトリ [DOCROOTからの相対パス]',
+        ),
+        array(
+            'type' => 'system',
+            'name' => 'success_image_dir',
+            'value' => 'success',
+            'description' => '問題正解時に表示する画像を格納するディレクトリ [assets/img/からの相対パス]',
+        ),
+        array(
+            'type' => 'system',
+            'name' => 'total_category_id',
+            'value' => 1,
+            'description' => 'カテゴリ全体を示すカテゴリID',
+        ),
+        array(
+            'type' => 'system',
+            'name' => 'admin_group_id',
+            'value' => 100,
+            'description' => '管理者ユーザのグループID',
+        ),
     ),
-    'history' => array(
-        // 試行回数を制限する間隔(秒)
-        'attempt_interval_seconds' => 60,
-        // 試行回数の制限値(回)
-        'attempt_limit_times' => 5,
+
+    // assets
+    'default_assets' => array(
+        // 画像
+        array(
+            'name' => 'first_bonus_img',
+            'type' => 'img',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => '初正解のボーナス画像',
+        ),
+        array(
+            'name' => 'complete_img',
+            'type' => 'img',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => '全完時の画像',
+        ),
+        array(
+            'name' => 'diploma_img',
+            'type' => 'img',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => '賞状の背景画像',
+        ),
+        array(
+            'name' => 'logo_img',
+            'type' => 'img',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => 'ロゴ画像',
+        ),
+        array(
+            'name' => 'register_img',
+            'type' => 'img',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => '登録時画像',
+        ),
+        array(
+            'name' => 'register_btn_img',
+            'type' => 'img',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => '登録時ボタン画像',
+        ),
+        array(
+            'name' => 'success_random_image',
+            'type' => 'img',
+            'is_random' => 1,
+            'sub_dir' => 'success_random',
+            'filename' => '',
+            'description' => '正解時に表示する画像(ランダムに表示)',
+        ),
+        array(
+            'name' => 'failure_random_image',
+            'type' => 'img',
+            'is_random' => 1,
+            'sub_dir' => 'failure_random',
+            'filename' => '',
+            'description' => '不正解時に表示する画像ファイル(ランダムに表示)',
+        ),
+        array(
+            'name' => 'background_image',
+            'type' => 'img',
+            'is_random' => 1,
+            'sub_dir' => 'background_random',
+            'filename' => '',
+            'description' => '背景画像',
+        ),
+        // 音
+        array(
+            'name' => 'success_random_sound',
+            'type' => 'audio',
+            'is_random' => 1,
+            'sub_dir' => 'success_random',
+            'filename' => '',
+            'description' => '正解音(ランダムに再生)',
+        ),
+        array(
+            'name' => 'failure_random_sound',
+            'type' => 'audio',
+            'is_random' => 1,
+            'sub_dir' => 'failure_random',
+            'filename' => '',
+            'description' => '不正解音(ランダムに再生)',
+        ),
+        array(
+            'name' => 'levelup_sound',
+            'type' => 'audio',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => 'レベルアップ音',
+        ),
+        array(
+            'name' => 'notice_sound',
+            'type' => 'audio',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => 'その他通知音',
+        ),
+        array(
+            'name' => 'first_bonus_sound',
+            'type' => 'audio',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => '初正解のボーナス音',
+        ),
+        array(
+            'name' => 'complete_sound',
+            'type' => 'audio',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => '全完時の音',
+        ),
+        array(
+            'name' => 'register_sound',
+            'type' => 'audio',
+            'is_random' => 0,
+            'sub_dir' => '',
+            'filename' => '',
+            'description' => 'ユーザ登録時の音',
+        ),
     ),
-    'review' => array(
-        // 最大評価点
-        'max_data_number' => 5,
-        // 未回答の問題へのレビュー投稿を許可
-        'allow_unanswered_puzzle' => false,
+
+    // グラフ色
+    'default_chart_colors' => array(
+        array('rank' => 1, 'color' => '#FF0000'), // red
+        array('rank' => 2, 'color' => '#008000'), // green
+        array('rank' => 3, 'color' => '#000080'), // navy
+        array('rank' => 4, 'color' => '#808080'), // gray
+        array('rank' => 5, 'color' => '#800000'), // maroon
+        array('rank' => 6, 'color' => '#800080'), // purple
+        array('rank' => 7, 'color' => '#808000'), // olive
+        array('rank' => 8, 'color' => '#008080'), // teal
+        array('rank' => 9, 'color' => '#FFFF00'), // yellow
+        array('rank' => 10, 'color' => '#FF7F50'), // coral
+        array('rank' => 11, 'color' => '#00FF7F'), // springgreen
+        array('rank' => 12, 'color' => '#FF4500'), // orangered
+        array('rank' => 13, 'color' => '#7CFC00'), // lawngreen
+        array('rank' => 14, 'color' => '#FFC0CB'), // pink
+        array('rank' => 15, 'color' => '#87CEEB'), // skyblue
+        array('rank' => 16, 'color' => '#A52A2A'), // brown
+        array('rank' => 17, 'color' => '#F0E68C'), // khaki
+        array('rank' => 18, 'color' => '#C0C0C0'), // silver
+        array('rank' => 19, 'color' => '#00FF00'), // lime
+        array('rank' => 20, 'color' => '#000000'), // black
     ),
-    'admin' => array(
-        // 管理者ユーザのグループID
-        'admin_group_id' => 100,
-        // 管理コンソールを有効にする
-        'management_console' => true,
+
+    // 静的ページ
+    'default_static_pages' => array(
+        array(
+            'name' => 'about',
+            'display_name' => 'このサイトについて',
+            'path' => 'score/about',
+            'content' => '<h4>このサイトについて</h4>サイトに関する説明を記載します。',
+            'display_order' => 1,
+            'is_active' => 1,
+        ),
+        array(
+            'name' => 'rule',
+            'display_name' => 'ルール',
+            'path' => 'score/rule',
+            'content' => '<h4>競技ルール</h4>競技ルールはここに記載します。',
+            'display_order' => 2,
+            'is_active' => 1,
+        ),
+        array(
+            'name' => 'misc',
+            'display_name' => 'その他説明',
+            'path' => 'score/misc',
+            'content' => '<h4>レベルの説明など他に説明したいことがあれば</h4><p>正解した問題数に応じてレベル獲得します。</p>',
+            'display_order' => 3,
+            'is_active' => 1,
+        ),
     ),
-    'level' => array(
-        // trueの場合、全体のレベルを有効にする
-        'is_active_total_level' => true,
-        // trueの場合、カテゴリごとのレベルを有効にする
-        'is_active_category_level' => true,
-        // 全体のダミーカテゴリ名（各カテゴリ名と重複しないこと)
-        'dummy_name_total' => '__total__',
-    ),
-    'static_page' => array(
-        // 競技ルールを記載するファイル
-        'rule_file' => DOCROOT.'../ctfadmin/html/rule.html',
-        // サイト説明を記載するファイル
-        'about_file' => DOCROOT.'../ctfadmin/html/about.html',
-        // 利用者の遵守事項を記載するファイル
-        'agreement_file' => DOCROOT.'../ctfadmin/html/agreement.html',
-        // レベル説明を記載するファイル
-        'level_file' => DOCROOT.'../ctfadmin/html/level.html',
-    ),
-    // 背景画像を置くディレクトリ[DOCROOTからの相対パス]
-    'background_image_dir' => '/assets/img/background',
-    // ロゴ画像[DOCROOT/assets/img/配下]
-    'logo_image' => '',
-    // カウントダウンタイマー
-    'countdown' => true,
-    // 登録時音声[DOCROOTからの相対パス]
-    'register_sound' => '',
-    // 登録時画像[DOCROOTからの相対パス]
-    'register_image' => '',
 );
 
-/* End of file ctfscore.php */

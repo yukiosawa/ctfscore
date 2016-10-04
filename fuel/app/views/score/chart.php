@@ -4,11 +4,8 @@
 <div id="errmsg"></div>
 
 <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-12">
 	<canvas id="myChart" width="1000" height="550"></canvas>
-    </div>
-    <div class="col-md-2">
-	<div id="legend"></div>
     </div>
 </div>
 

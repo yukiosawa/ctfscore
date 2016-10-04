@@ -56,7 +56,7 @@ class Controller_Score extends Controller_Template
         $data['end_time'] = $status['end_time'];
         $this->template->title = "実施状況";
         $this->template->content = View::forge('score/status', $data);
-        $this->template->footer = View::forge('score/footer');
+        $this->template->footer = '';
     }
 
 
@@ -70,11 +70,12 @@ class Controller_Score extends Controller_Template
         $data['my_name'] = Auth::get_screen_name();
 
         // カテゴリ一覧
-        $ignore = array('練習');
-        $data['categories'] = array_filter(
-            Model_Puzzle::get_categories(),
-            function ($var) use ($ignore) { return in_array($var, $ignore) === false; }
-        );
+        /* $ignore = array('練習');
+           $data['categories'] = array_filter(
+           Model_Puzzle::get_categories_with_point(),
+           function ($var) use ($ignore) { return in_array($var['category'], $ignore) === false; }
+           ); */
+        $data['categories'] = Model_Puzzle::get_categories_with_point();
 
         // 全ユーザの回答状況一覧
         $data['scoreboard'] = Model_Score::get_scoreboard();
@@ -106,48 +107,66 @@ class Controller_Score extends Controller_Template
         $result = '';
         $puzzle_id = '';
         $error_msg = '';
-        $image_names = array();
         $text = '';
+        $image_url = '';
+        $sound_url = '';
         $levels = '';
         $is_first_winner = false;
-        $first_bonus_img = '';
-
-        $image_urls = array();
-
+        $first_bonus_img_url = '';
+        $is_complete = false;
+        $complete_img_url = '';
+        $complete_sound_url = '';
 
         // ユーザID
         list($driver, $userid) = Auth::get_user_id();
         $username = Auth::get_screen_name();
 
+        $puzzle_id = Input::post('puzzle_id');
         $answer = Input::post('answer');
 
         // 回数制限のチェック
         if (Model_Score::is_over_attempt_limit($userid))
         {
-            $result = 'error';
-            $interval_seconds = Config::get('ctfscore.history.attempt_interval_seconds');
-            $error_msg = '連続回数制限。'.$interval_seconds.'秒後にリトライしてください。';
+            $result = Config::get('ctfscore.answer_result.over_limit');
+            $interval_seconds = Model_Config::get_value('submit_interval_seconds');
+            $error_msg = $result['description'].': '.$interval_seconds.'秒後にリトライしてください。';
+            if (Model_Config::get_value('is_active_sound') != 0)
+            {
+                $sound_url = Model_Config::get_asset_sounds('notice_sound')[0]['url'];
+            }
 
             // 管理画面へ通知
             $mgmt_msg = $username.':'.$error_msg;
-            Model_Score::emitToMgmtConsole('notice', $mgmt_msg);
+            $mgmt_data = array(
+               'msg' => $mgmt_msg,
+               'image_url' => '',
+               'sound_url' => $sound_url,
+//               'is_first_winner' => false,
+               'first_bonus_img_url' => '',
+            );
+            Model_Score::emitToMgmtConsole($result['event'], $mgmt_data);
         }
         elseif ($val->run())
         {
             // POSTされた回答が正解かチェック
-            $puzzle_id = Model_Puzzle::get_puzzle_id($answer);
-            if (!isset($puzzle_id))
+//            $puzzle_id = Model_Puzzle::get_puzzle_id($answer);
+//            if (!isset($puzzle_id))
+            if (Model_Puzzle::is_right_answer($puzzle_id, $answer) != true)
             {
                 // 不正解
-                $result = 'failure';
+                $result = Config::get('ctfscore.answer_result.failure');
 
                 // 表示するメッセージ(画像、テキスト)
-                $msg = Model_Puzzle::get_failure_messages();
+                $msg = Model_Puzzle::get_failure_message();
                 // 取得できない場合はデフォルト値をセット
-                $text = (!empty($msg['text'])) ? $msg['text'] : '不正解';
-                if (!empty($msg['image_name']))
+                $text = (!empty($msg['text'])) ? $msg['text'] : $result['description'];
+                if (Model_Config::get_value('is_active_image') != 0)
                 {
-                    $image_names[] = $msg['image_name'];
+                    $image_url = $msg['image']['url'];
+                }
+                if (Model_Config::get_value('is_active_sound') != 0)
+                {
+                    $sound_url = $msg['sound']['url'];
                 }
 
                 // 管理画面への通知メッセージ
@@ -159,14 +178,18 @@ class Controller_Score extends Controller_Template
                 if (Model_Puzzle::is_answered_puzzle($userid, $puzzle_id))
                 {
                     // 既に正解済み
-                    $result = 'duplicate';
-                    $text = '既に回答済み';
-                    $mgmt_msg = $username.':'.$text;
+                    $result = Config::get('ctfscore.answer_result.duplicate');
+                    $text = $result['description'];
+                    $mgmt_msg = $username.': '.$text.' #'.$puzzle_id;
+                    if (Model_Config::get_value('is_active_sound') != 0)
+                    {
+                        $sound_url = Model_Config::get_asset_sounds('notice_sound')[0]['url'];
+                    }
                 }
                 else
                 {
                     // 正解
-                    $result = 'success';
+                    $result = Config::get('ctfscore.answer_result.success');
 
                     // 初回回答者チェック
                     $is_first_winner = Model_Score::is_first_winner($puzzle_id);
@@ -178,81 +201,111 @@ class Controller_Score extends Controller_Template
                     $levels = Model_Score::set_level_gained($userid);
 
                     // 表示するメッセージ(画像、テキスト)
-                    $msg = Model_Puzzle::get_success_messages($puzzle_id);
+                    $msg = Model_Puzzle::get_success_message($puzzle_id);
                     // 取得できない場合はデフォルト値をセット
-                    $text = (!empty($msg['text'])) ? $msg['text'] : '正解';
-                    if (!empty($msg['image_name']))
+                    $text = (!empty($msg['text'])) ? $msg['text'] : $result['description'];
+                    $is_complete = Model_Score::is_complete($userid);
+                    if (Model_Config::get_value('is_active_image') != 0)
                     {
-                        $image_names[] = $msg['image_name'];
-                    }
-
-                    // 初回回答者は特別画像
-                    if ($is_first_winner)
-                    {
-                        if (Config::get('ctfscore.puzzles.images.is_active_on_bonus'))
+                        $image_url = $msg['image']['url'];
+                        // 初回回答者
+                        if ($is_first_winner)
                         {
-                            $first_bonus_img = Config::get('ctfscore.puzzles.images.first_bonus_img');
+                            $first_bonus_img_url = Model_Config::get_asset_images('first_bonus_img')[0]['url'];
+                        }
+                        // 全問正解
+                        if ($is_complete)
+                        {
+                            $complete_img_url = Model_Config::get_asset_images('complete_img')[0]['url'];
+                        }
+                    }
+                    if (Model_Config::get_value('is_active_sound') != 0)
+                    {
+                        // 初回回答者
+                        if ($is_first_winner)
+                        {
+                            $sound_url = Model_Config::get_asset_sounds('first_bonus_sound')[0]['url'];
+                        }
+                        else
+                        {
+                            $sound_url = $msg['sound']['url'];
+                        }
+                        // 全問正解
+                        if ($is_complete)
+                        {
+                            $complete_sound_url = Model_Config::get_asset_sounds('complete_sound')[0]['url'];
                         }
                     }
 
                     // 管理画面への通知メッセージ
-                    $puzzle = Model_Puzzle::get_puzzles($puzzle_id);
-                    if (count($puzzle) > 0) {
-                        $title = $puzzle[0]['title'];
-                    }
-                    else
-                    {
-                        $title = '----';
-                    }
-                    $mgmt_msg = $username.' は puzzle#'.$puzzle_id.':'.$title.' を解きました！';
+                    /* $puzzle = Model_Puzzle::get_puzzles($puzzle_id);
+                       if (count($puzzle) > 0) {
+                       $title = $puzzle[0]['title'];
+                       }
+                       else
+                       {
+                       $title = '----';
+                       } */
+
+                    $gained = Model_History::get_gained_history($userid, true)[0];
+                    $title = $gained['puzzle_title'];
+
+                    $mgmt_msg = $username.' は #'.$puzzle_id.':'.$title.' を解きました！ [ +'.$gained['point'].' +('.$gained['bonus_point'].') =>'.$gained['totalpoint'].']';
+                    
+                    // レベルアップ
                     if ($levels)
                     {
-                        $result = 'levelup';
-                        // レベルアップ
+//                        $result = Config::get('ctfscore.answer_result.levelup');
                         $level_string = '';
                         foreach ($levels as $level)
                         {
                             $level_string = $level_string.' '.$level.' ';
                         }
                         $mgmt_msg .= $level_string.'にレベルアップしました！';
+                        $text .= $level_string.'にレベルアップしました！';
+
+
+                        // TODO: レベルアップの音
+
+
+                        
                     }
                 }
             }
 
             // 管理画面へ通知(正解、不正解)
-            $image_urls = array();
-            foreach ($image_names as $image_name)
-            {
-                $image_urls[] = '/download/image?id='.$puzzle_id.'&type='.$result.'&file='.$image_name;
-            }
-            $data = array('msg' => $mgmt_msg,
-                'img_urls' => $image_urls,
-                'is_first_winner' => $is_first_winner,
-                'first_bonus_img' => $first_bonus_img,
+            $mgmt_data = array(
+                'msg' => $mgmt_msg,
+                'image_url' => $image_url,
+                'sound_url' => $sound_url,
+//                'is_first_winner' => $is_first_winner,
+                'first_bonus_img_url' => $first_bonus_img_url,
             );
-            Model_Score::emitToMgmtConsole($result, $data);
+            Model_Score::emitToMgmtConsole($result['event'], $mgmt_data);
         }
         else
         {
-            $result = 'error';
+            $result = Config::get('ctfscore.answer_result.validation_error');
             $error_msg = $val->show_errors();
         }
 
         // 試行履歴を記録する
-        Model_Score::set_attempt_history($userid, $answer, $result);
+        Model_Score::set_attempt_history($userid, $puzzle_id, $answer, $result);
 
         $data['result'] = $result;
         $data['puzzle_id'] = $puzzle_id;
-        $data['image_names'] = $image_names;
         $data['text'] = $text;
-        $data['levels'] = $levels;
+        $data['image_url'] = $image_url;
+        $data['sound_url'] = $sound_url;
         $data['is_first_winner'] = $is_first_winner;
-        $data['first_bonus_img'] = $first_bonus_img;
+        $data['first_bonus_img_url'] = $first_bonus_img_url;
+        $data['is_complete'] = $is_complete;
+        $data['complete_img_url'] = $complete_img_url;
+        $data['complete_sound_url'] = $complete_sound_url;
         $data['sound_on'] = Cookie::get('sound_on', '1');
 
         $this->template->title = '回答結果';
-        $this->template->content = View::forge('score/submit', $data);
-        $this->template->content->set_safe('image_urls', $image_urls);
+        $this->template->content = View::forge(($is_complete && $complete_img_url) ? 'score/complete' : 'score/submit', $data);
         $this->template->content->set_safe('errmsg', $error_msg);
         $this->template->footer = View::forge('score/footer');
     }
@@ -278,6 +331,60 @@ class Controller_Score extends Controller_Template
         $this->template->footer = '';
     }
 
+    public function action_puzzle_view($id)
+    {
+        // CTF開始前は許可しない
+        $this->checkCTFStatus(true, false);
+        // 認証済みユーザのみ許可
+        Controller_Auth::redirectIfNotAuth();
+
+        $puzzle = Model_Puzzle::get_puzzles($id);
+
+        if (empty($puzzle) === true) {
+            return new Response(json_encode(array('message' => 'この問題は存在しません。')));
+        }
+
+        $puzzle = $puzzle[0];
+        list($driver, $userid) = Auth::get_user_id();
+        $attachment = Model_Puzzle::get_attachment_names($id);
+        $is_hinted = Model_Hint::is_hinted($id, $userid);
+        $data = array('puzzle_id' => $id, 'content' => $puzzle['content'], 'attachment' => $attachment);
+        $body = View::forge('score/puzzle_view')->set_safe($data)->__toString();
+
+        return new Response(json_encode(array(
+            'title'     => $puzzle['category'] . ' - ' . $puzzle['title'],
+            'body'      => $body,
+            'is_hinted' => $is_hinted
+        )));
+    }
+
+    /**
+     * action_puzzle_solvers
+     * 
+     * @return void
+     */
+    public function action_puzzle_solvers($id)
+    {
+        // CTF開始前は許可しない
+        $this->checkCTFStatus(true, false);
+        // 認証済みユーザのみ許可
+        Controller_Auth::redirectIfNotAuth();
+
+        $puzzle = Model_Puzzle::get_puzzles($id);
+
+        if (empty($puzzle) === true) {
+            return new Response('この問題は存在しません。');
+        }
+
+        $puzzle = $puzzle[0];
+        $data = array();
+        $data['gained'] = Model_Puzzle::get_puzzle_gained($id);
+        return new Response(json_encode(array(
+            'title' => $puzzle['title'],
+            'body'  => View::forge('score/puzzle_solvers', $data)->__toString()
+        )));
+    }
+
 
     public function action_chart()
     {
@@ -297,43 +404,105 @@ class Controller_Score extends Controller_Template
     }
 
 
+    public function action_solvedStatus()
+    {
+        $this->template->title = '正解者分布';
+        $this->template->content = View::forge('score/solved_status');
+        $this->template->footer = '';
+    }
+
+
     public function action_rule()
     {
-        $data['file'] = Config::get('ctfscore.static_page.rule_file');
-        $this->template->title = 'ルール';
+        $page = Model_Staticpage::get('rule')[0];
+        if ($page['is_active'] != 1)
+        {
+            Response::redirect(Uri::base(false).'auth/404');
+        }
+        $this->template->title = $page['display_name'];
         $this->template->content = View::forge('score/static_page', $data);
+        $this->template->content->set_safe('page', $page);
         $this->template->footer = '';
     }
 
 
     public function action_about()
     {
-        $data['file'] = Config::get('ctfscore.static_page.about_file');
-        $this->template->title = 'About';
+        $page = Model_Staticpage::get('about')[0];
+        if ($page['is_active'] != 1)
+        {
+            Response::redirect(Uri::base(false).'auth/404');
+        }
+        $this->template->title = $page['display_name'];
         $this->template->content = View::forge('score/static_page', $data);
+        $this->template->content->set_safe('page', $page);
         $this->template->footer = '';
     }
 
 
-    public function action_level()
+    public function action_misc()
     {
-        $data['file'] = Config::get('ctfscore.static_page.level_file');
-        $this->template->title = 'Level';
+        $page = Model_Staticpage::get('misc')[0];
+        if ($page['is_active'] != 1)
+        {
+            Response::redirect(Uri::base(false).'auth/404');
+        }
+        $this->template->title = $page['display_name'];
         $this->template->content = View::forge('score/static_page', $data);
+        $this->template->content->set_safe('page', $page);
         $this->template->footer = '';
     }
 
 
-    public function action_profile($username)
+    public function action_profile($username = null)
     {
         // CTF開始前は許可しない
         $this->checkCTFStatus(true, false);
         // 認証済みユーザのみ許可
         Controller_Auth::redirectIfNotAuth();
 
-        $data['profile'] = Model_Score::get_profile($username);
+        $usernames = array();
+        if (Input::method() == 'POST')
+        {
+            $val = Model_Chart::validate('profile');
+            if ($val->run()) {
+                $usernames = $val->validated('usernames');
+            }
+        }
+        else
+        {
+            $usernames[0] = $username;
+        }
+        // ユーザ名の存在チェック: 存在しない場合はログインユーザとする
+        $usernames = array_filter($usernames, function ($var) {return Model_Score::get_uid($var); });
+        $data['usernames'] = empty($usernames) ? array(Auth::get_screen_name()) : $usernames;
+        
         $this->template->title = 'ユーザプロファイル';
         $this->template->content = View::forge('score/profile', $data);
+        $this->template->footer = '';
+    }
+
+
+    public function action_diploma($username = null)
+    {
+        // CTF終了後判定
+        $status = Model_Score::get_ctf_time_status();
+        if ($status['ended'] === false) {
+            Response::redirect('score/status');
+        }
+
+        $data['username'] = ($username === null) ? Auth::get_screen_name() : $username;
+        $profile = Model_Score::get_profile_detail($data['username']);
+        if ($profile === null) {
+            Response::redirect('score/view');
+        }
+
+        $data['profile'] = $profile;
+        $data['score'] = Model_Score::get_score_ranking($data['username']);
+        $ctf_name = Model_Config::get_value('ctf_name');
+        $data['ctf_name'] = $ctf_name;
+        $this->template->title = $ctf_name.'賞状';
+        $this->template->content = View::forge('score/diploma', $data);
         $this->template->footer = '';
     }
 }

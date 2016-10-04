@@ -4,110 +4,171 @@ class Model_News extends Model
 {
     public static function get_news($id = null)
     {
-	$query = DB::select(
-	    array('news.id', 'id'),
-	    array('news.comment', 'comment'),
-	    array('users.username', 'username'),
-	    array('news.updated_at', 'updated_at')
-	)->from('news');
+        $query = DB::select(
+            array('news.id', 'id'),
+            array('news.comment', 'comment'),
+            array('users.username', 'username'),
+            array('news.updated_at', 'updated_at')
+        )->from('news');
 
-	if (!is_null($id))
-	{
+        if (!is_null($id))
+        {
             $query->where('news.id', $id);
-	}
+        }
 
-	$query->join('users', 'LEFT')
-	      ->on('news.uid', '=', 'users.id')
-	      ->order_by('news.updated_at', 'desc');
-	$result = $query->execute()->as_array();
+        $query->join('users', 'LEFT')
+            ->on('news.uid', '=', 'users.id')
+            ->order_by('news.updated_at', 'desc');
+        $result = $query->execute()->as_array();
 
-	return $result;
+        return $result;
     }
 
 
     public static function create_news($comment, $uid)
     {
-	$result_id = '';
-	$now = Model_Score::get_current_time();
+        $result_id = '';
+        $now = Model_Score::get_current_time();
 
-	try
-	{
-	    DB::start_transaction();
-	    $result = DB::insert('news')->set(array(
-		'comment' => $comment,
-		'uid' => $uid,
-		'updated_at' => $now
-	    ))->execute();
-	    DB::commit_transaction();
-	    // INSERT実行の戻り値は
-	    // return array(
-	    //     lastInsertedId, // AUTO_INCREMENTなフィールドにセットされたID
-	    //     rowCount // 挿入された行数
-	    // );
-	    $result_id = $result[0];
-	}
-	catch (Exception $e)
-	{
-	    DB::rollback_transaction();
-	    throw $e;
-	}
-	
-	return $result_id;
+        try
+        {
+            DB::start_transaction();
+            $result = DB::insert('news')->set(array(
+                'comment' => $comment,
+                'uid' => $uid,
+                'updated_at' => $now
+            ))->execute();
+            DB::commit_transaction();
+            // INSERT実行の戻り値は
+            // return array(
+            //     lastInsertedId, // AUTO_INCREMENTなフィールドにセットされたID
+            //     rowCount // 挿入された行数
+            // );
+            $result_id = $result[0];
+        }
+        catch (Exception $e)
+        {
+            DB::rollback_transaction();
+            throw $e;
+        }
+
+        return $result_id;
     }
 
 
     public static function update_news($id, $comment, $uid)
     {
-	$result = '';
-	$now = Model_Score::get_current_time();
-	
-	try
-	{
-	    DB::start_transaction();
-	    $result = DB::update('news')->set(array(
-		'id' => $id,
-		'comment' => $comment,
-		'uid' => $uid,
-		'updated_at' => $now
-	    ))->where('id', $id)->execute();
-	    DB::commit_transaction();
-	}
-	catch (Exception $e)
-	{
-	    DB::rollback_transaction();
-	    throw $e;
-	}
-	return $result;
+        $result = '';
+        $now = Model_Score::get_current_time();
+
+        try
+        {
+            DB::start_transaction();
+            $result = DB::update('news')->set(array(
+                'id' => $id,
+                'comment' => $comment,
+                'uid' => $uid,
+                'updated_at' => $now
+            ))->where('id', $id)->execute();
+            DB::commit_transaction();
+        }
+        catch (Exception $e)
+        {
+            DB::rollback_transaction();
+            throw $e;
+        }
+        return $result;
     }
 
 
     public static function delete_news($id)
     {
-	return DB::delete('news')->where('id', $id)->execute();
+        return DB::delete('news')->where('id', $id)->execute();
+    }
+
+    /**
+     * get_already_id
+     * 
+     * @param int $userid 
+     * @static
+     * @return int users.already_news_id
+     */
+    public static function get_already_id($userid)
+    {
+        $result = DB::select('already_news_id')->from('users')
+            ->where('id', $userid)
+            ->execute()->as_array();
+
+        if (empty($result) === true) {
+            return 0;
+        }
+
+        return $result[0]['already_news_id'];
+    }
+
+    /**
+     * get_already_count
+     * 
+     * @param int $userid 
+     * @static
+     * @return int count
+     */
+    public static function get_already_count($userid)
+    {
+        $already_id = self::get_already_id($userid);
+        $result = DB::select(DB::expr('COUNT(id)'))->from('news')
+            ->where('id', '>', $already_id)
+            ->execute()->as_array();
+        return $result[0]['COUNT(id)'];
+    }
+
+    /**
+     * update_already
+     * 
+     * @param int $userid 
+     * @param int $newsid 
+     * @static
+     * @return void
+     */
+    public static function update_already($userid, $newsid)
+    {
+        try
+        {
+            DB::start_transaction();
+            $result = DB::update('users')->set(array(
+                'already_news_id' => $newsid
+            ))->where('id', $userid)->execute();
+            DB::commit_transaction();
+        }
+        catch (Exception $e)
+        {
+            DB::rollback_transaction();
+            throw $e;
+        }
     }
 
 
     // ブラウザからの入力パラメータのチェック
     public static function validate($factory)
     {
-	$val = Validation::forge($factory);
+        $val = Validation::forge($factory);
 
-	if ($factory == 'create' || $factory == 'edit')
-	{
-	    $val->add('comment', 'コメント')
-		->add_rule('required')
-		->add_rule('min_length', 1)
-		->add_rule('max_length', 1000);
-	}
-	else if ($factory == 'delete')
-	{
-	    $val->add('id', 'ID')
-		->add_rule('required')
-		->add_rule('numeric_max', 255)
-		->add_rule('numeric_min', 1);
-	}
+        if ($factory == 'create' || $factory == 'edit')
+        {
+            $val->add('comment', 'コメント')
+                ->add_rule('required')
+                ->add_rule('min_length', 1)
+                ->add_rule('max_length', 1000);
+        }
+        else if ($factory == 'delete')
+        {
+            $val->add('id', 'ID')
+                ->add_rule('required')
+                ->add_rule('numeric_max', 10000)
+                ->add_rule('numeric_min', 1);
+        }
 
-	return $val;
+        return $val;
     }
 }
 

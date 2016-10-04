@@ -12,7 +12,7 @@
     <tbody>
       <tr>
 	<td><?php echo $review['puzzle_id'].': '.$review['puzzle_title']; ?></td>
-	<td><div class="review" data-number="<?php echo \Config::get('ctfscore.review.max_data_number');?>" data-score="<?php echo $review['score']; ?>"></div></td>
+	<td><div class="review" data-number="<?php echo \Model_Config::get_value('max_review_score');?>" data-score="<?php echo $review['score']; ?>"></div></td>
 	<td><?php echo nl2br($review['comment']); ?></td>
 	<td><?php echo nl2br($review['secret_comment']); ?></td>
 	<td><?php echo $review['username']; ?></td>

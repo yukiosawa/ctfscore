@@ -24,7 +24,7 @@ if (!empty($errmsg)) {
 
   <div class="form-group">
     <div class="col-md-offset-2 col-md-4">
-      <button type="submit" class="btn btn-primary">ユーザー更新</button>
+      <button type="submit" class="btn btn-primary">パスワード更新</button>
     </div>
   </div>
 </form>

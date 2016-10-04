@@ -19,28 +19,49 @@ class Model_Score extends Model
         }
     }
 
+    public static function is_complete($userid)
+    {
+        $puzzle_count = count(DB::select('puzzle_id')->from('puzzles')->group_by('puzzle_id')->execute());
+
+        $gained_count = count(DB::select('puzzle_id')->from('gained')->where('uid', $userid)->group_by('puzzle_id')->execute());
+
+        return $gained_count >= $puzzle_count;
+        /* $puzzle = DB::select(DB::expr('SUM(point)'))->from('puzzles')
+           ->execute()->as_array();
+           $puzzle_point = $puzzle[0]['SUM(point)'];
+
+           $gained = DB::select(DB::expr('SUM(point)'))->from('gained')
+           ->where('uid', $userid)
+           ->execute()->as_array();
+           $gained_point = $gained[0]['SUM(point)'];
+
+           return $gained_point >= $puzzle_point; */
+    }
+
     // スコアボード全体を返す
     public static function get_scoreboard()
     {
         // 全員のスコア一覧 (管理者ユーザは表示しない)
-        $admin_group_id = Config::get('ctfscore.admin.admin_group_id');
-        $total_level = Config::get('ctfscore.level.dummy_name_total');
+        $admin_group_id = Model_Config::get_value('admin_group_id');
+        $total_level = Model_Config::get_value('dummy_name_total');
         $scores = DB::select('users.id', 'users.username', 'users.totalpoint', 'levels.name')
             ->from('users')
             ->join('gained_levels', 'LEFT')
             ->on('users.id', '=', 'gained_levels.uid')
-            ->on('gained_levels.category', '=', sprintf("'%s'", $total_level))
             ->on('gained_levels.is_current', '=', "'1'")
             ->join('levels', 'LEFT')
-            ->on('gained_levels.category', '=', 'levels.category')
+            ->on('gained_levels.category_id', '=', 'levels.category_id')
             ->on('gained_levels.level', '=', 'levels.level')
+            ->join('categories', 'LEFT')
+            ->on('gained_levels.category_id', '=', 'categories.id')
+            ->on('categories.category', '=', sprintf("'%s'", $total_level))
             ->where('users.group', '!=', $admin_group_id)
             ->order_by('users.totalpoint', 'desc')
             ->order_by('users.pointupdated_at', 'asc')
             ->execute()->as_array();
 
         // カテゴリごとのスコアを付加
-        $categories = Model_Puzzle::get_categories();
+        $categories = array_map(function ($var) { return $var['category']; }, Model_Category::get_categories());
         for ($i = 0; $i < count($scores); $i++)
         {
             $uid = $scores[$i]['id'];
@@ -63,7 +84,7 @@ class Model_Score extends Model
     // 管理画面へイベントを通知
     public static function emitToMgmtConsole($event = NULL, $msg = NULL)
     {
-        if (!Config::get('ctfscore.admin.management_console'))
+        if (Model_Config::get_value('is_active_management_console') == 0)
         {
             return;
         }
@@ -91,9 +112,9 @@ class Model_Score extends Model
         $start_time = $times[0]['start_time'];
         $end_time = $times[0]['end_time'];
         // プロット間隔(秒)
-        $interval_seconds = Config::get('ctfscore.chart.plot_interval_seconds');
+        $interval_seconds = Model_Config::get_value('plot_interval_seconds');
         // 最大プロット数
-        $max_steps = Config::get('ctfscore.chart.plot_max_steps');
+        $max_steps = Model_Config::get_value('plot_max_steps');
 
         $labels = array();
         $now = Model_Score::get_current_time();
@@ -125,8 +146,9 @@ class Model_Score extends Model
 
         // 上位のユーザだけ対象とする。また0点は対象外とする。
         // 管理者も対象外
-        $max_number = Config::get('ctfscore.chart.max_number_of_users');
-        $admin_group_id = Config::get('ctfscore.admin.admin_group_id');
+        $colors = Model_Config::get_config_chart_colors();
+        $max_number = count($colors);
+        $admin_group_id = Model_Config::get_value('admin_group_id');
         $users = DB::select('id', 'username')
             ->from('users')
             ->where('totalpoint', '>', 0)
@@ -142,7 +164,6 @@ class Model_Score extends Model
 
         // ユーザ名一覧とグラフの色
         $userlist = array();
-        $colors = Config::get('ctfscore.chart.colors');
         $cnt = 0;
         foreach ($users as $user)
         {
@@ -151,7 +172,7 @@ class Model_Score extends Model
             {
                 break;
             }
-            $userlist += array($user['username'] => $colors[$cnt]);
+            $userlist += array($user['username'] => $colors[$cnt]['color']);
             $cnt++;
         }
 
@@ -169,72 +190,141 @@ class Model_Score extends Model
     }
 
 
-    // 個人プロファイル(カテゴリごとの獲得点数)を返す
-    public static function get_profile_answered_category($username = NULL)
+    /**
+     * get_ranking_user
+     * 
+     * @static
+     * @return void
+     */
+    public static function get_score_ranking($username)
     {
-        $userid = '';
-        if (!$username)
+        $user = DB::select(DB::expr('(select count(*) + 1 from users as t where t.totalpoint > users.totalpoint or (t.totalpoint = users.totalpoint and t.pointupdated_at < users.pointupdated_at)) as rank'))
+            ->from('users')
+            ->where('username', $username)
+            ->execute()->as_array();
+        return $user[0]['rank'];
+    }
+
+
+    // 個人プロファイル(カテゴリごとの獲得点数)を返す
+    public static function get_profile_progress($usernames = NULL)
+    {
+        $result = array();
+        if (!$usernames)
         {
-            // 指定されない場合はログイン中のユーザIDとする
-            list($driver, $userid) = Auth::get_user_id();
-            $username = Auth::get_screen_name();
+            // 指定されない場合はログイン中のユーザとする
+            $usernames[0] = Auth::get_screen_name();
         }
-        else
+
+        $colors = Model_Config::get_config_chart_colors();
+
+        foreach ($usernames as $username)
         {
             $userid = Model_Score::get_uid($username);
-        }
-        if (!$userid) return;
-
-        $puzzles = Model_Puzzle::get_puzzles_addinfo($userid);
-
-        // カテゴリごとに獲得スコア／総スコアを算出
-        $categories = array();
-        foreach ($puzzles as $puzzle)
-        {
-            $category = $puzzle['category'];
-            $point = $puzzle['point'];
-            if (!array_key_exists($category, $categories))
+            if (!$userid)
             {
-                $categories[$category]['totalpoint'] = 0;
-                $categories[$category]['point'] = 0;
+                continue;
             }
-            $categories[$category]['totalpoint'] += $point;
-            if ($puzzle['answered'])
+            $puzzles = Model_Puzzle::get_puzzles_addinfo($userid);
+
+            // カテゴリごとに獲得スコア／総スコアを算出
+            $categories = array();
+            foreach ($puzzles as $puzzle)
             {
-                $categories[$category]['point'] += $point;
+                $category = $puzzle['category'];
+                $point = $puzzle['point'];
+                if (!array_key_exists($category, $categories))
+                {
+                    $categories[$category]['totalpoint'] = 0;
+                    $categories[$category]['point'] = 0;
+                }
+                $categories[$category]['totalpoint'] += $point;
+                if ($puzzle['answered'])
+                {
+                    $categories[$category]['point'] += $point;
+                }
             }
+
+            $result[] = array('username' => $username, 'categories' => $categories, 'color' => array_shift($colors)['color']);
         }
-        $result['username'] = $username;
-        $result['categories'] = $categories;
 
         return $result;
     }
 
 
     // 個人プロファイルを返す
-    public static function get_profile($username = NULL)
+    public static function get_profile_detail($usernames = NULL)
     {
-        $userid = '';
-        if (!$username)
+        $result = array();
+        if (!$usernames)
         {
-            // 指定されない場合はログイン中のユーザIDとする
-            list($driver, $userid) = Auth::get_user_id();
+            // 指定されない場合はログイン中のユーザとする
             $username = Auth::get_screen_name();
         }
-        else
+
+        foreach ($usernames as $username)
         {
             $userid = Model_Score::get_uid($username);
+            if (!$userid)
+            {
+                continue;
+            }
+            $answered = Model_Puzzle::get_answered_puzzles($userid);
+            $result[] = array(
+                'username' => $username,
+                'answered_puzzles' => $answered,
+                'reviews' => Model_Review::get_reviews(null, null, $userid),
+                'levels' => Model_Score::get_current_levels_name($userid)
+            );
         }
-        if (!$userid) return;
 
-        $answered = Model_Puzzle::get_answered_puzzles($userid);
-        $result['username'] = $username;
-        $result['answered_puzzles'] = $answered;
-        $result['reviews'] = Model_Review::get_reviews(null, null, $userid);
-        $result['levels'] = Model_Score::get_current_levels_name($userid);
         return $result;
     }
 
+
+    public function get_solved_status_chart()
+    {
+        // x=カテゴリ名, y=問題得点, r=回答者数
+        $data = array();
+        // 回答済の問題
+        $gained = DB::select()->from('gained')
+                              ->join('puzzles')
+                              ->on('gained.puzzle_id', '=', 'puzzles.puzzle_id')
+                              ->execute()->as_array();
+        // 問題設定されているカテゴリを列挙
+        $categories = DB::select('categories.*')
+            ->from('categories')
+            ->join('puzzles')
+            ->on('puzzles.category_id', '=', 'categories.id')
+            ->order_by('categories.id', 'asc')
+            ->execute()->as_array();
+
+        // 問題設定されている得点を列挙
+        $points = Model_Puzzle::get_points();
+
+        $colors = Model_Config::get_config_chart_colors();
+        foreach ($categories as $category)
+        {
+            foreach ($points as $point)
+            {
+                $solved = array_filter($gained, function ($var) use ($category, $point) {return $var['category_id'] == $category['id'] && $var['point'] == $point;});
+                $data[] = array(
+                    'category_id' => $category['id'],
+                    'category' => $category['category'],
+                    'point' => $point,
+                    'solved' => count($solved),
+                );
+            }
+        }
+        return array(
+            'data' => $data,
+            'categories' => array_map(function ($var) {return $var['category'];}, $categories),
+            'points' => $points,
+            'multiple_by' => Model_Config::get_value('bubble_size_multiple_by'),
+            'color' => Model_Config::get_value('bubble_color')
+        );
+    }
+    
 
     // usernameをuseridに変換する
     public static function get_uid($username = NULL)
@@ -272,8 +362,6 @@ class Model_Score extends Model
         if (count($times) < 1)
         {
             $status['no_use'] = true;
-            $status['start_time'] = 'N/A';
-            $status['end_time'] = 'N/A';
             return $status;
         }
 
@@ -323,7 +411,7 @@ class Model_Score extends Model
         }
         else if ($factory == 'create')
         {
-            $val->add('username', 'ユーザー名')
+            $val->add('username', 'ユーザ名')
                 ->add_rule('required')
                 ->add_rule('max_length', 15)
                 // 英数字
@@ -354,6 +442,10 @@ class Model_Score extends Model
         }
         else if ($factory == 'score_submit')
         {
+            $val->add('puzzle_id', '問題番号')
+                ->add_rule('required')
+                ->add_rule('numeric_max', 10000)
+                ->add_rule('numeric_min', 1);
             $val->add('answer', 'flag')
                 ->add_rule('required')
                 ->add_rule('max_length', 255);
@@ -366,18 +458,18 @@ class Model_Score extends Model
     // 回答試行数制限を超過しているかどうかを返す
     public static function is_over_attempt_limit($uid = NULL)
     {
-        $interval_seconds = Config::get('ctfscore.history.attempt_interval_seconds');
-        $limit_times = Config::get('ctfscore.history.attempt_limit_times');
+        $interval_seconds = Model_Config::get_value('submit_interval_seconds');
+        $limit_times = Model_Config::get_value('submit_limit_times');
         $now = Model_Score::get_current_time();
         $subed_time = Model_Score::get_mod_time($now, 'sub', $interval_seconds);
+        $success_event = Config::get('ctfscore.answer_result.success.event');
 
-        $query = DB::select()->from('history');
-        $query->where('uid', '=', $uid);
-        $query->where('posted_at', '>', $subed_time);
         // 正解時のポストは除外しておく
-        $query->where('result', '!=', 'success');
-        $query->where('result', '!=', 'levelup');
-        $result = $query->execute();
+        $result = DB::select()->from('history')
+                              ->where('uid', '=', $uid)
+                              ->where('submitted_at', '>', $subed_time)
+                              ->where('result_event', '!=', $success_event)
+                              ->execute();
 
         if (count($result) >= $limit_times)
         {
@@ -391,7 +483,7 @@ class Model_Score extends Model
 
 
     // 試行履歴を記録する
-    public static function set_attempt_history($uid = NULL, $answer = NULL, $type = NULL)
+    public static function set_attempt_history($uid = NULL, $puzzle_id = NULL, $answer = NULL, $result = NULL)
     {
         // DB更新
         $now = Model_Score::get_current_time();
@@ -400,9 +492,11 @@ class Model_Score extends Model
             DB::start_transaction();
             DB::insert('history')->set(array(
                 'uid' => $uid,
-                'posted_at' => $now,
-                'posted_answer' => $answer,
-                'result' => $type
+                'submitted_at' => $now,
+                'puzzle_id' => $puzzle_id,
+                'answer' => $answer,
+                'result_event' => $result['event'],
+                'result_description' => $result['description']
             ))->execute();
             DB::commit_transaction();
         }
@@ -488,20 +582,20 @@ class Model_Score extends Model
         }
 
         // カテゴリごとにレベルチェック
-        foreach ($expected_levels as $category => $expected)
+        foreach ($expected_levels as $category_id => $expected)
         {
-            if (!array_key_exists($category, $current_levels))
+            if (!array_key_exists($category_id, $current_levels))
             {
-                $current_levels[$category] = 0;
+                $current_levels[$category_id] = 0;
             }
-            if ($current_levels[$category] < $expected)
+            if ($current_levels[$category_id] < $expected)
             {
                 // レベルアップ
-                if ($level = Model_Score::get_levels($category, $expected))
+                if ($level = Model_Score::get_levels($category_id, $expected))
                 {
                     $name = $level[0]['name'];
-                    Model_Score::update_gained_levels_table($uid, $category, $expected);
-                    $updated_levels[$category] = $name;
+                    Model_Score::update_gained_levels_table($uid, $category_id, $expected);
+                    $updated_levels[$category_id] = $name;
                 }
             }
         }
@@ -511,28 +605,46 @@ class Model_Score extends Model
 
 
     // 現在のレベルを取得する
-    public static function get_current_levels($uid = NULL)
+    public static function get_current_levels($uid = NULL, $byname = false)
     {
         $levels = array();
+        if (Model_Config::get_value('is_active_level') == 0)
+        {
+            return $levels;
+        }
         $category_levels = array();
-        $result = DB::select()->from('gained_levels')
-            ->where('uid', $uid)
-            ->where('is_current', true)
-            ->order_by('category', 'asc')
+        $result = DB::select('gained_levels.*', 'levels.name')->from('gained_levels')
+            ->join('levels')
+            ->on('gained_levels.level', '=', 'levels.level')
+            ->where('gained_levels.uid', $uid)
+            ->where('gained_levels.is_current', true)
+            ->order_by('gained_levels.category_id', 'asc')
             ->execute()->as_array();
-        $total_dummy = Config::get('ctfscore.level.dummy_name_total');
-        $conf_total = Config::get('ctfscore.level.is_active_total_level');
-        $conf_cate = Config::get('ctfscore.level.is_active_category_level');
+        $total_category_id = Model_Config::get_value('total_category_id');
         foreach ($result as $row)
         {
-            $category = $row['category'];
-            if ($category == $total_dummy && $conf_total)
+            $category_id = $row['category_id'];
+            if ($category_id == $total_category_id)
             {
-                $levels[$category] = $row['level'];
+                if ($byname)
+                {
+                    $levels[$category_id] = $row['name'];
+                }
+                else
+                {
+                    $levels[$category_id] = $row['level'];
+                }
             }
-            else if ($category != $total_dummy && $conf_cate)
+            else
             {
-                $category_levels[$category] = $row['level'];
+                if ($byname)
+                {
+                    $category_levels[$category_id] = $row['name'];
+                }
+                else
+                {
+                    $category_levels[$category_id] = $row['level'];
+                }
             }
         }
         $levels += $category_levels;
@@ -543,33 +655,7 @@ class Model_Score extends Model
     // 現在のレベルを名称で取得する
     public static function get_current_levels_name($uid)
     {
-        $levels = Model_Score::get_current_levels($uid);
-        $names = array();
-        $category_names = array();
-        $name = '';
-        $total_dummy = Config::get('ctfscore.level.dummy_name_total');
-        foreach ($levels as $category => $level)
-        {
-            if($level = Model_Score::get_levels($category, $level))
-            {
-                $name = $level[0]['name'];
-            }
-            else
-            {
-                continue;
-            }
-            if ($category == $total_dummy)
-            {
-                // 全体のレベルが配列の先頭にくるようにする
-                $names[$category] = $name;
-            }
-            else
-            {
-                $category_names[$category] = $name;
-            }
-        }
-        $names += $category_names;
-        return $names;
+        Model_Score::get_current_levels($uid, true);
     }
 
 
@@ -577,66 +663,67 @@ class Model_Score extends Model
     public static function get_expected_levels($uid = NULL)
     {
         $levels = array();
+        if (Model_Config::get_value('is_active_level') == 0)
+        {
+            return $levels;
+        }
+        
         // 獲得済の問題数
         $solved_num = array();
         $puzzles = Model_Puzzle::get_answered_puzzles($uid);
         foreach ($puzzles as $puzzle)
         {
-            $category = $puzzle['category'];
-            if (array_key_exists($category, $solved_num))
+            $category_id = $puzzle['category_id'];
+            if (array_key_exists($category_id, $solved_num))
             {
-                $solved_num[$category] += 1;
+                $solved_num[$category_id] += 1;
             }
             else
             {
-                $solved_num[$category] = 1;
+                $solved_num[$category_id] = 1;
             }
         }
         // カテゴリ名でソートしておく
         ksort($solved_num);
 
         // 全体レベル
-        $total_dummy = Config::get('ctfscore.level.dummy_name_total');
-        if (Config::get('ctfscore.level.is_active_total_level'))
-        {
-            $total_level = DB::select(DB::expr('MAX(level)'))
+        $total_category_id = Model_Config::get_value('total_category_id');
+        $total_level = DB::select(DB::expr('MAX(level)'))
                 ->from('levels')
-                ->where('category', $total_dummy)
+                ->where('category_id', $total_category_id)
                 ->where('criteria', '<=', count($puzzles))
                 ->execute()->as_array();
-            $levels[$total_dummy] = $total_level[0]['MAX(level)'];
+        if ($total_level[0]['MAX(level)'])
+        {
+            $levels[$total_category_id] = $total_level[0]['MAX(level)'];
         }
 
         // カテゴリごと
-        if (Config::get('ctfscore.level.is_active_category_level'))
+        foreach ($solved_num as $category_id => $num)
         {
-            foreach ($solved_num as $category => $num)
-            {
-                $category_level = DB::select(DB::expr('MAX(level)'))
+            $category_level = DB::select(DB::expr('MAX(level)'))
                     ->from('levels')
-                    ->where('category', '!=', $total_dummy)
+                    ->where('category_id', $category_id)
                     ->where('criteria', '<=', $num)
                     ->execute()->as_array();
-                $levels[$category] = $category_level[0]['MAX(level)'];
+            if ($category_level[0]['MAX(level)'])
+            {
+                $levels[$category_id] = $category_level[0]['MAX(level)'];
             }
         }
-
+        
         return $levels;
     }
 
 
     // 獲得済レベルのテーブル更新
-    public static function update_gained_levels_table($uid = NULL, $category = NULL, $level = NULL)
+    public static function update_gained_levels_table($uid = NULL, $category_id = NULL, $level = NULL)
     {
-        if ($uid == NULL || $category == NULL || $level == NULL)
+        if ($uid == NULL || $category_id == NULL || $level == NULL)
         {
             return;
         }
-        $total_dummy = Config::get('ctfscore.level.dummy_name_total');
-        $conf_total = Config::get('ctfscore.level.is_active_total_level');
-        $conf_cate = Config::get('ctfscore.level.is_active_category_level');
-        if (($category == $total_dummy && !$conf_total)
-            || ($category != $total_dummy && !$conf_cate))
+        if (Model_Config::get_value('is_active_level') == 0)
         {
             return;
         }
@@ -646,11 +733,11 @@ class Model_Score extends Model
             DB::start_transaction();
             DB::update('gained_levels')->set(array(
                 'is_current' => false,
-            ))->where('uid', $uid)->where('category', $category)
+            ))->where('uid', $uid)->where('category_id', $category_id)
             ->where('is_current', true)->execute();
             DB::insert('gained_levels')->set(array(
                 'uid' => $uid,
-                'category' => $category,
+                'category_id' => $category_id,
                 'level' => $level,
                 'gained_at' => $now,
                 'is_current' => true
@@ -665,12 +752,12 @@ class Model_Score extends Model
 
 
     // レベルのテーブルを返す
-    public static function get_levels($category = NULL, $level = NULL)
+    public static function get_levels($category_id = NULL, $level = NULL)
     {
         $query = DB::select()->from('levels');
-        if (!is_null($category))
+        if (!is_null($category_id))
         {
-            $query->where('category', $category);
+            $query->where('category_id', $category_id);
         }
         if (!is_null($level))
         {
@@ -680,4 +767,100 @@ class Model_Score extends Model
         return $result;
     }
 
+
+    public static function get_total_levels()
+    {
+        return Model_Score::get_levels(Model_Config::get_value('total_category_id'));
+    }
+
+
+    public static function get_category_levels($category_id)
+    {
+        if ($category_id)
+        {
+            return Model_Score::get_levels($category_id);
+        }
+        else
+        {
+            $total_category_id = Model_Config::get_value('total_category_id');
+            return DB::select()->from('levels')
+                ->where('category_id', '!=', $total_category_id)
+                ->execute()->as_array();
+        }
+    }
+
+
+    // 現在のレベルテーブルで獲得済レベルを再設定する
+    public static function refresh_gained_levels()
+    {
+        // 全ての獲得済レベルをクリアする
+        DB::update('gained_levels')->value('is_current', false)
+            ->where('is_current', true)
+            ->execute();
+        // ユーザごとにレベルを再計算
+        $users = DB::select()->from('users')->execute()->as_array();
+        foreach ($users as $user)
+        {
+            $uid = $user['id'];
+            $username = $user['username'];
+            $updated_levels = Model_Score::set_level_gained($uid);
+        }
+    }
+    
+
+    public static function update_levels($category_ids, $levels, $names, $criteria)
+    {
+        // POSTされていないデータは削除対象とする
+        $levels_before = DB::select()->from('levels')->execute()->as_array();
+        $levels_update = array();
+
+        $table_name = 'levels';
+        try
+        {
+            DB::start_transaction();
+            for ($i=0; $i<count($category_ids); $i++)
+            {
+                $levels_update[$category_ids[$i].$levels[$i]] = array('name' => $names[$i], 'criteria' => $criteria[$i]);
+                
+                if ($category_ids[$i] == '' || $levels[$i] == '' || $names[$i] == '' || $criteria[$i] == '')
+                {
+                    continue;
+                }
+
+                // 既に登録があれば更新、なければ新規
+                if (count(DB::select()->from($table_name)->where('category_id', $category_ids[$i])->where('level', $levels[$i])->execute()) < 1)
+                {
+                    DB::insert($table_name)->set(array(
+                        'category_id' => $category_ids[$i],
+                        'level' => $levels[$i],
+                        'name' => $names[$i],
+                        'criteria' => $criteria[$i]
+                    ))->execute();
+                }
+                else
+                {
+                    DB::update($table_name)->where('category_id', $category_ids[$i])->where('level', $levels[$i])->set(array(
+                        'category_id' => $category_ids[$i],
+                        'level' => $levels[$i],
+                        'name' => $names[$i],
+                        'criteria' => $criteria[$i]
+                    ))->execute();
+                }
+            }
+
+            $levels_delete = array_filter($levels_before, function ($var) use ($levels_update) {return !array_key_exists($var['category_id'].$var['level'], $levels_update); });
+            foreach ($levels_delete as $del)
+            {
+                DB::delete($table_name)->where('category_id', $del['category_id'])->where('level', $del['level'])->execute();
+            }
+            DB::commit_transaction();
+        } catch (Exception $e) {
+            // ロールバック
+            DB::rollback_transaction();
+            return array('bool' => false, 'errmsg' => 'レベルの更新に失敗しました。: '.$type);
+        }
+
+        return array('bool' => true);
+
+    }
 }

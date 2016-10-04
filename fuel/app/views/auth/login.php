@@ -6,7 +6,7 @@ if (!empty($errmsg)) {
 
 <ul class="nav nav-tabs">
   <li role="presentation" class="active"><a href="#">ログイン</a></li>
-  <li role="presentation"><a href="/auth/create">新規ユーザー作成</a></li>
+  <li role="presentation"><a href="/auth/create">新規ユーザ</a></li>
 </ul>
 <br>
   

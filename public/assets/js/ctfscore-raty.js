@@ -1,7 +1,11 @@
 $(function(){
     $.fn.raty.defaults.path = "/assets/js/images/raty";
     $.fn.raty.defaults.hints = null;
-    
+    print_raty();
+});
+
+
+function print_raty(){
     $(".review").raty({
 	readOnly: true,
 	number: function(){
@@ -23,6 +27,4 @@ $(function(){
 	    $('#review-score').val(score);
 	}
     });
-});
-
-
+}

@@ -25,6 +25,16 @@ class Model_Hint extends Model
         return array_map(function ($var) { return $var['puzzle_id']; }, $result);
     }
 
+    public static function is_hinted($puzzle_id, $userid)
+    {
+        $result = DB::select()->from('hints')
+            ->where('puzzle_id', $puzzle_id)
+            ->where('uid', $userid)
+            ->execute()->as_array();
+
+        return empty($result) === false;
+    }
+
     public static function get_hints_count()
     {
         $result = DB::select(DB::expr('puzzle_id, COUNT(puzzle_id)'))->from('hints')

@@ -70,7 +70,7 @@ class Controller_Auth extends Controller_Template
     public static function is_admin()
     {
         // 管理者ユーザかどうか判定
-        $admin_group_id = Config::get('ctfscore.admin.admin_group_id');
+        $admin_group_id = Model_Config::get_value('admin_group_id');
         return Auth::member($admin_group_id);
     }
 
@@ -112,7 +112,7 @@ class Controller_Auth extends Controller_Template
                 if (Auth::login($username, $password))
                 {
                     // ログイン成功
-                    $this->redirectIfAuth();
+                    $this->redirectIfAuth('/score/puzzle');
                 }
                 $error_msg = 'ログインに失敗しました。';
             }
@@ -134,6 +134,7 @@ class Controller_Auth extends Controller_Template
         // 認証済みユーザのみ許可
         $this->redirectIfNotAuth();
         Auth::logout();
+        Session::destroy();
         $this->template->title = 'ログアウト';
         $this->template->content = View::forge('auth/logout');
         $this->template->footer = View::forge('auth/footer');
@@ -143,19 +144,18 @@ class Controller_Auth extends Controller_Template
     public function action_create()
     {
         // ユーザー作成
-        $data['file'] = Config::get('ctfscore.static_page.agreement_file');
+        $page = Model_Staticpage::get('rule')[0];
         $this->template->title = 'ユーザー作成';
         $this->template->content = View::forge('auth/create', $data);
+        $this->template->content->set_safe('page', $page);
         $this->template->content->set_safe('errmsg', '');
         $this->template->footer = View::forge('auth/footer');
     }
 
 
-    public function action_created()
+    public function post_created()
     {
         // ユーザー作成実行
-        // POST以外は受け付けない
-        $this->checkAllowedMethod('POST');
         // 入力パラメータチェック
         $this->checkCSRF();
         $val = Model_Score::validate('create');
@@ -164,29 +164,24 @@ class Controller_Auth extends Controller_Template
         {
             $username = $val->validated('username');
             $password = $val->validated('password');
-            /* SimpleAuthにemailが必要 */
-            $dummyemail = rand() . '@dummy.com';
-            try
+            $admin = false;
+
+            // 初登録ユーザは管理者とする
+            $admin = count(Model_Users::get_users()) == 0 ? true : false;
+            $result = Model_Users::create_user($username, $password, $admin);
+            if ($result['created_id'] == false)
             {
-                // 登録
-                if (Auth::create_user($username, $password, $dummyemail))
-                {
-                    // 登録したユーザでログインしておく
-                    Auth::login($username, $password);
-                    $data['sound_on'] = Cookie::get('sound_on', '1');
-                    $this->template->title = 'ユーザー登録完了';
-                    $this->template->content = View::forge('auth/created', $data);
-                    $this->template->footer = View::forge('auth/footer');
-                    return;
-                }
-                else
-                {
-                    $error_msg = 'ユーザー作成に失敗しました。';
-                }
+                    $error_msg = 'ユーザー作成に失敗しました。'.$result['errmsg'];
             }
-            catch (SimpleUserUpdateException $e)
+            else
             {
-                $error_msg = $e->getMessage();
+                // 登録したユーザでログインしておく
+                Auth::login($username, $password);
+                $data['sound_on'] = Cookie::get('sound_on', '1');
+                $this->template->title = 'ユーザー登録完了';
+                $this->template->content = View::forge('auth/created', $data);
+                $this->template->footer = View::forge('auth/footer');
+                return;
             }
         }
         else
@@ -194,7 +189,7 @@ class Controller_Auth extends Controller_Template
             $error_msg = $val->show_errors();
         }
 
-        $data['file'] = Config::get('ctfscore.static_page.agreement_file');
+        $data['file'] = Model_Config::get_value('agreement_file');
         $this->template->title = 'ユーザー作成';
         $this->template->content = View::forge('auth/create', $data);
         $this->template->content->set_safe('errmsg', $error_msg);
@@ -213,13 +208,11 @@ class Controller_Auth extends Controller_Template
     }
 
 
-    public function action_updated()
+    public function post_updated()
     {
         // ユーザー更新実行
         // 認証済みユーザのみ許可
         $this->redirectIfNotAuth();
-        // POST以外は受け付けない
-        $this->checkAllowedMethod('POST');
         // 入力パラメータチェック
         $this->checkCSRF();
         $val = Model_Score::validate('update');
@@ -227,29 +220,20 @@ class Controller_Auth extends Controller_Template
         if ($val->run())
         {
             $username = Auth::get_screen_name();
-            $values = array(
-                'password' => $val->validated('password'),
-                'old_password' => $val->validated('old_password'),
-            );
-            if (!empty($values))
+            $old_password = $val->validated('old_password');
+            $new_password = $val->validated('password');
+
+            $result = Model_Users::change_password($old_password, $new_password);
+            if ($result['bool'] == false)
             {
-                try {
-                    if (Auth::update_user($values, $username))
-                    {
-                        $this->template->title = 'ユーザー更新完了';
-                        $this->template->content = View::forge('auth/updated');
-                        $this->template->footer = View::forge('auth/footer');
-                        return;
-                    }
-                    else
-                    {
-                        $error_msg = '更新に失敗しました。';
-                    }
-                }
-                catch (Exception $e)
-                {
-                    $error_msg = $e->getMessage();
-                }
+                $error_msg = '更新に失敗しました。'.$result['errmsg'];
+            }
+            else
+            {
+                $this->template->title = 'ユーザー更新完了';
+                $this->template->content = View::forge('auth/updated');
+                $this->template->footer = View::forge('auth/footer');
+                return;
             }
         }
         else
@@ -276,32 +260,32 @@ class Controller_Auth extends Controller_Template
         $this->template->footer = View::forge('auth/footer');
     }
 
-    public function action_removed()
+    public function post_removed()
     {
         // ユーザー削除
         // 認証済みユーザのみ許可
         $this->redirectIfNotAuth();
-        // POST以外は受け付けない
-        $this->checkAllowedMethod('POST');
         // 入力パラメータチェック
         $this->checkCSRF();
-        try {
-            Auth::delete_user(Auth::get_screen_name());
-            Auth::logout();
-        }
-        catch (Exception $e)
+
+        $result = Model_Users::delete_user(Auth::get_screen_name());
+        if ($result == true)
         {
-            $error_msg = $e->getMessage();
+            Auth::logout();
+            $this->template->title = 'ユーザー削除完了';
+            $this->template->content = View::forge('auth/removed');
+            $this->template->footer = View::forge('auth/footer');
+        }
+        else
+        {
+            $error_msg = '削除に失敗しました。'.$result['errmsg'];
             $this->template->title = 'ユーザー削除';
             $this->template->content = View::forge('auth/remove');
             $this->template->content->set('errmsg', $error_msg);
             $this->template->footer = View::forge('auth/footer');
-            return;
         }
-        $this->template->title = 'ユーザー削除完了';
-        $this->template->content = View::forge('auth/removed');
-        $this->template->footer = View::forge('auth/footer');
     }
+
 
     /**
      * action_sound

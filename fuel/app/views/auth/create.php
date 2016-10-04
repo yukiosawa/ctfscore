@@ -6,15 +6,12 @@ if (!empty($errmsg)) {
 
 <ul class="nav nav-tabs">
   <li role="presentation"><a href="/auth/login">ログイン</a></li>
-  <li role="presentation" class="active"><a href="#">新規ユーザー作成</a></li>
+  <li role="presentation" class="active"><a href="#">新規ユーザ</a></li>
 </ul>
 <br>
 
 <p class='h4'>
   新規ユーザ登録します。
-</p>
-<p>
-  パスワードを忘れるとログインできませんので注意してください。(リセットはできません)
 </p>
 
 <form class="form-horizontal" action="/auth/created" method="POST">
@@ -40,7 +37,11 @@ if (!empty($errmsg)) {
   </div>
 
   <!-- 遵守事項 -->
-  <p><?php File::read($file, false); ?></p>
+  <p class="h4">遵守事項</p>
+  <p>
+    <a href="<?php echo Uri::base(false).$page['path']; ?>" target="_blank">ルール</a>
+    を事前によく読んでおき、それに従ってください。
+  </p>
 
   <div class="form-group">
     <div class="col-md-offset-2 col-md-4">

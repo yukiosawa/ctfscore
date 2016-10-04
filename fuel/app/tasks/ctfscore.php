@@ -43,29 +43,56 @@ class Ctfscore
     }
 
 
+    public function delete_table($table = NULL)
+    {
+        if ($table != NULL)
+        {
+            \DBUtil::drop_table($table);
+            echo "Table deleted: ".$table."\n";
+        }
+        else
+        {
+            echo "Table unspecified.\n";
+        }
+    }
+    
+
     public function init_all_tables()
     {
         /* delete all tables */
-        $this->delete_gained_levels_table();
-        $this->delete_levels_table();
-        $this->delete_reviews_table();
-        $this->delete_hints_table();
-        $this->delete_gained_table();
-        $this->delete_history_table();
-        $this->delete_news_table();
-        $this->delete_users_table();
-        $this->delete_attachment_table();
-        $this->delete_success_image_table();
-        $this->delete_success_text_table();
-        $this->delete_success_random_text_table();
-        $this->delete_failure_random_text_table();
-        $this->delete_flags_table();
-        $this->delete_puzzles_table();
-        $this->delete_times_table();
+        $tables = array(
+            'static_pages',
+            'config_chart_colors',
+            'assets',
+            'config',
+            'admin_bonus_point',
+            'news',
+            'gained_levels',
+            'levels',
+            'hints',
+            'reviews',
+            'history',
+            'gained',
+            'times',
+            'failure_random_text',
+            'success_random_text',
+            'success_text',
+            'success_image',
+            'attachment',
+            'flags',
+            'puzzles',
+            'categories',
+            'users',
+        );
+        foreach ($tables as $table)
+        {
+            $this->delete_table($table);
+        }
+        
         /* create all tables */
         $this->create_users_table();
+        $this->create_categories_table();
         $this->create_puzzles_table();
-        $this->create_hint_table();
         $this->create_flags_table();
         $this->create_attachment_table();
         $this->create_success_image_table();
@@ -80,6 +107,11 @@ class Ctfscore
         $this->create_levels_table();
         $this->create_gained_levels_table();
         $this->create_news_table();
+        $this->create_admin_bonus_point_table();
+        $this->create_config_table();
+        $this->create_assets_table();
+        $this->create_config_chart_colors_table();
+        $this->create_static_pages_table();
     }
 
 
@@ -88,9 +120,6 @@ class Ctfscore
         // get the tablename
         \Config::load('simpleauth', true);
         $table = \Config::get('simpleauth.table_name', 'users');
-
-        // make sure the configured DB is used
-        \DBUtil::set_connection(\Config::get('simpleauth.db_connection', null));
 
         // only do this if it doesn't exist yet
         if (\DBUtil::table_exists($table))
@@ -107,35 +136,38 @@ class Ctfscore
             'last_login' => array('type' => 'varchar', 'constraint' => 25),
             'login_hash' => array('type' => 'varchar', 'constraint' => 255),
             'profile_fields' => array('type' => 'text'),
+            'already_news_id' => array('type' => 'int', 'default' => 0),
             'created_at' => array('type' => 'int', 'constraint' => 11, 'default' => 0),
             'updated_at' => array('type' => 'int', 'constraint' => 11, 'default' => 0),
             'totalpoint' => array('type' => 'int', 'default' => 0),
             'pointupdated_at' => array('type' => 'datetime'),
         ), array('id'));
 
-        // reset any DBUtil connection set
-        \DBUtil::set_connection(null);
-
         echo "Table created: ".$table."\n";
     }
 
 
-    public function delete_users_table()
+    public function create_categories_table()
     {
-        // get the tablename
-        \Config::load('simpleauth', true);
-        $table = \Config::get('simpleauth.table_name', 'users');
+        $table = 'categories';
 
-        // make sure the configured DB is used
-        \DBUtil::set_connection(\Config::get('simpleauth.db_connection', null));
+        // only do this if it doesn't exist yet
+        if (\DBUtil::table_exists($table))
+        {
+            return;
+        }
+        \DBUtil::create_table(
+            $table,
+            /* fields */
+            array(
+                'id' => array('type' => 'int', 'auto_increment' => true),
+                'category' => array('type' => 'varchar', 'constraint' => 255),
+            ),
+            /* primary_keys */
+            array('id')
+        );
 
-        // drop the admin_users table
-        \DBUtil::drop_table($table);
-
-        // reset any DBUtil connection set
-        \DBUtil::set_connection(null);
-
-        echo "Table deleted: ".$table."\n";
+        echo "Table created: ".$table."\n";
     }
 
 
@@ -155,23 +187,28 @@ class Ctfscore
                 'puzzle_id' => array('type' => 'int'),
                 'point' => array('type' => 'int'),
                 'bonus_point' => array('type' => 'int'),
-                'category' => array('type' => 'varchar', 'constraint' => 255),
+                'category_id' => array('type' => 'int'),
                 'title' => array('type' => 'varchar', 'constraint' => 255),
                 'content' => array('type' => 'varchar', 'constraint' => 1000),
             ),
             /* primary_keys */
-            array('puzzle_id')
+            array('puzzle_id'),
+            true, false, NULL,
+            /* foreign_keys */
+            array(
+                array(
+                    'key' => 'category_id',
+                    'reference' => array(
+                        'table' => 'categories',
+                        'column' => 'id',
+                    ),
+                    'on_update' => 'CASCADE',
+                    'on_delete' => 'CASCADE',
+                )
+            )
         );
 
         echo "Table created: ".$table."\n";
-    }
-
-
-    public function delete_puzzles_table()
-    {
-        $table = 'puzzles';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
     }
 
 
@@ -213,14 +250,6 @@ class Ctfscore
     }
 
 
-    public function delete_flags_table()
-    {
-        $table = 'flags';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
-    }
-
-
     public function create_attachment_table()
     {
         $table = 'attachment';
@@ -256,14 +285,6 @@ class Ctfscore
         );
 
         echo "Table created: ".$table."\n";
-    }
-
-
-    public function delete_attachment_table()
-    {
-        $table = 'attachment';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
     }
 
 
@@ -305,14 +326,6 @@ class Ctfscore
     }
 
 
-    public function delete_success_image_table()
-    {
-        $table = 'success_image';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
-    }
-
-
     public function create_success_text_table()
     {
         $table = 'success_text';
@@ -351,14 +364,6 @@ class Ctfscore
     }
 
 
-    public function delete_success_text_table()
-    {
-        $table = 'success_text';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
-    }
-
-
     public function create_success_random_text_table()
     {
         $table = 'success_random_text';
@@ -380,14 +385,6 @@ class Ctfscore
         );
 
         echo "Table created: ".$table."\n";
-    }
-
-
-    public function delete_success_random_text_table()
-    {
-        $table = 'success_random_text';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
     }
 
 
@@ -415,14 +412,6 @@ class Ctfscore
     }
 
 
-    public function delete_failure_random_text_table()
-    {
-        $table = 'failure_random_text';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
-    }
-
-
     public function create_gained_table()
     {
         $table = 'gained';
@@ -439,9 +428,7 @@ class Ctfscore
             array(
                 'uid' => array('type' => 'int'),
                 'puzzle_id' => array('type' => 'int'),
-                'point' => array('type' => 'int'),
-                'bonus_point' => array('type' => 'int'),
-                'category' => array('type' => 'varchar', 'constraint' => 255),
+                'has_bonus' => array('type' => 'int'),
                 'totalpoint' => array('type' => 'int'),
                 'gained_at' => array('type' => 'datetime'),
             ),
@@ -459,18 +446,19 @@ class Ctfscore
                     'on_update' => 'CASCADE',
                     'on_delete' => 'CASCADE',
                 ),
+                array(
+                    'key' => 'puzzle_id',
+                    'reference' => array(
+                        'table' => 'puzzles',
+                        'column' => 'puzzle_id',
+                    ),
+                    'on_update' => 'CASCADE',
+                    'on_delete' => 'CASCADE',
+                )
             )
         );
 
         echo "Table created: ".$table."\n";
-    }
-
-
-    public function delete_gained_table()
-    {
-        $table = 'gained';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
     }
 
 
@@ -490,7 +478,7 @@ class Ctfscore
             array(
                 'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
                 'uid' => array('type' => 'int'),
-                'category' => array('type' => 'varchar', 'constraint' => 255),
+                'category_id' => array('type' => 'int'),
                 'level' => array('type' => 'int'),
                 'gained_at' => array('type' => 'datetime'),
                 'is_current' => array('type' => 'int'),
@@ -509,18 +497,19 @@ class Ctfscore
                     'on_update' => 'CASCADE',
                     'on_delete' => 'CASCADE',
                 ),
+                array(
+                    'key' => 'category_id',
+                    'reference' => array(
+                        'table' => 'categories',
+                        'column' => 'id',
+                    ),
+                    'on_update' => 'CASCADE',
+                    'on_delete' => 'CASCADE',
+                )
             )
         );
 
         echo "Table created: ".$table."\n";
-    }
-
-
-    public function delete_gained_levels_table()
-    {
-        $table = 'gained_levels';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
     }
 
 
@@ -538,24 +527,29 @@ class Ctfscore
             $table,
             /* fields */
             array(
-                'category' => array('type' => 'varchar', 'constraint' => 255),
+                'category_id' => array('type' => 'int'),
                 'level' => array('type' => 'int'),
                 'name' => array('type' => 'varchar', 'constraint' => 50),
                 'criteria' => array('type' => 'int'),
             ),
             /* primary_keys */
-            array('category', 'level')
+            array('category_id', 'level'),
+            true, false, NULL,
+            /* foreign_keys */
+            array(
+                array(
+                    'key' => 'category_id',
+                    'reference' => array(
+                        'table' => 'categories',
+                        'column' => 'id',
+                    ),
+                    'on_update' => 'CASCADE',
+                    'on_delete' => 'CASCADE',
+                )
+            )
         );
 
         echo "Table created: ".$table."\n";
-    }
-
-
-    public function delete_levels_table()
-    {
-        $table = 'levels';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
     }
 
 
@@ -577,14 +571,6 @@ class Ctfscore
     }
 
 
-    public function delete_times_table()
-    {
-        $table = 'times';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
-    }
-
-
     public function create_history_table()
     {
         $table = 'history';
@@ -600,12 +586,14 @@ class Ctfscore
             /* fields */
             array(
                 'uid' => array('type' => 'int', 'constraint' => 11),
-                'posted_at' => array('type' => 'datetime'),
-                'posted_answer' => array('type' => 'varchar', 'constraint' => 255),
-                'result' => array('type' => 'varchar', 'constraint' => 10)
+                'submitted_at' => array('type' => 'datetime'),
+                'puzzle_id' => array('type' => 'int'),
+                'answer' => array('type' => 'varchar', 'constraint' => 255),
+                'result_event' => array('type' => 'varchar', 'constraint' => 255),
+                'result_description' => array('type' => 'varchar', 'constraint' => 255),
             ),
             /* primary_keys */
-            array('uid', 'posted_at'),
+            array('uid', 'submitted_at'),
             true, false, NULL,
             /* foreign_keys */
             array(
@@ -622,14 +610,6 @@ class Ctfscore
         );
 
         echo "Table created: ".$table."\n";
-    }
-
-
-    public function delete_history_table()
-    {
-        $table = 'history';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
     }
 
 
@@ -676,14 +656,6 @@ class Ctfscore
     }
 
 
-    public function delete_reviews_table()
-    {
-        $table = 'reviews';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
-    }
-
-
     public function create_hints_table()
     {
         $table = 'hints';
@@ -721,14 +693,6 @@ class Ctfscore
 
         echo "Table created: ".$table."\n";
     }
-
-    public function delete_hints_table()
-    {
-        $table = 'hints';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
-    }
-
 
     public function create_news_table()
     {
@@ -770,278 +734,170 @@ class Ctfscore
     }
 
 
-    public function delete_news_table()
+    public function create_admin_bonus_point_table()
     {
-        $table = 'news';
-        \DBUtil::drop_table($table);
-        echo "Table deleted: ".$table."\n";
-    }
+        $table = 'admin_bonus_point';
 
-
-    public function update_times($timelist = NULL)
-    {
-        if ($timelist == NULL){
-            echo "Usage: php oil r ctfscore:update_times file\n";
-            return;
-        }
-        require $timelist;
-        $table = 'times';
-        $start_time = $times['start_time'];
-        $end_time = $times['end_time'];
-        if (count(\DB::select()->from($table)->execute()) < 1)
+        // only do this if it doesn't exist yet
+        if (\DBUtil::table_exists($table))
         {
-            \DB::insert($table)->set(array(
-                'start_time' => $start_time,
-                'end_time' => $end_time
-            ))->execute();
-            echo "Time inserted: START=".$start_time.": END=".$end_time."\n";
+            return;
         }
-        else
+
+        \DBUtil::create_table(
+            $table,
+            /* fields */
+            array(
+                'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
+                'uid' => array('type' => 'int'),
+                'bonus_point' => array('type' => 'int'),
+                'comment' => array('type' => 'varchar', 'constraint' => 1000),
+                'updated_by' => array('type' => 'varchar', 'constraint' => 50),
+                'updated_at' => array('type' => 'datetime'),
+            ),
+            /* primary_keys */
+            array('id'),
+            true, false, NULL,
+            /* foreign_keys */
+            array(
+                array(
+                    'key' => 'uid',
+                    'reference' => array(
+                        'table' => 'users',
+                        'column' => 'id',
+                    ),
+                    'on_update' => 'CASCADE',
+                    'on_delete' => 'CASCADE',
+                ),
+            )
+        );
+
+        echo "Table created: ".$table."\n";
+    }
+
+
+    public function create_config_table()
+    {
+        $table = 'config';
+
+        // only do this if it doesn't exist yet
+        if (\DBUtil::table_exists($table))
         {
-            \DB::update($table)->set(array(
-                'start_time' => $start_time,
-                'end_time' => $end_time
-            ))->execute();
-            echo "Time updated: START=".$start_time.": END=".$end_time."\n";
-        }
-    }
-
-
-    /* Update puzzles from the php file specified by argument. */
-    public function update_puzzles($puzzlelist = NULL)
-    {
-        if ($puzzlelist == NULL){
-            echo "Usage: php oil r ctfscore:update_puzzles file\n";
             return;
         }
-        require $puzzlelist;
-        foreach ($puzzles as $puzzle) {
-            $this->update_puzzle($puzzle);
-        }
+        \DBUtil::create_table(
+            $table,
+            /* fields */
+            array(
+                'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
+                'type' => array('type' => 'varchar', 'constraint' => 255),
+                'name' => array('type' => 'varchar', 'constraint' => 255),
+                'value' => array('type' => 'varchar', 'constraint' => 255),
+                'description' => array('type' => 'varchar', 'constraint' => 1000),
+            ),
+            /* primary_keys */
+            array('id')
+        );
+
+        echo "Table created: ".$table."\n";
     }
 
 
-    /* Update the puzzle specified by arguments. */
-    public function update_puzzle($puzzle = NULL)
+    public function create_assets_table()
     {
-        $puzzle_id = $puzzle['puzzle_id'];
-        try
+        $table = 'assets';
+
+        // only do this if it doesn't exist yet
+        if (\DBUtil::table_exists($table))
         {
-            \DB::start_transaction();
-
-            // 既に登録があれば更新、なければ新規
-            $q1 = '';
-            if (count(\DB::select()->from('puzzles')->where('puzzle_id', $puzzle_id)->execute()) > 0)
-            {
-                $q1 = \DB::update('puzzles');
-                $q1->where('puzzle_id', $puzzle_id);
-            }
-            else
-            {
-                $q1 = \DB::insert('puzzles');
-            }
-            $q1->set(array(
-                'puzzle_id' => $puzzle_id,
-                'point' => $puzzle['point'],
-                'bonus_point' => $puzzle['bonus_point'],
-                'category' => $puzzle['category'],
-                'title' => $puzzle['title'],
-                'content' => $puzzle['content'],
-            ))->execute();
-
-            // flagは複数可能
-            // 既に登録済のデータは全削除したあと、新規登録
-            \DB::delete('flags')->where('puzzle_id', $puzzle_id)->execute();
-            foreach ($puzzle['flag'] as $flag)
-            {
-                \DB::insert('flags')->set(array(
-                    'puzzle_id' => $puzzle_id,
-                    'flag' => $flag,
-                ))->execute();
-            }
-
-            // 添付ファイルは複数可能
-            // 既に登録済のデータは全削除したあと、新規登録
-            \DB::delete('attachment')->where('puzzle_id', $puzzle_id)->execute();
-            foreach ($puzzle['attachment'] as $attach)
-            {
-                \DB::insert('attachment')->set(array(
-                    'puzzle_id' => $puzzle_id,
-                    'filename' => $attach,
-                ))->execute();
-            }
-
-            // 正解時に表示する画像ファイル
-            // 既に登録済のデータは全削除したあと、新規登録
-            \DB::delete('success_image')->where('puzzle_id', $puzzle_id)->execute();
-            if ($puzzle['success_image'])
-            {
-                \DB::insert('success_image')->set(array(
-                    'puzzle_id' => $puzzle_id,
-                    'filename' => $puzzle['success_image'],
-                ))->execute();
-            }
-
-            // 正解時に表示するテキストメッセージ
-            // 既に登録済のデータは全削除したあと、新規登録
-            \DB::delete('success_text')->where('puzzle_id', $puzzle_id)->execute();
-            if ($puzzle['success_text'])
-            {
-                \DB::insert('success_text')->set(array(
-                    'puzzle_id' => $puzzle_id,
-                    'text' => $puzzle['success_text'],
-                ))->execute();
-            }
-
-            \DB::commit_transaction();
-        } catch (Exception $e) {
-            // ロールバック
-            DB::rollback_transaction();
-            throw $e;
-        }
-
-        echo "Puzzle updated: ".$puzzle_id.":".$puzzle['point'].":".$puzzle['bonus_point'].":".$puzzle['category'].":".$puzzle['title'].":".$puzzle['content']."\n";
-    }
-
-
-    /* Insert users from the php file specified by argument. */
-    public function insert_users($userlist = NULL)
-    {
-        if ($userlist == NULL){
-            echo "Usage: php oil r ctfscore:insert_users file\n";
             return;
         }
-        require $userlist;
-        foreach ($users as $user){
-            $username = $user["username"];
-            $password = $user["password"];
-            $admin = $user["admin"];
-            $this->insert_user($username, $password, $admin);
-        }
+        \DBUtil::create_table(
+            $table,
+            /* fields */
+            array(
+                'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
+                'name' => array('type' => 'varchar', 'constraint' => 255),
+                'type' => array('type' => 'varchar', 'constraint' => 255),
+                'is_random' => array('type' => 'int', 'constraint' => 1),
+                'sub_dir' => array('type' => 'varchar', 'constraint' => 255),
+                'filename' => array('type' => 'varchar', 'constraint' => 255),
+                'description' => array('type' => 'varchar', 'constraint' => 1000),
+            ),
+            /* primary_keys */
+            array('id')
+        );
+
+        echo "Table created: ".$table."\n";
     }
 
 
-    /* Insert the user specified by arguments */
-    public function insert_user($username = NULL, $password = NULL, $admin = false)
+    public function create_config_chart_colors_table()
     {
-        if (($username == NULL) || ($password == NULL)){
-            echo "Usage: php oil r ctfscore:insert_user username password\n";
-            return;
-        }
-        try {
-            $auth = \Auth::instance();
-            $dummyemail = rand() . '@dummy.com';
-            $group = null;
-            if ($admin) {
-                $group = \Config::get('ctfscore.admin.admin_group_id');
-            }
-            if ($auth->create_user($username, $password, $dummyemail, $group)) {
-                echo "User inserted: ".$username.":".$group."\n";
-                return;
-            }
-            $errmsg = "Failed to insert: " . $username . "\n";
-        } catch (SimpleUserUpdateException $e) {
-            $errmsg = $e->getMessage();
-        }
-        echo $errmsg;
-    }
+        $table = 'config_chart_colors';
 
-
-    /* Insert texts from the php file specified by argument. */
-    public function insert_random_texts($textlist = NULL)
-    {
-        if ($textlist == NULL){
-            echo "Usage: php oil r ctfscore:insert_random_texts file\n";
-            return;
-        }
-        require $textlist;
-        foreach ($random_texts['success'] as $success){
-            $this->insert_random_text('success_random_text', $success);
-        }
-        foreach ($random_texts['failure'] as $failure){
-            $this->insert_random_text('failure_random_text', $failure);
-        }
-    }
-
-
-    /* Insert the text specified by arguments */
-    public function insert_random_text($table = NULL, $text = NULL)
-    {
-        if (($table == NULL) || ($text == NULL)){
-            echo "Usage: php oil r ctfscore:insert_random_text table text\n";
-            return;
-        }
-
-        \DB::insert($table)->set(array(
-            'text' => $text,
-        ))->execute();
-        echo "Random text inserted: ".$table.":".$text."\n";
-    }
-
-
-    /* Update levels from the php file specified by argument. */
-    public function update_levels($levellist = NULL)
-    {
-        if ($levellist == NULL){
-            echo "Usage: php oil r ctfscore:update_levels file\n";
-            return;
-        }
-        require $levellist;
-        foreach ($levels as $level){
-            $this->update_level($level);
-        }
-    }
-
-
-    /* Update the level specified by arguments */
-    public function update_level($level = NULL)
-    {
-        // 既に登録があれば更新、なければ新規
-        $c = $level['category'];
-        $l = $level['level'];
-        $query = '';
-        if (count(\DB::select()->from('levels')->where('category', $c)->where('level', $l)->execute()) > 0)
+        // only do this if it doesn't exist yet
+        if (\DBUtil::table_exists($table))
         {
-            $query = \DB::update('levels');
-            $query->where('category', $c)->where('level', $l);
+            return;
         }
-        else
-        {
-            $query = \DB::insert('levels');
-        }
-        $query->set(array(
-            'category' => $c,
-            'level' => $l,
-            'name' => $level['name'],
-            'criteria' => $level['criteria'],
-        ))->execute();
+        \DBUtil::create_table(
+            $table,
+            /* fields */
+            array(
+                'id' => array('type' => 'int', 'constraint' => 11, 'auto_increment' => true),
+                'rank' => array('type' => 'int', 'constraint' => 11),
+                'color' => array('type' => 'varchar', 'constraint' => 255),
+            ),
+            /* primary_keys */
+            array('id')
+        );
 
-        echo "Level updated: ".$c.":".$l.":".$level['name'].":".$level['criteria']."\n";
+        echo "Table created: ".$table."\n";
     }
 
 
-    /* Refresh gained levels based on the levels table */
+    public function create_static_pages_table()
+    {
+        $table = 'static_pages';
+
+        // only do this if it doesn't exist yet
+        if (\DBUtil::table_exists($table))
+        {
+            return;
+        }
+
+        \DBUtil::create_table(
+            $table,
+            /* fields */
+            array(
+                'name' => array('type' => 'varchar', 'constraint' => 255),
+                'display_name' => array('type' => 'varchar', 'constraint' => 255),
+                'path' => array('type' => 'varchar', 'constraint' => 255),
+                'content' => array('type' => 'varchar', 'constraint' => 1000),
+                'display_order' => array('type' => 'int'),
+                'is_active' => array('type' => 'int')
+            ),
+            /* primary_keys */
+            array('name')
+        );
+
+        echo "Table created: ".$table."\n";
+    }
+
+
+    // 現在の回答済問題から獲得総スコアを再計算する
+    public function refresh_gained_points()
+    {
+        \Model_Puzzle::refresh_gained_points();
+        echo "Updated the tables: 'gained', 'users'\n";
+    }
+
+
     public function refresh_gained_levels()
     {
-        // 全ての獲得済レベルをクリアする
-        \DB::update('gained_levels')->value('is_current', false)
-            ->where('is_current', true)
-            ->execute();
-        // ユーザごとにレベルを再計算
-        $users = \DB::select()->from('users')->execute()->as_array();
-        foreach ($users as $user)
-        {
-            $uid = $user['id'];
-            $username = $user['username'];
-            $updated_levels = \Model_Score::set_level_gained($uid);
-            echo "Level refreshed: ".$username;
-            foreach ($updated_levels as $category => $name)
-            {
-                echo ":".$category."=>".$name;
-            }
-            echo "\n";
-        }
+        \Model_Score::refresh_gained_levels();
+        echo "Updated the table: 'gained_levels'\n";
     }
-
 }
 /* End of file tasks/ctfscore.php */

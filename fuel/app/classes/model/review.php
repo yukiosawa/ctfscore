@@ -6,7 +6,7 @@ class Model_Review extends Model
     public static function get_reviewable_puzzles($uid)
     {
         // 回答済のチェック
-        if (!Config::get('ctfscore.review.allow_unanswered_puzzle'))
+        if (!Model_Config::get_value('allow_unanswered_review'))
         {
             return Model_Puzzle::get_answered_puzzles($uid);
         }
@@ -40,7 +40,7 @@ class Model_Review extends Model
 
         // 回答済のチェック
         list($driver, $userid) = Auth::get_user_id();
-        if (!Config::get('ctfscore.review.allow_unanswered_puzzle'))
+        if (!Model_Config::get_value('allow_unanswered_review'))
         {
             $puzzle_id = $review['puzzle_id'];
             if (!Model_Puzzle::is_answered_puzzle($userid, $puzzle_id))
@@ -122,12 +122,57 @@ class Model_Review extends Model
             {
                 $review['puzzle_title'] = '';
             }
+            $review['max_score'] = Model_Config::get_value('max_review_score');
         }
         unset($review);
 
         return $result;
     }
 
+    /**
+     * get_reviews_for_search
+     * 
+     * @param string $category 
+     * @param string $username
+     * @static
+     * @return array
+     */
+    public static function get_reviews_for_search($category = null, $username = null)
+    {
+        $query = DB::select(DB::expr('reviews.*,users.username,puzzles.title as puzzle_title'))->from('reviews')
+            ->join('users', 'LEFT')
+            ->on('reviews.uid', '=', 'users.id')
+            ->join('puzzles', 'LEFT')
+            ->on('reviews.puzzle_id', '=', 'puzzles.puzzle_id')
+            ->join('categories', 'LEFT')
+            ->on('puzzles.category_id', '=', 'categories.id')
+            ->order_by('reviews.updated_at', 'desc');
+
+        if ($category) {
+            $query->where('categories.category', $category);
+        }
+
+        if ($username) {
+            $query->where('users.username', $username);
+        }
+
+        $result = $query->execute()->as_array();
+        return $result;
+    }
+
+    /**
+     * get_users
+     * 
+     * @static
+     * @return array(username,...)
+     */
+    public static function get_users()
+    {
+        $result = DB::select(DB::expr('username'))->from('users')
+            ->where(DB::expr('exists (select uid from reviews where users.id = reviews.uid)'))
+            ->execute()->as_array();
+        return array_map(function ($var) { return $var['username']; }, $result);
+    }
 
     public static function create_review($puzzle_id, $score, $comment, $secret_comment, $uid)
     {
@@ -135,7 +180,7 @@ class Model_Review extends Model
         if (!Model_Puzzle::get_puzzles($puzzle_id)) return null;
 
         // 回答済のチェック
-        if (!Config::get('ctfscore.review.allow_unanswered_puzzle'))
+        if (!Model_Config::get_value('allow_unanswered_review'))
         {
             if (!Model_Puzzle::is_answered_puzzle($uid, $puzzle_id)) return null;
         }
@@ -247,13 +292,14 @@ class Model_Review extends Model
 
         if ($factory == 'create' || $factory == 'edit')
         {
+            $max_data_number = Model_Config::get_value('max_review_score');
             $val->add('puzzle_id', '問題番号')
                 ->add_rule('required')
-                ->add_rule('numeric_max', 255)
+                ->add_rule('numeric_max', 10000)
                 ->add_rule('numeric_min', 1);
             $val->add('score', '評価点')
                 ->add_rule('required')
-                ->add_rule('numeric_max', 10)
+                ->add_rule('numeric_max', $max_data_number)
                 ->add_rule('numeric_min', 0);
             $val->add('comment', '公開コメント')
                 ->add_rule('max_length', 1000);
@@ -264,7 +310,7 @@ class Model_Review extends Model
         {
             $val->add('review_id', 'レビューID')
                 ->add_rule('required')
-                ->add_rule('numeric_max', 255)
+                ->add_rule('numeric_max', 10000)
                 ->add_rule('numeric_min', 1);
         }
 
