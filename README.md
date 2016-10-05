@@ -11,7 +11,13 @@ CTFのスコアサーバです。
 
 
 ## 環境構築(Ubuntu)
+- 事前準備
+```
+sudo apt-get install -y git curl
+```
+
 - apache, mysql and php
+途中MySQLのrootパスワード設定を(何度か)求められるが、後で設定するので、空欄のまま進める。
 ```
 $ sudo apt-get install -y apache2 mysql-server php5 php5-mysql
 ```
@@ -19,43 +25,28 @@ $ sudo apt-get install -y apache2 mysql-server php5 php5-mysql
 - FuelPHP
 ```
 $ curl get.fuelphp.com/oil | sh
-$ cd /var/www
-$ sudo oil create ctfscore
-```
-
-- apache Document Root
-virtual hostの設定を作成
-```
-$ sudo cp etc/apache2/ctfscore.conf /etc/apache2/sites-available/.
-$ sudo a2dissite 000-default
-$ sudo a2ensite ctfscore
-```
-
-- apache mod rewrite
-```
+$ oil create ctfscore
+$ sudo mv ctfscore /var/www/.
 $ sudo a2enmod rewrite
 $ sudo service apache2 restart
 ```
 
 - node.js and socket.io
 ```
-$ sudo apt-get install -y nodejs
+$ sudo apt-get install -y nodejs npm
 $ sudo update-alternatives --install /usr/bin/node nodejs /usr/bin/nodejs 100
-$ sudo mkdir /var/www/ctfscore/nodejs
-$ cd /var/www/ctfscore/nodejs
-$ curl https://www.npmjs.com/install.sh | sudo sh
-$ sudo npm install socket.io
-$ sudo cp node_modules/socket.io-client/socket.io.js /var/www/ctfscore/public/assets/js/.
+$ npm install socket.io
+$ sudo cp node_modules/socket.io/node_modules/socket.io-client/socket.io.js /var/www/ctfscore/public/assets/js/.
 ```
 
 - socket.io-php-emitter
 ```
 $ sudo apt-get install -y redis-server
-$ sudo npm install socket.io-redis
-$ sudo npm install socket.io-emitter
-$ sudo git clone https://github.com/ashiina/socket.io-php-emitter.git
+$ npm install socket.io-redis
+$ npm install socket.io-emitter
+$ git clone https://github.com/ashiina/socket.io-php-emitter.git
 $ cd socket.io-php-emitter
-$ sudo /var/www/ctfscore/composer.phar install
+$ /var/www/ctfscore/composer.phar install
 ```
 
 - ctfscoreアプリケーションのインストール
@@ -63,6 +54,14 @@ $ sudo /var/www/ctfscore/composer.phar install
 $ cd ~
 $ git clone https://github.com/yukiosawa/ctfscore.git
 $ sudo cp -r ctfscore/* /var/www/ctfscore/.
+$ sudo cp -r node_modules /var/www/ctfscore/nodejs/.
+```
+
+- apache virtual hostの設定
+```
+$ sudo cp ctfscore/etc/apache2/ctfscore.conf /etc/apache2/sites-available/.
+$ sudo a2dissite 000-default
+$ sudo a2ensite ctfscore
 ```
 
 - ctfscoreデータベースの初期化
@@ -81,17 +80,14 @@ $ node /var/www/ctfscore/nodejs/app.js
 ```
 
 - 動作確認
-_全般_
-Webブラウザでアクセス `{http://<hostname>/`
-
-_管理コンソール_
-(1) Redisサーバが受信したメッセージをリアルタイム表示する。
-```
-$ redis-cli -h localhost monitor
-```
-(2) 管理コンソールで受信したメッセージをリアルタイム表示する。  
-Webブラウザで管理コンソールを開き、`F12開発者ツール -> コンソールログ`
-(3) 上記の状態で別のWebブラウザを開き、一般ユーザでログインしてflag(正解、不正解)をサブミットしてみる。
+    - Webブラウザでアクセス `{http://<hostname>/`
+    - 管理コンソールで受信したメッセージをリアルタイム表示する。
+      Webブラウザで管理コンソールを開き、`F12開発者ツール -> コンソールログ`
+    - Redisサーバが受信したメッセージをリアルタイム表示する。
+    ```
+    $ redis-cli -h localhost monitor
+    ```
+    - 上記の状態で別のWebブラウザを開き、一般ユーザでログインしてflag(正解、不正解)をサブミットしてみる。
 
 
 ## その他同梱している外部ライブラリ

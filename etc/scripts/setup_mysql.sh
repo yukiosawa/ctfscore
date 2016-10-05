@@ -15,7 +15,7 @@ fi
 echo "Setting up MySQL root user."
 if [ -z "$MYSQL_ROOT_PASSWD" ]; then
     echo "+Generating a random password."
-    MYSQL_ROOT_PASSWD="$(head -n 10 /dev/random | base64 | fold -w 32 | head -n 1)"
+    MYSQL_ROOT_PASSWD="$(head -n 10 /dev/urandom | base64 | fold -w 32 | head -n 1)"
 fi
 echo "MYSQL_ROOT_PASSWD=$MYSQL_ROOT_PASSWD"
 echo "MYSQL_ROOT_PASSWD=$MYSQL_ROOT_PASSWD" > $PASSFILE
@@ -34,7 +34,7 @@ echo "MYSQL_ADMIN_USER=$MYSQL_ADMIN_USER"
 echo "MYSQL_ADMIN_USER=$MYSQL_ADMIN_USER" >> $PASSFILE
 if [ -z "$MYSQL_ADMIN_PASSWD" ]; then
     echo "+Generating a random password."
-    MYSQL_ADMIN_PASSWD="$(head -n 10 /dev/random | base64 | fold -w 32 | head -n 1)"
+    MYSQL_ADMIN_PASSWD="$(head -n 10 /dev/urandom | base64 | fold -w 32 | head -n 1)"
 fi
 echo "MYSQL_ADMIN_PASSWD=$MYSQL_ADMIN_PASSWD"
 echo "MYSQL_ADMIN_PASSWD=$MYSQL_ADMIN_PASSWD" >> $PASSFILE
