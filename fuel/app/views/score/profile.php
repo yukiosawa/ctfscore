@@ -4,7 +4,6 @@
 <?php echo Asset::js('ctfscore-raty.js'); ?>
 <?php echo Asset::css('animate.css'); ?>
 <?php echo Asset::js('jquery.lettering.js'); ?>
-<!-- <?php echo Asset::js('jquery.lettering-0.6.min.js'); ?> -->
 <?php echo Asset::js('jquery.textillate.js'); ?>
 <?php echo Asset::js('jquery.tablesorter.min.js'); ?>
 
