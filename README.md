@@ -53,6 +53,7 @@ $ /var/www/ctfscore/composer.phar install
 ```
 $ cd ~
 $ git clone https://github.com/yukiosawa/ctfscore.git
+$ sudo cp -r ctfscore/etc/fuelphp/* /var/www/ctfscore/.
 $ sudo cp -r ctfscore/* /var/www/ctfscore/.
 $ sudo cp -r node_modules /var/www/ctfscore/nodejs/.
 ```
@@ -62,6 +63,7 @@ $ sudo cp -r node_modules /var/www/ctfscore/nodejs/.
 $ sudo cp ctfscore/etc/apache2/ctfscore.conf /etc/apache2/sites-available/.
 $ sudo a2dissite 000-default
 $ sudo a2ensite ctfscore
+$ sudo service apache2 restart
 ```
 
 - ctfscoreデータベースの初期化
@@ -76,7 +78,7 @@ $ ~/ctfscore/etc/scripts/init_app_db.sh
 $ sudo service mysql start
 $ sudo service apache2 start
 $ sudo service redis-server start
-$ node /var/www/ctfscore/nodejs/app.js
+$ node /var/www/ctfscore/nodejs/app.js &
 ```
 
 - 管理者ユーザの作成
