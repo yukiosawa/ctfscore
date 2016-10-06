@@ -3,9 +3,8 @@
 <?php endif; ?>
 
 <?php
-//$action = $_SERVER['REQUEST_URI'];
 $action = Uri::current();
-echo render('users/_form', array('action' => $action));
+echo render('admin/users/_form', array('action' => $action));
 ?>
 
 

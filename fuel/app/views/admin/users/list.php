@@ -15,8 +15,8 @@
       <td><?php echo $user['group'] == Model_Config::get_value('admin_group_id') ? '管理者' : '一般'; ?></td>
       <td>
         <a class="btn btn-primary" href="<?php echo Uri::base(false).'admin/users/edit/'.$user['id']; ?>">編集</a>
-        <?php echo render('users/_delete', array('action' => Uri::base(false).'admin/users/delete', 'username' => $user['username'])); ?>
-        <?php echo render('users/_pwreset', array('action' => Uri::base(false).'admin/users/pwreset', 'username' => $user['username'])); ?>
+        <?php echo render('admin/users/_delete', array('action' => Uri::base(false).'admin/users/delete', 'username' => $user['username'])); ?>
+        <?php echo render('admin/users/_pwreset', array('action' => Uri::base(false).'admin/users/pwreset', 'username' => $user['username'])); ?>
       </td>
     </tr>
     <?php endforeach; ?>

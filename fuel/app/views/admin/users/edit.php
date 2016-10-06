@@ -5,5 +5,5 @@
 <?php
 $action = Uri::current();
 $admin = $user['group'] == Model_Config::get_value('admin_group_id') ? true : false;
-echo render('users/_form', array('action' => $action, 'username' => $user['username'], 'admin' => $admin));
+echo render('admin/users/_form', array('action' => $action, 'username' => $user['username'], 'admin' => $admin));
 ?>
