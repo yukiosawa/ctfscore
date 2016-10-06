@@ -50,6 +50,7 @@ desktop.ini
 /nodejs/node_modules/
 /nodejs/socket.io-php-emitter/
 
-# temp
-/tmp/
+# data uploaded by user
+/public/assets/img/usr/
+/public/assets/audio/usr/
 
