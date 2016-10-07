@@ -94,6 +94,17 @@ $ node /var/www/ctfscore/nodejs/app.js &
     ```
     - 上記の状態で別のWebブラウザを開き、一般ユーザでログインしてflag(正解、不正解)をサブミットしてみる。
 
+- エラーメッセージを非表示に  
+`/var/www/ctfscore/public/.htaccess`の以下の行をコメントアウトして本番環境設定にする。
+```
+SetEnv FUEL_ENV production
+```
+`/var/www/ctfscore/public/index.php`を以下のとおり設定する(値0を設定)。
+```
+error_reporting(0);
+ini_set('display_errors', 0);
+```
+
 
 ## その他同梱している外部ライブラリ
 * [jQuery](https://jquery.com/) v2.2.4
@@ -106,5 +117,4 @@ $ node /var/www/ctfscore/nodejs/app.js &
     * (Textillate) [animate.css](https://github.com/daneden/animate.css)
 * [FlipClock.js](http://flipclockjs.com/) 0.8.0 Beta
 * [jQuery.floatThead](http://mkoryak.github.io/floatThead/) 1.4.3
-
 

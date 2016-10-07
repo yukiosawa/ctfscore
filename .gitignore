@@ -29,6 +29,11 @@ desktop.ini
 /fuel/app/views/welcome/
 /fuel/app/classes/controller/welcome.php
 /fuel/app/tasks/robots.php
+/fuel/app/migrations
+/fuel/app/tests
+/fuel/app/themes
+/fuel/app/tmp
+/fuel/app/bootstrap.php
 /CHANGELOG.md
 /CONTRIBUTING.md
 /LICENSE.md
@@ -36,6 +41,15 @@ desktop.ini
 /composer.json
 /composer.phar
 /oil
+/public/index.php
+/public/favicon.ico
+/public/web.config
+/public/assets/fonts/
+/public/assets/css/index.html
+/public/assets/css/bootstrap*
+/public/assets/js/index.html
+/public/assets/js/bootstrap*
+/public/assets/img/index.html
 
 # dynamically generated files
 /fuel/app/logs/*/*/*
