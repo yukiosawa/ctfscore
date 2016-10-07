@@ -3,20 +3,40 @@ ctfscore
 CTFのスコアサーバです。
 
 ## 説明
-
+CTFスコアサーバとしての基本的な機能のほか、CTFを楽しく開催するための便利機能もつけています。  
+主な特徴
+- フラグサブミット時の画像、音声、テキスト(正解、不正解それぞれ指定可)
+    - 連動する管理コンソールで会場スクリーンへ表示も可
+- プロフィール画面(CTFプレイヤー間の比較も可)
+- 解いた問題数に応じたCTFプレイヤーのレベル(称号)
+- 問題のレビュー投稿
+- チャート表示(順位、正解者分布)
+- CTF終了までのカウントダウン
+- 問題へのヒントリクエスト
+- 各CTFプレイヤー向けの賞状
+- CTFプレイヤーは個人(チーム参加には未対応)
 
 
 ## 使い方
+- スコアサーバ設置場所は任意
+    - 管理コンソールとスコアサーバがネットワーク的に離れる場合は、管理コンソールとスコアサーバ間のWebSocket(8080/TCP)が接続可能であることを確認しておくこと(特にProxyやFWが間にある環境で要注意)。
+- 管理者の作成(初めて作成するユーザが自動的に管理者となる)
+- 管理者ページからカテゴリ、問題、競技ルール、開始終了時刻、画像音声などを登録
+- CTF開始
+    - 管理コンソールを開いておく。
+    - 開始時刻になると自動的に問題公開。
+    - 終了時刻以降はサブミット不可。賞状へのアクセス可。
 
 
+## 環境構築
+- Ubuntu 14.04 LTSで検証済み
 
-## 環境構築(Ubuntu)
 - 事前準備
 ```
 sudo apt-get install -y git curl
 ```
 
-- apache, mysql and php
+- apache, mysql and php  
 途中MySQLのrootパスワード設定を(何度か)求められるが、後で設定するので、空欄のまま進める。
 ```
 $ sudo apt-get install -y apache2 mysql-server php5 php5-mysql
@@ -95,15 +115,21 @@ $ node /var/www/ctfscore/nodejs/app.js &
     - 上記の状態で別のWebブラウザを開き、一般ユーザでログインしてflag(正解、不正解)をサブミットしてみる。
 
 - エラーメッセージを非表示に  
-`/var/www/ctfscore/public/.htaccess`の以下の行をコメントアウトして本番環境設定にする。
-```
-SetEnv FUEL_ENV production
-```
-`/var/www/ctfscore/public/index.php`を以下のとおり設定する(値0を設定)。
-```
-error_reporting(0);
-ini_set('display_errors', 0);
-```
+    - `/var/www/ctfscore/public/.htaccess`の以下の行をコメントアウトして本番環境設定にする。
+    ```
+    SetEnv FUEL_ENV production
+    ```
+    - `/var/www/ctfscore/public/index.php`を以下のとおり設定する(値0を設定)。
+    ```
+    error_reporting(0);
+    ini_set('display_errors', 0);
+    ```
+
+- ファイアウォール設定  
+以下のポートを開放する。
+    - HTTP(80/TCP)
+    - WebSocket(8080/TCP) *管理者(管理コンソール)のみが利用
+    - SSHなどその他必要に応じて
 
 
 ## その他同梱している外部ライブラリ
