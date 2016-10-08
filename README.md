@@ -78,6 +78,12 @@ $ sudo cp -r ctfscore/* /var/www/ctfscore/.
 $ sudo cp -r node_modules /var/www/ctfscore/nodejs/.
 ```
 
+- Webサーバ権限設定  
+所有権をapacheユーザとする
+```
+$ sudo chown -R www-data:www-data /var/www/ctfscore
+```
+
 - apache virtual hostの設定
 ```
 $ sudo cp ctfscore/etc/apache2/ctfscore.conf /etc/apache2/sites-available/.
@@ -93,7 +99,8 @@ $ ~/ctfscore/etc/scripts/setup_mysql.sh
 $ ~/ctfscore/etc/scripts/init_app_db.sh
 ```
 
-- サービスの開始
+- サービスの開始  
+自動起動していれば不要
 ```
 $ sudo service mysql start
 $ sudo service apache2 start

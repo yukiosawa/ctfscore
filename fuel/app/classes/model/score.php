@@ -43,18 +43,18 @@ class Model_Score extends Model
     {
         // 全員のスコア一覧 (管理者ユーザは表示しない)
         $admin_group_id = Model_Config::get_value('admin_group_id');
-        $total_level = Model_Config::get_value('dummy_name_total');
+        $total_category_id = Model_Config::get_value('total_category_id');
         $scores = DB::select('users.id', 'users.username', 'users.totalpoint', 'levels.name')
             ->from('users')
             ->join('gained_levels', 'LEFT')
             ->on('users.id', '=', 'gained_levels.uid')
+            ->on('gained_levels.category_id', '=', $total_category_id)
             ->on('gained_levels.is_current', '=', "'1'")
             ->join('levels', 'LEFT')
             ->on('gained_levels.category_id', '=', 'levels.category_id')
             ->on('gained_levels.level', '=', 'levels.level')
             ->join('categories', 'LEFT')
             ->on('gained_levels.category_id', '=', 'categories.id')
-            ->on('categories.category', '=', sprintf("'%s'", $total_level))
             ->where('users.group', '!=', $admin_group_id)
             ->order_by('users.totalpoint', 'desc')
             ->order_by('users.pointupdated_at', 'asc')
