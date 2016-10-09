@@ -14,6 +14,15 @@
   <?php echo render('admin/config/_levels_form', array('id' => 'category_levels', 'levels' => $category_levels, 'categories' => $categories)); ?>
 
   <div>
+    レベル設定に関する説明
+    <ul>
+      <li>「レベル」は1以上の整数値とし、値が小さいものから順にレベルアップしていきます。</li>
+      <li>初期状態で全ユーザにレベル設定する場合は、「正解した問題数」を0としてください。</li>
+      <li>「レベル」と「正解した問題数」の大小関係は一致させてください。<br>(例)「レベル」=1 「正解した問題数」=0、「レベル」=2 「正解した問題数」=2、「レベル」=3 「正解した問題数」=4、、、</li>
+    </ul>
+  </div>
+
+  <div>
     <button class="btn btn-primary" type="submit">更新する</button>
   </div>
 

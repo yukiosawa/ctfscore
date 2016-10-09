@@ -1,7 +1,7 @@
 <script>
  $(function(){
      $("#add_<?php echo $id; ?>").click(function(){
-         <?php if ($total_category_id): ?>
+         <?php if (isset($total_category_id)): ?>
              var cate = "<select class='form-control' name='levels[category_id][]'>";
              cate += "<option value='<?php echo $total_category_id; ?>'>N/A</option>";
              cate += "</select>";
@@ -15,9 +15,9 @@
              cate += "</select>";
          <?php endif; ?>
 
-         var level = "<input type='text' class='form-control' name='levels[level][]' value='<?php echo $level['level']; ?>'></input>";
-         var name = "<input type='text' class='form-control' name='levels[name][]' value='<?php echo $level['name']; ?>'></input>";
-         var criteria = "<input type='text' class='form-control' name='levels[criteria][]' value='<?php echo $level['criteria']; ?>'></input>";
+         var level = "<input type='text' class='form-control' name='levels[level][]' value='<?php echo isset($level['level']) ? $level['level'] : ''; ?>'></input>";
+         var name = "<input type='text' class='form-control' name='levels[name][]' value='<?php echo isset($level['name']) ? $level['name'] : ''; ?>'></input>";
+         var criteria = "<input type='text' class='form-control' name='levels[criteria][]' value='<?php echo isset($level['criteria']) ? $level['criteria'] : ''; ?>'></input>";
 
          var del = "<a class='btn btn-primary del_<?php echo $id; ?>'>削除</a>";
          
@@ -43,7 +43,7 @@
         <?php foreach ($levels as $level): ?>
           <tr>
             <td>
-              <?php if ($total_category_id): ?>
+              <?php if (isset($total_category_id)): ?>
                 <select class='form-control' name='levels[category_id][]'>
                   <option value='<?php echo $total_category_id; ?>'>N/A</option>
                 </select>

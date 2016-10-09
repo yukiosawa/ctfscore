@@ -532,7 +532,7 @@ class Model_Config extends Model
         else if ($factory == 'edittexts')
         {
             $texts = Input::post('texts');
-            foreach ($texts as $key => $value)
+            foreach ((array)$texts as $key => $value)
             {
                 $val->add('texts['.$key.']', 'テキストメッセージ')
                     ->add_rule('min_length', 1)
@@ -542,7 +542,7 @@ class Model_Config extends Model
         else if ($factory == 'editlevels')
         {
             $category_id = Input::post('levels')['category_id'];
-            foreach ($category_id as $key => $value)
+            foreach ((array)$category_id as $key => $value)
             {
                 $val->add('levels[category_id]['.$key.']', 'カテゴリID')
                     ->add_rule('required')
@@ -550,15 +550,15 @@ class Model_Config extends Model
                     ->add_rule('numeric_max', 1000);
             }
             $level = Input::post('levels')['level'];
-            foreach ($level as $key => $value)
+            foreach ((array)$level as $key => $value)
             {
                 $val->add('levels[level]['.$key.']', 'レベル')
                     ->add_rule('required')
                     ->add_rule('numeric_min', 1)
-                    ->add_rule('numeric_max', Model_Config::get_value('total_category_id'));
+                    ->add_rule('numeric_max', 1000);
             }
             $name = Input::post('levels')['name'];
-            foreach ($name as $key => $value)
+            foreach ((array)$name as $key => $value)
             {
                 $val->add('levels[name]['.$key.']', 'レベル名称')
                     ->add_rule('required')
@@ -566,7 +566,7 @@ class Model_Config extends Model
                     ->add_rule('max_length', 50);
             }
             $criteria = Input::post('levels')['criteria'];
-            foreach ($criteria as $key => $value)
+            foreach ((array)$criteria as $key => $value)
             {
                 $val->add('levels[criteria]['.$key.']', '正答した問題数')
                     ->add_rule('required')
