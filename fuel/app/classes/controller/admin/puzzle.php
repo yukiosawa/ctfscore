@@ -26,6 +26,8 @@ class Controller_Admin_Puzzle extends Controller_Template
 
     public function action_edit($puzzle_id)
     {
+        $data = array();
+        $error_msg = '';
         $is_new = true;
         if ($puzzle_id == null)
         {
@@ -33,8 +35,13 @@ class Controller_Admin_Puzzle extends Controller_Template
         }
         else
         {
-            $puzzle_tmp = Model_Puzzle::get_puzzles($puzzle_id)[0];
-            $is_new = empty($puzzle_tmp) ? true : false;
+            $puzzle_tmp = '';
+            $puzzles_tmp = Model_Puzzle::get_puzzles($puzzle_id);
+            if (count($puzzles_tmp) > 0)
+            {
+                $is_new = false;
+                $puzzle_tmp = $puzzles_tmp[0];
+            }
             if (Input::method() == 'POST')
             {
                 // 入力パラメータチェック
@@ -54,7 +61,14 @@ class Controller_Admin_Puzzle extends Controller_Template
                     $success_images = $val->validated('success_image');
                     $success_texts = $val->validated('success_text');
 
-                    $result = Model_Puzzle::update_puzzle($puzzle, $flags, $attaches, $success_images, $success_texts);
+                    if ($is_new == true)
+                    {
+                        $result = Model_Puzzle::insert_puzzle($puzzle, $flags, $attaches, $success_images, $success_texts);
+                    }
+                    else
+                    {
+                        $result = Model_Puzzle::update_puzzle($puzzle, $flags, $attaches, $success_images, $success_texts);
+                    }
 
                     if ($result['bool'] == true)
                     {
@@ -99,6 +113,9 @@ class Controller_Admin_Puzzle extends Controller_Template
 
     public function post_delete()
     {
+        $data = array();
+        $error_msg = '';
+
         // 入力パラメータチェック
         Controller_Auth::checkCSRF();
         $val = Model_Puzzle::validate('delete');

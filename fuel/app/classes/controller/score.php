@@ -207,7 +207,7 @@ class Controller_Score extends Controller_Template
                     $is_complete = Model_Score::is_complete($userid);
                     if (Model_Config::get_value('is_active_image') != 0)
                     {
-                        $image_url = $msg['image']['url'];
+                        $image_url = !empty($msg['image']['url']) ? $msg['image']['url'] : '';
                         // 初回回答者
                         if ($is_first_winner)
                         {
@@ -248,9 +248,9 @@ class Controller_Score extends Controller_Template
                        } */
 
                     $gained = Model_History::get_gained_history($userid, true)[0];
-                    $title = $gained['puzzle_title'];
+                    $title = $gained['title'];
 
-                    $mgmt_msg = $username.' は #'.$puzzle_id.':'.$title.' を解きました！ [ +'.$gained['point'].' +('.$gained['bonus_point'].') =>'.$gained['totalpoint'].']';
+                    $mgmt_msg = $username.' は #'.$puzzle_id.':'.$title.' を解きました！ ['.$gained['point'].'点 ('.$gained['bonus_point'].'点)]';
                     
                     // レベルアップ
                     if ($levels)

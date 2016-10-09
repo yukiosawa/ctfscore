@@ -15,7 +15,7 @@
          <td><?php echo $puzzle['bonus_point']; ?></td>
          <td><?php echo $puzzle['content']; ?></td>
          <td>
-           <?php if ($is_editable == true): ?>
+           <?php if (isset($is_editable) && $is_editable == true): ?>
              <a class="btn btn-primary" href="<?php echo Uri::base(false).'admin/puzzle/edit/'.$puzzle['puzzle_id']; ?>">編集</a>
              <?php echo render('admin/puzzle/_delete_form', array('action' => Uri::base(false).'admin/puzzle/delete', 'puzzle_id' => $puzzle['puzzle_id'])); ?>
            <?php endif; ?>
@@ -24,6 +24,6 @@
     <?php endforeach; ?>
   </tbody>
 </table>
-<?php if ($is_editable == true): ?>
+<?php if (isset($is_editable) && $is_editable == true): ?>
   <a class="btn btn-primary" href="<?php echo Uri::base(false).'admin/puzzle/edit/new'; ?>">新規追加する</a>
 <?php endif; ?>

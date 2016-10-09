@@ -26,7 +26,7 @@
       <?php endforeach; ?>
       <span>
         <span class="col-md-11">
-          <input type="file" name="<?php echo $item_name; ?>_upload[]" accept="<?php echo $mimetype; ?>" <?php echo $multiple; ?> />
+          <input type="file" name="<?php echo $item_name; ?>_upload[]" accept="<?php echo isset($mymetype) ? $mimetype : ''; ?>" <?php echo isset($multiple) ? $multiple : ''; ?> />
         </span>
       </span>
     </span>

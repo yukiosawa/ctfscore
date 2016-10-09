@@ -292,54 +292,63 @@ class Model_Puzzle extends Model
     // 現在の回答済問題から獲得総スコアを再計算する
     public static function refresh_gained_points()
     {
-        // ユーザごとに再計算
-        $users = DB::select()->from('users')->execute()->as_array();
-        foreach ($users as $user)
+        try
         {
-            $uid = $user['id'];
-            $username = $user['username'];
-            $totalpoint = 0;
-            $gained_all = DB::select()->from('gained')->where('uid', $uid)->order_by('gained_at', 'asc')->execute()->as_array();
-            foreach ($gained_all as $gained)
+            DB::start_transaction();
+
+            // ユーザごとに再計算
+            $users = DB::select()->from('users')->execute()->as_array();
+            foreach ($users as $user)
             {
-                $puzzle = Model_Puzzle::get_puzzles($gained['puzzle_id'])[0];
-                $totalpoint += $puzzle['point'];
-                if ($gained['has_bonus'] == 1)
+                $uid = $user['id'];
+                $username = $user['username'];
+                $totalpoint = 0;
+                $gained_all = DB::select()->from('gained')->where('uid', $uid)->order_by('gained_at', 'asc')->execute()->as_array();
+                if (count($gained_all) < 1)
                 {
-                    $totalpoint += $puzzle['bonus_point'];
+                    DB::update('users')->set(array(
+                        'totalpoint' => 0
+                    ))->where('id', $uid)->execute();
                 }
-                try
+                else
                 {
-                    DB::start_transaction();
-                    DB::update('gained')->set(array(
-                        'totalpoint' => $totalpoint
-                    ))->where('uid', $uid)->where('puzzle_id', $gained['puzzle_id'])->execute();
+                    foreach ($gained_all as $gained)
+                    {
+                        $puzzle = Model_Puzzle::get_puzzles($gained['puzzle_id'])[0];
+                        $totalpoint += $puzzle['point'];
+                        if ($gained['has_bonus'] == 1)
+                        {
+                            $totalpoint += $puzzle['bonus_point'];
+                        }
+                        DB::update('gained')->set(array(
+                            'totalpoint' => $totalpoint
+                        ))->where('uid', $uid)->where('puzzle_id', $gained['puzzle_id'])->execute();
+                        DB::update('users')->set(array(
+                            'totalpoint' => $totalpoint
+                        ))->where('id', $uid)->execute();
+                    }
+                }
+                
+                // 管理者によるボーナスがあれば加算
+                $admin_bonus = DB::select(DB::expr('SUM(bonus_point) as point'))
+                ->from('admin_bonus_point')
+                ->where('uid', $uid)->execute()->as_array();
+                if ($admin_bonus[0]['point'] > 0)
+                {
+                    $totalpoint += $admin_bonus[0]['point'];
                     DB::update('users')->set(array(
                         'totalpoint' => $totalpoint
                     ))->where('id', $uid)->execute();
-                    DB::commit_transaction();
-                }
-                catch (Exception $e)
-                {
-                    /* ロールバック */
-                    DB::rollback_transaction();
-                    throw $e;
                 }
             }
             
-            // 管理者によるボーナスがあれば加算
-            $admin_bonus = DB::select(DB::expr('SUM(bonus_point) as point'))
-                ->from('admin_bonus_point')
-                ->where('uid', $uid)->execute()->as_array();
-            if ($admin_bonus[0]['point'] > 0)
-            {
-                $totalpoint += $admin_bonus[0]['point'];
-                DB::start_transaction();
-                DB::update('users')->set(array(
-                    'totalpoint' => $totalpoint
-                ))->where('id', $uid)->execute();
-                DB::commit_transaction();
-            }
+            DB::commit_transaction();
+        }
+        catch (Exception $e)
+        {
+            /* ロールバック */
+            DB::rollback_transaction();
+            throw $e;
         }
     }
 
@@ -364,16 +373,16 @@ class Model_Puzzle extends Model
         }
         else
         {
-            // 指定がない場合は共通設定ののランダム画像
+            // 指定がない場合は共通設定のランダム画像
             $images = Model_Config::get_asset_random_images('success_random_image');
             $assets = $images[0]['assets'];
-            $message['image'] = $assets[array_rand($assets)];
+            $message['image'] = count($assets) > 0 ? $assets[array_rand($assets)] : '';
         }
 
         // 音声
         $sounds = Model_Config::get_asset_random_sounds('success_random_sound');
         $assets = $sounds[0]['assets'];
-        $message['sound'] = $assets[array_rand($assets)];
+        $message['sound'] = count($assets) > 0 ? $assets[array_rand($assets)] : '';
 
         // 問題個別のテキストがあるかチェック
         $texts = Model_Puzzle::get_success_text($puzzle_id);
@@ -548,12 +557,27 @@ class Model_Puzzle extends Model
         }
     }
 
+
+    // 管理者：問題新規登録
+    public static function insert_puzzle($puzzle = NULL, $flags = NULL, $attaches = NULL, $success_images = NULL, $success_texts = NULL)
+    {
+        // 問題IDの重複チェック
+        $puzzle_id = $puzzle['puzzle_id'];
+        $cnt = count(DB::select()->from('puzzles')->where('puzzle_id', $puzzle_id)->execute());
+        if ($cnt > 0)
+        {
+            return array('bool' => false, 'errmsg' => '問題IDが重複しています。問題ごとにユニークな番号としてください。');
+        }
+
+        return Model_Puzzle::update_puzzle($puzzle, $flags, $attaches, $success_images, $success_texts);
+    }
+
     
     // 管理者：問題登録更新
     public static function update_puzzle($puzzle = NULL, $flags = NULL, $attaches = NULL, $success_images = NULL, $success_texts = NULL)
     {
         $bool = true;
-        $errmsg = '';
+        $error_msg = '';
         $puzzle_id = $puzzle['puzzle_id'];
 
         $result = Model_Puzzle::update_puzzle_main($puzzle);
@@ -635,7 +659,6 @@ class Model_Puzzle extends Model
             // 既に登録があれば更新、なければ新規
             $q1 = '';
             $current = DB::select()->from('puzzles')->where('puzzle_id', $puzzle_id)->execute();
-//            $cnt = count(DB::select()->from('puzzles')->where('puzzle_id', $puzzle_id)->execute());
             if (count($current) > 0)
             {
                 $q1 = DB::update('puzzles')->where('puzzle_id', $puzzle_id);
@@ -940,15 +963,17 @@ class Model_Puzzle extends Model
             // 問題を削除
             $result = DB::delete('puzzles')->where('puzzle_id', $puzzle_id)->execute();
 
-            // 全ユーザの獲得済ポイントを更新
-            Model_Puzzle::refresh_gained_points();
-            
             DB::commit_transaction();
         } catch (Exception $e) {
             // ロールバック
             DB::rollback_transaction();
             throw $e;
         }
+
+        // 全ユーザの獲得済ポイントを更新
+        Model_Puzzle::refresh_gained_points();
+        // 全ユーザの獲得済レベルを更新
+        Model_Score::refresh_gained_levels();
 
         return $result;
     }
@@ -984,7 +1009,7 @@ class Model_Puzzle extends Model
 	    $val->add('content', '問題文')
 		->add_rule('max_length', 1000);
             $flag = Input::post('flag');
-            foreach ($flag as $key => $value)
+            foreach ((array)$flag as $key => $value)
             {
                 $val->add('flag['.$key.']', 'フラグ')
                     ->add_rule('required')
@@ -992,21 +1017,21 @@ class Model_Puzzle extends Model
                     ->add_rule('max_length', 255);
             }
             $attach = Input::post('attach');
-            foreach ($attach as $key => $value)
+            foreach ((array)$attach as $key => $value)
             {
                 $val->add('attach['.$key.']', '添付ファイル')
                     ->add_rule('min_length', 1)
                     ->add_rule('max_length', 255);
             }
             $success_image = Input::post('success_image');
-            foreach ($success_image as $key => $value)
+            foreach ((array)$success_image as $key => $value)
             {
                 $val->add('success_image['.$key.']', '正解時に表示する画像')
                     ->add_rule('min_length', 1)
                     ->add_rule('max_length', 255);
             }
             $success_text = Input::post('success_text');
-            foreach ($success_text as $key => $value)
+            foreach ((array)$success_text as $key => $value)
             {
                 $val->add('success_text['.$key.']', '正解時に表示するテキスト')
                     ->add_rule('min_length', 1)

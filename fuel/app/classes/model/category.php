@@ -76,6 +76,7 @@ class Model_Category extends Model
         $result = DB::delete('categories')->where('id', $id)->execute();
         // カテゴリに紐づく問題も削除されるので、全ユーザの獲得済ポイントを更新
         Model_Puzzle::refresh_gained_points();
+        Model_Score::refresh_gained_levels();
         return $result;
     }
 
