@@ -73,12 +73,14 @@ $ npm install socket.io-emitter
 $ git clone https://github.com/ashiina/socket.io-php-emitter.git
 $ cd socket.io-php-emitter
 $ /var/www/ctfscore/composer.phar install
+$ cd ~
+$ sudo cp -r node_modules /var/www/ctfscore/nodejs/.
+$ sudo cp -r socket.io-php-emitter /var/www/ctfscore/nodejs/.
 ```
 
 - ctfscoreアプリケーションのインストール
 ```
 $ cd ~
-$ sudo cp -r node_modules /var/www/ctfscore/nodejs/.
 $ git clone https://github.com/yukiosawa/ctfscore.git
 $ sudo cp -r ctfscore/etc/fuelphp/* /var/www/ctfscore/.
 $ sudo cp -r ctfscore/* /var/www/ctfscore/.
@@ -143,6 +145,15 @@ $ node /var/www/ctfscore/nodejs/app.js &
     $ redis-cli -h localhost monitor
     ```
     - 上記の状態で別のWebブラウザを開き、一般ユーザでログインしてflag(正解、不正解)をサブミットしてみる。
+
+- [参考]ctfscoreアプリケーションの更新  
+データベースや設定は保持してアプリケーションコードのみ更新する。
+```
+$ cd ~/ctfscore
+$ git pull
+$ cd ~
+$ sudo cp -r ctfscore/* /var/www/ctfscore/.
+```
 
 
 ## その他同梱している外部ライブラリ
