@@ -22,6 +22,7 @@ class Model_Users extends Model
     public static function create_user($username, $password, $admin)
     {
         $result = false;
+        $errmsg = '';
         
         $dummyemail = rand() . '@dummy.com';
         $password = $password ? $password : 'dummypassword';
@@ -47,6 +48,7 @@ class Model_Users extends Model
     public static function update_user($username, $admin)
     {
         $result = false;
+        $errmsg = '';
 
         // 一般ユーザはグループ1 (SimpleAuthのデフォルト値)
         $group = $admin == true ? Model_Config::get_value('admin_group_id') : 1;
@@ -67,6 +69,7 @@ class Model_Users extends Model
     public static function delete_user($username)
     {
         $result = false;
+        $errmsg = '';
         
         try
         {
@@ -84,6 +87,7 @@ class Model_Users extends Model
     public static function reset_password($username)
     {
         $result = '';
+        $errmsg = '';
 
         try
         {
@@ -101,6 +105,7 @@ class Model_Users extends Model
     public static function change_password($old_password, $new_password)
     {
         $result = false;
+        $errmsg = '';
 
         try
         {

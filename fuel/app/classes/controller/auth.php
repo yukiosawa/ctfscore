@@ -146,7 +146,7 @@ class Controller_Auth extends Controller_Template
         // ユーザー作成
         $page = Model_Staticpage::get('rule')[0];
         $this->template->title = 'ユーザー作成';
-        $this->template->content = View::forge('auth/create', $data);
+        $this->template->content = View::forge('auth/create');
         $this->template->content->set_safe('page', $page);
         $this->template->content->set_safe('errmsg', '');
         $this->template->footer = View::forge('auth/footer');
@@ -189,9 +189,8 @@ class Controller_Auth extends Controller_Template
             $error_msg = $val->show_errors();
         }
 
-        $data['file'] = Model_Config::get_value('agreement_file');
         $this->template->title = 'ユーザー作成';
-        $this->template->content = View::forge('auth/create', $data);
+        $this->template->content = View::forge('auth/create');
         $this->template->content->set_safe('errmsg', $error_msg);
         $this->template->footer = View::forge('auth/footer');
     }
