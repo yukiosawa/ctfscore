@@ -286,6 +286,7 @@ class Model_Score extends Model
             ->from('categories')
             ->join('puzzles')
             ->on('puzzles.category_id', '=', 'categories.id')
+            ->group_by('categories.id')
             ->order_by('categories.id', 'asc')
             ->execute()->as_array();
 
