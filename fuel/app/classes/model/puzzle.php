@@ -439,12 +439,12 @@ class Model_Puzzle extends Model
         // 画像
         $images = Model_Config::get_asset_random_images('failure_random_image');
         $assets = $images[0]['assets'];
-        $message['image'] = $assets[array_rand($assets)];
+        $message['image'] = count($assets) > 0 ? $assets[array_rand($assets)] : '';
 
         // 音声
         $sounds = Model_Config::get_asset_random_sounds('failure_random_sound');
         $assets = $sounds[0]['assets'];
-        $message['sound'] = $assets[array_rand($assets)];
+        $message['sound'] = count($assets) > 0 ? $assets[array_rand($assets)] : '';
 
         // テキスト
         $texts = Model_Puzzle::get_random_text('failure');
