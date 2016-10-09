@@ -71,13 +71,13 @@ return array(
         array(
             'type' => 'switches',
             'name' => 'is_active_management_diag_msg',
-            'value' => 1,
+            'value' => 0,
             'description' => '管理コンソール間の診断メッセージ通知　[0:無効, 1(0以外):有効]',
         ),
         array(
            'type' => 'switches',
            'name' => 'is_active_force_review',
-           'value' => 1,
+           'value' => 0,
            'description' => '問題正解時にレビュー画面へ遷移させる　[0:無効, 1(0以外):有効]',
         ),
 
@@ -86,7 +86,7 @@ return array(
            'type' => 'chart',
            'name' => 'plot_interval_seconds',
            'value' => '900',
-           'description' => 'ランキングをプロットする間隔[秒]　=> 900=15min, 3600=1h, 86400=24h',
+           'description' => 'ランキングをプロットする間隔[秒]　=> 900=15min, 3600=1h, 86400=24h。長時間(例えば24時間以上)CTF開催する場合は長めに設定してください。',
         ),
         array(
            'type' => 'chart',
@@ -98,13 +98,13 @@ return array(
            'type' => 'chart',
            'name' => 'bubble_size_multiple_by',
            'value' => '2',
-           'description' => 'バブルチャート（正解者数)の大きさ倍率',
+           'description' => 'バブルチャート(正解者数)の表示サイズ倍率',
         ),
         array(
            'type' => 'chart',
            'name' => 'bubble_color',
            'value' => '#FF6384',
-           'description' => 'バブルチャート（正解者数)の色',
+           'description' => 'バブルチャート(正解者数)の色',
         ),
 
         // サブミット履歴に関する設定
@@ -112,13 +112,13 @@ return array(
               'type' => 'history',
               'name' => 'submit_interval_seconds',
               'value' => 60,
-              'description' => '試行回数を制限する間隔[秒]',
+              'description' => 'サブミット回数を制限する間隔[秒]',
         ),
         array(
               'type' => 'history',
               'name' => 'submit_limit_times',
               'value' => 10,
-              'description' => '試行回数の制限値[回]',
+              'description' => 'サブミット回数の制限値[回]',
         ),
 
         // レビューに関する設定
@@ -177,7 +177,7 @@ return array(
             'is_random' => 0,
             'sub_dir' => 'usr',
             'filename' => '',
-            'description' => '初正解のボーナス画像',
+            'description' => '初正解者に表示するボーナス画像',
         ),
         array(
             'name' => 'complete_img',
@@ -185,7 +185,7 @@ return array(
             'is_random' => 0,
             'sub_dir' => 'usr',
             'filename' => '',
-            'description' => '全完時の画像',
+            'description' => '全問正解時に表示する画像',
         ),
         array(
             'name' => 'diploma_img',
@@ -201,7 +201,7 @@ return array(
             'is_random' => 0,
             'sub_dir' => 'usr',
             'filename' => '',
-            'description' => 'ロゴ画像',
+            'description' => 'サイトのロゴ',
         ),
         array(
             'name' => 'register_img',
@@ -209,7 +209,7 @@ return array(
             'is_random' => 0,
             'sub_dir' => 'usr',
             'filename' => '',
-            'description' => '登録時画像',
+            'description' => 'ユーザ新規登録時に表示する画像',
         ),
         array(
             'name' => 'register_btn_img',
@@ -217,7 +217,7 @@ return array(
             'is_random' => 0,
             'sub_dir' => 'usr',
             'filename' => '',
-            'description' => '登録時ボタン画像',
+            'description' => 'ユーザ新規登録時に表示するボタン',
         ),
         array(
             'name' => 'success_random_image',
@@ -241,7 +241,7 @@ return array(
             'is_random' => 1,
             'sub_dir' => 'usr/background_random',
             'filename' => '',
-            'description' => '背景画像',
+            'description' => 'サイトの背景',
         ),
         // 音
         array(
@@ -266,7 +266,7 @@ return array(
             'is_random' => 0,
             'sub_dir' => 'usr',
             'filename' => '',
-            'description' => 'その他通知音',
+            'description' => 'その他通知音(サブミット回数制限、既に回答済の時)',
         ),
         array(
             'name' => 'first_bonus_sound',
@@ -274,7 +274,7 @@ return array(
             'is_random' => 0,
             'sub_dir' => 'usr',
             'filename' => '',
-            'description' => '初正解のボーナス音',
+            'description' => '初正解者のボーナス音',
         ),
         array(
             'name' => 'complete_sound',
@@ -282,7 +282,7 @@ return array(
             'is_random' => 0,
             'sub_dir' => 'usr',
             'filename' => '',
-            'description' => '全完時の音',
+            'description' => '全問正解時の音',
         ),
         array(
             'name' => 'register_sound',
@@ -290,7 +290,7 @@ return array(
             'is_random' => 0,
             'sub_dir' => 'usr',
             'filename' => '',
-            'description' => 'ユーザ登録時の音',
+            'description' => 'ユーザ新規登録時の音',
         ),
     ),
 
@@ -342,7 +342,7 @@ return array(
             'path' => 'score/misc',
             'content' => '<h4>レベルの説明など他に説明したいことがあれば</h4><p>正解した問題数に応じてレベル獲得します。</p>',
             'display_order' => 3,
-            'is_active' => 1,
+            'is_active' => 0,
         ),
     ),
 );
