@@ -3,8 +3,8 @@ ctfscore
 CTFのスコアサーバです。
 
 ## 説明
-CTFスコアサーバとしての基本的な機能のほか、CTFを楽しく開催するための便利機能もつけています。  
-主な特徴
+CTFスコアサーバとしての基本的な機能のほか、CTFを楽しく開催するための便利機能もつけています。
+- 問題ごとのポイント・初回ボーナスポイント
 - フラグサブミット時の画像、音声、テキスト(正解、不正解それぞれ指定可)
     - 連動する管理コンソールで会場スクリーンへ表示も可
 - プロフィール画面(CTFプレイヤー間の比較も可)
@@ -14,6 +14,10 @@ CTFスコアサーバとしての基本的な機能のほか、CTFを楽しく�
 - CTF終了までのカウントダウン
 - 問題へのヒントリクエスト
 - 各CTFプレイヤー向けの賞状
+- 管理者からのお知らせ
+- 管理者によるボーナスポイント付与
+- 一定時間内のサブミット回数制限(ブルートフォース禁止)
+- ロゴ画像、背景画像のカスタマイズ
 - CTFプレイヤーは個人(チーム参加には未対応)
 
 
@@ -33,7 +37,8 @@ CTFスコアサーバとしての基本的な機能のほか、CTFを楽しく�
 
 - 事前準備
 ```
-sudo apt-get install -y git curl
+$ cd ~
+$ sudo apt-get install -y git curl
 ```
 
 - apache, mysql and php  
@@ -46,6 +51,7 @@ $ sudo apt-get install -y apache2 mysql-server php5 php5-mysql
 ```
 $ curl get.fuelphp.com/oil | sh
 $ oil create ctfscore
+$ sudo php /var/www/ctfscore/oil refine install
 $ sudo mv ctfscore /var/www/.
 $ sudo a2enmod rewrite
 $ sudo service apache2 restart
@@ -72,10 +78,10 @@ $ /var/www/ctfscore/composer.phar install
 - ctfscoreアプリケーションのインストール
 ```
 $ cd ~
+$ sudo cp -r node_modules /var/www/ctfscore/nodejs/.
 $ git clone https://github.com/yukiosawa/ctfscore.git
 $ sudo cp -r ctfscore/etc/fuelphp/* /var/www/ctfscore/.
 $ sudo cp -r ctfscore/* /var/www/ctfscore/.
-$ sudo cp -r node_modules /var/www/ctfscore/nodejs/.
 ```
 
 - Webサーバ権限設定  
@@ -95,7 +101,7 @@ $ sudo service apache2 restart
 - ctfscoreデータベースの初期化
 ```
 $ sudo service mysql start
-$ ~/ctfscore/etc/scripts/setup_mysql.sh
+$ sudo ~/ctfscore/etc/scripts/setup_mysql.sh
 $ ~/ctfscore/etc/scripts/init_app_db.sh
 ```
 
@@ -111,15 +117,6 @@ $ node /var/www/ctfscore/nodejs/app.js &
 - 管理者ユーザの作成
     - Webブラウザでアクセス `http://<hostname>/`
     - `ログイン -> 新規ユーザ`で新規ユーザ登録する。初めて作成したユーザには自動的に管理者権限が付与される。
-
-- [参考]管理コンソールが反応しない(音・メッセージ)時の調査方法
-    - 管理コンソールで受信したメッセージをリアルタイム表示する。
-      Webブラウザで管理コンソールを開き、`F12開発者ツール -> コンソールログ`
-    - Redisサーバが受信したメッセージをリアルタイム表示する。
-    ```
-    $ redis-cli -h localhost monitor
-    ```
-    - 上記の状態で別のWebブラウザを開き、一般ユーザでログインしてflag(正解、不正解)をサブミットしてみる。
 
 - エラーメッセージを非表示に  
     - `/var/www/ctfscore/public/.htaccess`の以下の行をコメントアウトして本番環境設定にする。
@@ -137,6 +134,15 @@ $ node /var/www/ctfscore/nodejs/app.js &
     - HTTP(80/TCP)
     - WebSocket(8080/TCP) *管理者(管理コンソール)のみが利用
     - SSHなどその他必要に応じて
+
+- [参考]管理コンソールが反応しない(音・メッセージ)時の調査方法
+    - 管理コンソールで受信したメッセージをリアルタイム表示する。
+      Webブラウザで管理コンソールを開き、`F12開発者ツール -> コンソールログ`
+    - Redisサーバが受信したメッセージをリアルタイム表示する。
+    ```
+    $ redis-cli -h localhost monitor
+    ```
+    - 上記の状態で別のWebブラウザを開き、一般ユーザでログインしてflag(正解、不正解)をサブミットしてみる。
 
 
 ## その他同梱している外部ライブラリ
