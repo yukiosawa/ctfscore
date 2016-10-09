@@ -4,10 +4,14 @@
 
   <span class="form-group">
     <!-- for deleting a chart color -->
-    <input type="hidden" class="form-control" name="id" value="<?php echo $id ?>">
+    <?php if (isset($id)): ?>
+      <input type="hidden" class="form-control" name="id" value="<?php echo $id ?>">
+    <?php endif; ?>
     <!-- for deleting an asset file -->
-    <input type="hidden" name="filename" value="<?php echo $filename ?>">
-    <input type="hidden" name="name" value="<?php echo $name ?>">
+    <?php if (isset($filename)): ?>
+      <input type="hidden" name="filename" value="<?php echo $filename ?>">
+      <input type="hidden" name="name" value="<?php echo $name ?>">
+    <?php endif; ?>
   </span>
 
   <span>

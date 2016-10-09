@@ -48,7 +48,7 @@ class Model_Score extends Model
             ->from('users')
             ->join('gained_levels', 'LEFT')
             ->on('users.id', '=', 'gained_levels.uid')
-            ->on('gained_levels.category_id', '=', $total_category_id)
+            ->on('gained_levels.category_id', '=', sprintf("'%s'", $total_category_id))
             ->on('gained_levels.is_current', '=', "'1'")
             ->join('levels', 'LEFT')
             ->on('gained_levels.category_id', '=', 'levels.category_id')
@@ -259,7 +259,7 @@ class Model_Score extends Model
         if (!$usernames)
         {
             // 指定されない場合はログイン中のユーザとする
-            $username = Auth::get_screen_name();
+            $usernames = array(Auth::get_screen_name());
         }
 
         foreach ($usernames as $username)
@@ -615,6 +615,7 @@ class Model_Score extends Model
         $category_levels = array();
         $result = DB::select('gained_levels.*', 'levels.name')->from('gained_levels')
             ->join('levels')
+            ->on('gained_levels.category_id', '=', 'levels.category_id')
             ->on('gained_levels.level', '=', 'levels.level')
             ->where('gained_levels.uid', $uid)
             ->where('gained_levels.is_current', true)
@@ -655,7 +656,7 @@ class Model_Score extends Model
     // 現在のレベルを名称で取得する
     public static function get_current_levels_name($uid)
     {
-        Model_Score::get_current_levels($uid, true);
+        return Model_Score::get_current_levels($uid, true);
     }
 
 
@@ -754,7 +755,9 @@ class Model_Score extends Model
     // レベルのテーブルを返す
     public static function get_levels($category_id = NULL, $level = NULL)
     {
-        $query = DB::select()->from('levels');
+        $query = DB::select(DB::expr('levels.*, categories.category'))->from('levels')
+            ->join('categories')
+            ->on('levels.category_id', '=', 'categories.id');
         if (!is_null($category_id))
         {
             $query->where('category_id', $category_id);
@@ -774,7 +777,7 @@ class Model_Score extends Model
     }
 
 
-    public static function get_category_levels($category_id)
+    public static function get_category_levels($category_id = null)
     {
         if ($category_id)
         {
@@ -783,7 +786,9 @@ class Model_Score extends Model
         else
         {
             $total_category_id = Model_Config::get_value('total_category_id');
-            return DB::select()->from('levels')
+            return DB::select(DB::expr('levels.*, categories.category'))->from('levels')
+                ->join('categories')
+                ->on('levels.category_id', '=', 'categories.id')
                 ->where('category_id', '!=', $total_category_id)
                 ->execute()->as_array();
         }

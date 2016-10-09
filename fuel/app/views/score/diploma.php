@@ -3,8 +3,10 @@
 <?php echo Asset::js('jquery.textillate.js'); ?>
 
 <?php
-if (Cookie::get('sound_on', '1')) {
-    printf('<audio src="%s" autoplay loop></audio>', $complete_sound_url);
+if ($sound_on) {
+    if ($complete_sound_url != '') {
+        printf('<audio src="%s" autoplay loop></audio>', $complete_sound_url);
+    }
 }
 ?>
 

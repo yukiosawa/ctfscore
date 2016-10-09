@@ -11,7 +11,7 @@
          <td><?php echo $item['name']; ?></td>
          <td><?php echo $item['value']; ?></td>
          <td>
-           <?php if ($readonly != true): ?>
+           <?php if (isset($readonly) && $readonly != true): ?>
              <a href="<?php echo Uri::base(false).'admin/config/edit/'.$item['id']; ?>" class="btn btn-sm btn-primary">編集</a>
            <?php endif; ?>
          </td>

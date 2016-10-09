@@ -13,7 +13,7 @@
     <?php echo Asset::js('bootstrap.min.js'); ?>
   </head>
 
-  <?php require('_templateheader.php'); ?>
+  <?php require(APPPATH.'views/_templateheader.php'); ?>
 
   <body>
     <div class="container">

@@ -4,6 +4,10 @@ class Model_Config extends Model
 {
     public static function _init()
     {
+        // カスタムのアセットパスを追加
+        Asset::add_path('assets/audio/', 'audio');
+        Config::set('asset.audio_dir', 'audio/');
+
         // DB設定がなければデフォルト値で初期化
         $result = DB::select()->from('config')->execute()->as_array();
         if (count($result) == 0)
@@ -62,7 +66,7 @@ class Model_Config extends Model
     }
 
 
-    public static function get_assets($name, $type, $is_random)
+    public static function get_assets($name = null, $type = null, $is_random = null)
     {
         $query = DB::select()->from('assets');
 
@@ -99,7 +103,7 @@ class Model_Config extends Model
     
 
     // asset画像を取得(ファイル名指定で設定している画像)
-    public static function get_asset_images($name)
+    public static function get_asset_images($name = null)
     {
         $images = Model_Config::get_assets($name, 'img', 0);
         return array_map(
@@ -119,7 +123,7 @@ class Model_Config extends Model
 
 
     // asset画像を取得(ランダム表示する画像)
-    public static function get_asset_random_images($name)
+    public static function get_asset_random_images($name = null)
     {
         $images = Model_Config::get_assets($name, 'img', 1);
         $dir1 = Config::get('asset.img_dir');
@@ -144,7 +148,7 @@ class Model_Config extends Model
 
 
     // asset音を取得(ファイル名指定で設定している音)
-    public static function get_asset_sounds($name)
+    public static function get_asset_sounds($name = null)
     {
         $sounds = Model_Config::get_assets($name, 'audio', 0);
         return array_map(
@@ -164,7 +168,7 @@ class Model_Config extends Model
 
 
     // asset音を取得(ランダム再生する音)
-    public static function get_asset_random_sounds($name)
+    public static function get_asset_random_sounds($name = null)
     {
         $sounds = Model_Config::get_assets($name, 'audio', 1);
         $dir1 = Config::get('asset.audio_dir');
@@ -249,7 +253,7 @@ class Model_Config extends Model
     }
 
     
-    public static function update_config($id, $name, $value)
+    public static function update_config($id = null, $name = null, $value)
     {
         try
         {

@@ -44,7 +44,7 @@ $logo_image = Model_Config::get_asset_images('logo_img')[0]['url'];
 
 // 背景画像
 $bg_images = Model_Config::get_asset_random_images('background_image')[0]['assets'];
-$bg_image = $bg_images[array_rand($bg_images)]['url'];
+$bg_image = empty($bg_images[array_rand($bg_images)]['url']) ? null : $bg_images[array_rand($bg_images)]['url'];
 
 // 賞状機能背景
 if ((Request::main()->controller === 'Controller_Score' && Request::main()->action === 'diploma') || (Request::main()->controller === 'Controller_Admin_Test' && Request::main()->action === 'diploma')) {

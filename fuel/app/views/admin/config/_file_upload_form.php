@@ -2,7 +2,9 @@
   <div class='alert alert-danger'><?php echo $errmsg ?></div>
 <?php endif; ?>
 
-<h4><?php echo $description; ?></h4>
+<?php if (isset($description)): ?>
+  <h4><?php echo $description; ?></h4>
+<?php endif; ?>
 
 <form style="display: inline;" action="<?php echo Uri::base(false).'admin/config/fileupload' ?>" method="post" enctype="multipart/form-data">
   

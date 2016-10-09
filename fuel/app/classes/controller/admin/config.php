@@ -268,10 +268,6 @@ class Controller_Admin_Config extends Controller_Template
                 else if ($asset['type'] == 'audio')
                 {
                     $config += array('type_whitelist' => array('audio', 'video', 'application'));
-//                    $config += array('type_whitelist' => array('audio', 'video/ogg'));
-//                    $config += array('mime_whitelist' => array('audio/*', 'video/*'));
-
-//                    $config += array('mime_whitelist' => array('application/ogg'));
                     $data['mimetype'] = 'audio/*';
                 }
 

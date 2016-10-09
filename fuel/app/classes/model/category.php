@@ -16,7 +16,7 @@ class Model_Category extends Model
 
 
     // カテゴリ一覧を取得
-    public static function get_categories($id)
+    public static function get_categories($id = null)
     {
         $query = DB::select()->from('categories')
             ->where('id', '!=', Model_Config::get_value('total_category_id'))

@@ -55,15 +55,22 @@ class Controller_Admin_Test extends Controller_Template
     public function action_diploma($username = null)
     {
         $data['username'] = ($username === null) ? Auth::get_screen_name() : $username;
-        $profile = Model_Score::get_profile_detail($data['username']);
+        $profile = Model_Score::get_profile_detail(array($data['username']))[0];
         if ($profile === null) {
             Response::redirect('score/view');
         }
 
+        $complete_sound_url = '';
+        if (Model_Config::get_value('is_active_sound') != 0)
+        {
+            $complete_sound_url = Model_Config::get_asset_sounds('complete_sound')[0]['url'];
+        }
+
         $data['profile'] = $profile;
         $data['score'] = Model_Score::get_score_ranking($data['username']);
-        $ctf_name = Model_Config::get_value('ctf_name');
-        $data['ctf_name'] = $ctf_name;
+        $data['ctf_name'] = Model_Config::get_value('ctf_name');
+        $data['complete_sound_url'] = $complete_sound_url;
+        $data['sound_on'] = Cookie::get('sound_on', '1');
         $this->template->title = $ctf_name.'賞状';
         $this->template->content = View::forge('score/diploma', $data);
         $this->template->footer = '';

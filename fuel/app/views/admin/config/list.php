@@ -78,7 +78,7 @@ echo render('admin/config/_list', array('config' => $config_names));
   <?php echo render('admin/config/_levels_list', array('levels' => $total_levels, 'total_category_id' => $total_category_id)); ?>
   
   <h4>カテゴリごとのレベル</h4>
-  <?php echo render('admin/config/_levels_list', array('levels' => $category_levels)); ?>
+  <?php echo render('admin/config/_levels_list', array('levels' => $category_levels, 'total_category_id' => $total_category_id)); ?>
 </p>
 
 

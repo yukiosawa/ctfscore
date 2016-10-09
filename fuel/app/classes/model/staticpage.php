@@ -32,7 +32,7 @@ class Model_Staticpage extends Model
     }
 
     
-    public static function get($name)
+    public static function get($name = null)
     {
         $query = DB::select()->from('static_pages');
         if ($name != null)
