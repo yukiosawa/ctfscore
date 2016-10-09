@@ -4,6 +4,6 @@
 
 <?php
 $action = $_SERVER['REQUEST_URI'];
-echo render('admin/category/_form', array('action' => $action, 'category' => $category));
+echo render('admin/category/_form', array('action' => $action));
 ?>
 

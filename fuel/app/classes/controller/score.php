@@ -508,7 +508,7 @@ class Controller_Score extends Controller_Template
         $data['ctf_name'] = Model_Config::get_value('ctf_name');
         $data['complete_sound_url'] = $complete_sound_url;
         $data['sound_on'] = Cookie::get('sound_on', '1');
-        $this->template->title = $ctf_name.'賞状';
+        $this->template->title = '賞状';
         $this->template->content = View::forge('score/diploma', $data);
         $this->template->footer = '';
     }

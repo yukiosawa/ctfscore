@@ -11,7 +11,7 @@
          <td><?php echo $category['id']; ?></td>
          <td><?php echo $category['category']; ?></td>
          <td>
-           <?php if ($is_editable == true): ?>
+           <?php if (isset($is_editable) && $is_editable == true): ?>
              <a class="btn btn-primary" href="<?php echo Uri::base(false).'admin/category/edit/'.$category['id']; ?>">編集</a>
              <?php echo render('admin/category/_delete', array('action' => Uri::base(false).'admin/category/delete', 'category_id' => $category['id'])); ?>
            <?php endif; ?>
@@ -20,6 +20,6 @@
     <?php endforeach; ?>
   </tbody>
 </table>
-<?php if ($is_editable == true): ?>
+<?php if (isset($is_editable) && $is_editable == true): ?>
   <a class="btn btn-primary" href="<?php echo Uri::base(false).'admin/category/create'; ?>">新規追加する</a>
 <?php endif; ?>

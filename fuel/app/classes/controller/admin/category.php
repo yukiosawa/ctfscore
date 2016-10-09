@@ -26,6 +26,9 @@ class Controller_Admin_Category extends Controller_Template
 
     public function action_create()
     {
+        $data = array();
+        $error_msg = '';
+
         if (Input::method() == 'POST')
         {
             // 入力パラメータチェック
@@ -69,6 +72,9 @@ class Controller_Admin_Category extends Controller_Template
     
     public function action_edit($category_id)
     {
+        $data = array();
+        $error_msg = '';
+
         if ($category_id == null)
         {
             $error_msg = '編集できません。';
@@ -111,7 +117,6 @@ class Controller_Admin_Category extends Controller_Template
             }
         }
 
-        $data['is_new'] = $is_new;
         $data['category'] = $category_tmp;
         $data['categories'] = Model_Category::get_categories();
         $this->template->title = '問題編集';
@@ -123,6 +128,9 @@ class Controller_Admin_Category extends Controller_Template
 
     public function post_delete()
     {
+        $data = array();
+        $error_msg = '';
+
         // 入力パラメータチェック
         Controller_Auth::checkCSRF();
         $val = Model_Category::validate('delete');
