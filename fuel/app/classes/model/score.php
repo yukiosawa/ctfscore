@@ -26,16 +26,6 @@ class Model_Score extends Model
         $gained_count = count(DB::select('puzzle_id')->from('gained')->where('uid', $userid)->group_by('puzzle_id')->execute());
 
         return $gained_count >= $puzzle_count;
-        /* $puzzle = DB::select(DB::expr('SUM(point)'))->from('puzzles')
-           ->execute()->as_array();
-           $puzzle_point = $puzzle[0]['SUM(point)'];
-
-           $gained = DB::select(DB::expr('SUM(point)'))->from('gained')
-           ->where('uid', $userid)
-           ->execute()->as_array();
-           $gained_point = $gained[0]['SUM(point)'];
-
-           return $gained_point >= $puzzle_point; */
     }
 
     // スコアボード全体を返す
@@ -282,7 +272,7 @@ class Model_Score extends Model
     }
 
 
-    public function get_solved_status_chart()
+    public static function get_solved_status_chart()
     {
         // x=カテゴリ名, y=問題得点, r=回答者数
         $data = array();

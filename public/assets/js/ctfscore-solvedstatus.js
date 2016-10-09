@@ -20,8 +20,6 @@ function print_chart()
 // Chart.js用のデータを生成する
 function get_chartjs_data(raw_data)
 {
-console.log(JSON.stringify(raw_data));
-
     var chart_data = [];
     chart_data['datasets'] = [];
     var datasets = [];

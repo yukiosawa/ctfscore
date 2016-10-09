@@ -1,134 +1,135 @@
-<a href="#names" class="btn btn-primary">名称</a>
-<a href="#images" class="btn btn-primary">画像</a>
-<a href="#audio" class="btn btn-primary">音</a>
-<a href="#texts" class="btn btn-primary">テキスト</a>
-<a href="#levels" class="btn btn-primary">レベル</a>
-<a href="#history" class="btn btn-primary">サブミット</a>
-<a href="#review" class="btn btn-primary">レビュー</a>
-<a href="#chart" class="btn btn-primary">グラフ</a>
-<a href="#time" class="btn btn-primary">時刻</a>
-<a href="#switches" class="btn btn-primary">ON/OFF</a>
-<a href="#system" class="btn btn-primary">システム</a>
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#images" data-toggle="tab">画像</a></li>
+  <li><a href="#audio" data-toggle="tab">音</a></li>
+  <li><a href="#texts" data-toggle="tab">テキスト</a></li>
+  <li><a href="#levels" data-toggle="tab">レベル</a></li>
+  <li><a href="#history" data-toggle="tab">サブミット</a></li>
+  <li><a href="#review" data-toggle="tab">レビュー</a></li>
+  <li><a href="#chart" data-toggle="tab">グラフ</a></li>
+  <li><a href="#names" data-toggle="tab">名称</a></li>
+  <li><a href="#time" data-toggle="tab">時刻</a></li>
+  <li><a href="#switches" data-toggle="tab">ON/OFF</a></li>
+  <li><a href="#system" data-toggle="tab">システム</a></li>
+</ul>
 
-<div id="names" class="page-header"><h4>CTF名称　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-<?php
-echo render('admin/config/_list', array('config' => $config_names));
-?>
-</p>
+<div class="tab-content">
+  <!-- 画像 -->
+  <div class="tab-pane active" id="images">
+    <!-- ランダム画像 -->
+    <?php foreach ($random_images as $random_image): ?>
+      <h4><?php echo $random_image['description']; ?></h4>
+      <!-- 最大5個まで表示 -->
+      <?php if (count($random_image['assets']) > 5): ?>
+        <span>・・・(省略)・・・　<a class="btn btn-sm btn-primary" href="<?php echo Uri::base(false).'admin/config/imageslist/'.$random_image['name'] ?>">すべて表示</a></span>
+      <?php endif; ?>
+      <?php echo render('admin/config/_images_list', array('images' => array_slice($random_image['assets'], 0, 5), 'name' => $random_image['name'])); ?>
+    <?php endforeach; ?>
 
-<div id="images" class="page-header"><h4>画像設定　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<!-- 個々に指定する画像  -->
-<p>
-  <?php foreach ($images as $image): ?>
-    <h4><?php echo $image['description']; ?></h4>
-    <?php echo render('admin/config/_image_view', array('image' => $image, 'name' => $image['name'])); ?>
-  <?php endforeach; ?>
-</p>
+    <!-- 個々に指定する画像  -->
+    <?php foreach ($images as $image): ?>
+      <h4><?php echo $image['description']; ?></h4>
+      <?php echo render('admin/config/_image_view', array('image' => $image, 'name' => $image['name'])); ?>
+    <?php endforeach; ?>
+  </div>
 
-<!-- ランダム画像 -->
-<?php foreach ($random_images as $random_image): ?>
-  <h4><?php echo $random_image['description']; ?></h4>
-  <!-- 最大5個まで表示 -->
-  <?php if (count($random_image['assets']) > 5): ?>
-    <span>・・・(省略)・・・　<a class="btn btn-sm btn-primary" href="<?php echo Uri::base(false).'admin/config/imageslist/'.$random_image['name'] ?>">すべて表示</a></span>
-  <?php endif; ?>
-  <?php echo render('admin/config/_images_list', array('images' => array_slice($random_image['assets'], 0, 5), 'name' => $random_image['name'])); ?>
-<?php endforeach; ?>
+  <!-- 音 -->
+  <div class="tab-pane" id="audio">
+    <!-- ランダム音 -->
+    <?php foreach ($random_sounds as $random_sound): ?>
+      <h4><?php echo $random_sound['description']; ?></h4>
+      <!-- 最大5個まで表示 -->
+      <?php if (count($random_sound['assets']) > 5): ?>
+        <span>・・・(省略)・・・　<a class="btn btn-sm btn-primary" href="<?php echo Uri::base(false).'admin/config/soundslist/'.$random_sound['name'] ?>">すべて表示</a></span>
+      <?php endif; ?>
+      <?php echo render('admin/config/_sounds_list', array('sounds' => array_slice($random_sound['assets'], 0, 5), 'name' => $random_sound['name'])); ?>
+    <?php endforeach; ?>
 
+    <!-- 個々に指定する音 -->
+    <?php foreach ($sounds as $sound): ?>
+      <h4><?php echo $sound['description']; ?></h4>
+      <?php echo render('admin/config/_sound_view', array('sound' => $sound, 'name' => $sound['name'])); ?>
+    <?php endforeach; ?>
+  </div>
 
-<div id="audio" class="page-header"><h4>音設定　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-  <!-- 個々に指定する音 -->
-  <?php foreach ($sounds as $sound): ?>
-    <h4><?php echo $sound['description']; ?></h4>
-    <?php echo render('admin/config/_sound_view', array('sound' => $sound, 'name' => $sound['name'])); ?>
-  <?php endforeach; ?>
+  <!-- テキスト -->
+  <div class="tab-pane" id="texts">
+    <h4>正解メッセージ(ランダムに表示)</h4>
+    <?php
+    echo render('admin/config/_texts_list', array('type' => 'success', 'texts' => $success_random_texts));
+    ?>
 
-  <!-- ランダム音 -->
-  <?php foreach ($random_sounds as $random_sound): ?>
-    <h4><?php echo $random_sound['description']; ?></h4>
-    <!-- 最大5個まで表示 -->
-    <?php if (count($random_sound['assets']) > 5): ?>
-      <span>・・・(省略)・・・　<a class="btn btn-sm btn-primary" href="<?php echo Uri::base(false).'admin/config/soundslist/'.$random_sound['name'] ?>">すべて表示</a></span>
-    <?php endif; ?>
-    <?php echo render('admin/config/_sounds_list', array('sounds' => array_slice($random_sound['assets'], 0, 5), 'name' => $random_sound['name'])); ?>
-  <?php endforeach; ?>
-</p>
+    <h4>不正解メッセージ(ランダムに表示)</h4>
+    <?php
+    echo render('admin/config/_texts_list', array('type' => 'failure', 'texts' => $failure_random_texts));
+    ?>
+  </div>
 
+  <!-- レベル -->
+  <div class="tab-pane" id="levels">
+    <?php $total_category_id = Model_Config::get_value('total_category_id'); ?>
+    <h4>全体のレベル</h4>
+    <?php echo render('admin/config/_levels_list', array('levels' => $total_levels, 'total_category_id' => $total_category_id)); ?>
 
-<div id="texts" class="page-header"><h4>テキスト設定　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-  <h4>正解メッセージ(ランダムに表示)</h4>
-  <?php
-  echo render('admin/config/_texts_list', array('type' => 'success', 'texts' => $success_random_texts));
-  ?>
-
-  <h4>不正解メッセージ(ランダムに表示)</h4>
-  <?php
-  echo render('admin/config/_texts_list', array('type' => 'failure', 'texts' => $failure_random_texts));
-  ?>
-</p>
-
-
-<div id="levels" class="page-header"><h4>レベル設定　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-  <?php $total_category_id = Model_Config::get_value('total_category_id'); ?>
-  <h4>全体のレベル</h4>
-  <?php echo render('admin/config/_levels_list', array('levels' => $total_levels, 'total_category_id' => $total_category_id)); ?>
-  
-  <h4>カテゴリごとのレベル</h4>
-  <?php echo render('admin/config/_levels_list', array('levels' => $category_levels, 'total_category_id' => $total_category_id)); ?>
-</p>
+    <h4>カテゴリごとのレベル</h4>
+    <?php echo render('admin/config/_levels_list', array('levels' => $category_levels, 'total_category_id' => $total_category_id)); ?>
+  </div>
 
 
-<div id="history" class="page-header"><h4>サブミット回数設定　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-<?php
-echo render('admin/config/_list', array('config' => $config_history));
-?>
-</p>
+  <!-- サブミット回数 -->
+  <div class="tab-pane" id="history">
+    <h4>フラグのサブミット</h4>
+    <?php
+    echo render('admin/config/_list', array('config' => $config_history));
+    ?>
+  </div>
 
-<div id="review" class="page-header"><h4>レビュー設定　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-<?php
-echo render('admin/config/_list', array('config' => $config_review));
-?>
-</p>
+  <!-- レビュー -->
+  <div class="tab-pane" id="review">
+    <h4>レビュー</h4>
+    <?php
+    echo render('admin/config/_list', array('config' => $config_review));
+    ?>
+  </div>
 
-<div id="chart" class="page-header"><h4>グラフ描画設定　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-<?php
-echo render('admin/config/_list', array('config' => $config_chart));
-echo render('admin/config/_chart_colors_list', array('config_chart_colors' => $config_chart_colors));
-?>
-</p>
+  <!-- グラフ描画 -->
+  <div class="tab-pane" id="chart">
+    <h4>グラフ描画</h4>
+    <?php
+    echo render('admin/config/_list', array('config' => $config_chart));
+    echo render('admin/config/_chart_colors_list', array('config_chart_colors' => $config_chart_colors));
+    ?>
+  </div>
 
+  <!-- CTF名称 -->
+  <div class="tab-pane" id="names">
+    <h4>CTFの名称</h4>
+    <?php
+    echo render('admin/config/_list', array('config' => $config_names));
+    ?>
+  </div>
 
-<div id="time" class="page-header"><h4>時刻設定　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-<?php
-echo render('admin/config/_time_list', array('start_time' => $start_time, 'end_time' => $end_time));
-?>
-</p>
+  <!-- 時刻 -->
+  <div class="tab-pane" id="time">
+    <h4>時刻設定</h4>
+    <?php
+    echo render('admin/config/_time_list', array('start_time' => $start_time, 'end_time' => $end_time));
+    ?>
+  </div>
 
-<div id="switches" class="page-header"><h4>機能のON/OFF　[0:無効, 1(0以外):有効]　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-<?php
-echo render('admin/config/_list', array('config' => $config_switches));
-?>
-</p>
+  <!-- 機能のON/OFF -->
+  <div class="tab-pane" id="switches">
+    <h4>機能のON/OFF　[0:無効, 1(0以外):有効]</h4>
+    <?php
+    echo render('admin/config/_list', array('config' => $config_switches));
+    ?>
+  </div>
 
+  <!-- システム関連 -->
+  <div class="tab-pane" id="system">
+    <h4>システム関連</h4>
+    <?php
+    echo render('admin/config/_list', array('config' => $config_system, 'readonly' => true));
+    ?>
+  </div>
 
-
-
-<div id="system" class="page-header"><h4>システム関連　　　<small><a href="#">ページ上部へ戻る</a></small></h4></div>
-<p>
-<?php
-echo render('admin/config/_list', array('config' => $config_system, 'readonly' => true));
-?>
-</p>
-
-<div class="page-header"><a href="#">ページ上部へ戻る</a></div>
-
-
+</div>
