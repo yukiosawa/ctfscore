@@ -141,7 +141,6 @@ class Controller_Score extends Controller_Template
                'msg' => $mgmt_msg,
                'image_url' => '',
                'sound_url' => $sound_url,
-//               'is_first_winner' => false,
                'first_bonus_img_url' => '',
             );
             Model_Score::emitToMgmtConsole($result['event'], $mgmt_data);
@@ -149,8 +148,6 @@ class Controller_Score extends Controller_Template
         elseif ($val->run())
         {
             // POSTされた回答が正解かチェック
-//            $puzzle_id = Model_Puzzle::get_puzzle_id($answer);
-//            if (!isset($puzzle_id))
             if (Model_Puzzle::is_right_answer($puzzle_id, $answer) != true)
             {
                 // 不正解
@@ -162,11 +159,11 @@ class Controller_Score extends Controller_Template
                 $text = (!empty($msg['text'])) ? $msg['text'] : $result['description'];
                 if (Model_Config::get_value('is_active_image') != 0)
                 {
-                    $image_url = $msg['image']['url'];
+                    $image_url = !empty($msg['image']['url']) ? $msg['image']['url'] : '';
                 }
                 if (Model_Config::get_value('is_active_sound') != 0)
                 {
-                    $sound_url = $msg['sound']['url'];
+                    $sound_url = !empty($msg['sound']['url']) ? $msg['sound']['url'] : '';
                 }
 
                 // 管理画面への通知メッセージ
