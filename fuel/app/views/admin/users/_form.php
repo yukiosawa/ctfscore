@@ -13,7 +13,7 @@
 
   <div class="checkbox">
     <label>
-      <?php if ($admin == true): ?>
+      <?php if (isset($admin) && $admin == true): ?>
         <input type="checkbox" name="admin" value="1" checked>管理者権限</input>
       <?php else: ?>
         <input type="checkbox" name="admin" value="1">管理者権限</input>

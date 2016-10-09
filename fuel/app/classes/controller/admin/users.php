@@ -25,8 +25,10 @@ class Controller_Admin_Users extends Controller_Template
 
     public function action_create()
     {
+        $data = array();
 	$error_msg = '';
         $user = '';
+        $msg = '';
 
 	if (Input::method() == 'POST')
 	{
@@ -85,7 +87,10 @@ class Controller_Admin_Users extends Controller_Template
 
     public function action_edit($uid)
     {
+        $data = array();
 	$error_msg = '';
+        $user = '';
+        $msg = '';
 
         $check = Model_Users::get_users($uid);
         if (count($check) != 1)
@@ -150,13 +155,14 @@ class Controller_Admin_Users extends Controller_Template
     
     public function post_delete()
     {
+        $data = array();
+	$error_msg = '';
+        $user = '';
+        $msg = '';
+
         // 入力パラメータチェック
         Controller_Auth::checkCSRF();
         $val = Model_Users::validate('delete');
-
-        $user = '';
-	$error_msg = '';
-	$msg = '';
 
 	if ($val->run())
 	{
@@ -189,13 +195,14 @@ class Controller_Admin_Users extends Controller_Template
 
     public function post_pwreset()
     {
+        $data = array();
+	$error_msg = '';
+        $user = '';
+        $msg = '';
+
         // 入力パラメータチェック
         Controller_Auth::checkCSRF();
         $val = Model_Users::validate('pwreset');
-
-        $user = '';
-	$error_msg = '';
-	$msg = '';
 
 	if ($val->run())
 	{
