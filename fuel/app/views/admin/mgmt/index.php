@@ -24,7 +24,6 @@
      var socket = io(<?php echo '"http://'.$_SERVER['SERVER_NAME'].':8080"'; ?>);
 
      var success = '<?php echo Config::get('ctfscore.answer_result.success.event'); ?>';
-//     var levelup = '<?php echo Config::get('ctfscore.answer_result.levelup.event'); ?>';
      var failure = '<?php echo Config::get('ctfscore.answer_result.failure.event'); ?>';
      var duplicate = '<?php echo Config::get('ctfscore.answer_result.duplicate.event'); ?>';
      var over_limit = '<?php echo Config::get('ctfscore.answer_result.over_limit.event'); ?>';
@@ -42,14 +41,6 @@
 	 showOverlay(data);
 	 addMessage('messageArea', success, data.msg);
      });
-
-     // レベルアップ
-     /* socket.on(levelup, function (data) {
-	console.log(data);
-	playAudio(data.sound_url);
-	showOverlay(data);
-	addMessage('messageArea', levelup, data.msg);
-        }); */
 
      // 不正解
      socket.on(failure, function (data) {

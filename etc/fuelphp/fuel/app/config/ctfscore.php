@@ -15,10 +15,6 @@ return array(
             'event' => 'duplicate',
             'description' => '既に回答済み',
         ),
-        /* 'levelup' => array(
-           'event' => 'levelup',
-           'description' => 'レベルアップ',
-           ), */
         'over_limit' => array(
             'event' => 'over_limit',
             'description' => '回数制限オーバー',
@@ -263,14 +259,6 @@ return array(
             'sub_dir' => 'usr/failure_random',
             'filename' => '',
             'description' => '不正解音(ランダムに再生)',
-        ),
-        array(
-            'name' => 'levelup_sound',
-            'type' => 'audio',
-            'is_random' => 0,
-            'sub_dir' => 'usr',
-            'filename' => '',
-            'description' => 'レベルアップ音',
         ),
         array(
             'name' => 'notice_sound',

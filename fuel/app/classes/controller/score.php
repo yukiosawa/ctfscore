@@ -228,7 +228,7 @@ class Controller_Score extends Controller_Template
                         }
                         else
                         {
-                            $sound_url = $msg['sound']['url'];
+                            $sound_url = !empty($msg['sound']['url']) ? $msg['sound']['url'] : '';
                         }
                         // 全問正解
                         if ($is_complete)
@@ -238,24 +238,13 @@ class Controller_Score extends Controller_Template
                     }
 
                     // 管理画面への通知メッセージ
-                    /* $puzzle = Model_Puzzle::get_puzzles($puzzle_id);
-                       if (count($puzzle) > 0) {
-                       $title = $puzzle[0]['title'];
-                       }
-                       else
-                       {
-                       $title = '----';
-                       } */
-
                     $gained = Model_History::get_gained_history($userid, true)[0];
                     $title = $gained['title'];
-
                     $mgmt_msg = $username.' は #'.$puzzle_id.':'.$title.' を解きました！ ['.$gained['point'].'点 ('.$gained['bonus_point'].'点)]';
                     
                     // レベルアップ
                     if ($levels)
                     {
-//                        $result = Config::get('ctfscore.answer_result.levelup');
                         $level_string = '';
                         foreach ($levels as $level)
                         {
@@ -263,12 +252,6 @@ class Controller_Score extends Controller_Template
                         }
                         $mgmt_msg .= $level_string.'にレベルアップしました！';
                         $text .= $level_string.'にレベルアップしました！';
-
-
-                        // TODO: レベルアップの音
-
-
-                        
                     }
                 }
             }
@@ -278,7 +261,6 @@ class Controller_Score extends Controller_Template
                 'msg' => $mgmt_msg,
                 'image_url' => $image_url,
                 'sound_url' => $sound_url,
-//                'is_first_winner' => $is_first_winner,
                 'first_bonus_img_url' => $first_bonus_img_url,
             );
             Model_Score::emitToMgmtConsole($result['event'], $mgmt_data);
