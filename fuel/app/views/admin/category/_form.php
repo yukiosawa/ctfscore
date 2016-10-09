@@ -5,11 +5,11 @@
   <div class="form-group">
     <div class="col-md-2">
       <label for="category_id">ID</label>
-      <input type="text" class="form-control" id="category_id" name="category_id" value="<?php echo $category['id']; ?>" placeholder="N/A" readonly></input>
+      <input type="text" class="form-control" id="category_id" name="category_id" value="<?php echo isset($category) ? $category['id'] : ''; ?>" placeholder="N/A" readonly></input>
     </div>
     <div class="col-md-6">
       <label for="category">カテゴリ</label>
-      <input type="text" class="form-control" id="category" name="category" value="<?php echo $category['category']; ?>" placeholder="カテゴリの名称"></input>
+      <input type="text" class="form-control" id="category" name="category" value="<?php echo isset($category) ? $category['category'] : ''; ?>" placeholder="カテゴリの名称"></input>
     </div>
   </div>
   
