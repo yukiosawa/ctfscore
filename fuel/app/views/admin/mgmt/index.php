@@ -13,9 +13,8 @@
 
     <style type='text/css'>
      #messageArea{
-       /* color: #32CD32; */
+       color: #222222;
        font-size: 20px;
-       color: rgba(0,0,0,0.9);
        font-weight: bold;
      }
     </style>
@@ -69,15 +68,11 @@
 	 var span1 = $('<span>');
 	 var span2 = $('<span>');
 	 span1.attr('class', 'datetime');
-         /* span1.text(new Date().toTimeString() + ': '); */
          span1.text('[' + getFormatDate() + '] ');
 	 span2.attr('class', className);
-         /* span2.text(msg + ' [' + className + ']'); */
 	 span2.text(msg);
 	 div.append(span1).append(span2);
 	 $('#' + targetName).prepend(div);
-	 // テキストが増えてくると重くなるのでやめとく
-	 //messageTextillate();
      }
 
      function getFormatDate(){
@@ -132,39 +127,46 @@
   <?php require(APPPATH.'views/_templateheader.php'); ?>
 
   <body>
-    <?php if ($logo_image): ?>
-      <img src="<?php echo $logo_image; ?>" class="img-responsive" />
-    <?php endif; ?>
+    <div class="container">
+      <div class="container-blur">
+        <div class="container-main">
+          <?php if ($logo_image): ?>
+            <img src="<?php echo $logo_image; ?>" class="img-responsive" />
+          <?php endif; ?>
 
-    <div id='messageArea'>
-      <?php $success = Config::get('ctfscore.answer_result.success.event'); ?>
-      <?php foreach ($gained_history as $value): ?>
-        <div>
-          <span class='datetime'><?php echo '[' . $value['gained_at'] . '] '; ?></span>
-          <span class='<?php echo $success; ?>'>
-            <?php echo $value['username'] . ' は #' . $value['puzzle_id'] . ':' . $value['title'] . ' を解きました！ ['.$value['point'].'点 ('.$value['bonus_point'].'点)]'; ?>
-          </span>
+          <div id='messageArea'>
+            <!-- 過去の履歴を初期表示 -->
+            <?php $success = Config::get('ctfscore.answer_result.success.event'); ?>
+            <?php foreach ($gained_history as $value): ?>
+              <div>
+                <span class='datetime'><?php echo '[' . $value['gained_at'] . '] '; ?></span>
+                <span class='<?php echo $success; ?>'>
+                  <?php echo $value['username'] . ' は #' . $value['puzzle_id'] . ':' . $value['title'] . ' を解きました！ ['.$value['point'].'点 ('.$value['bonus_point'].'点)]'; ?>
+                </span>
+              </div>
+            <?php endforeach; ?>
+          </div>
+
+          <!-- メッセージ送信テスト -->
+          <?php if ($diag_msg): ?>
+            <p>
+              <form>
+                <span class='col-md-5'>
+                  <input class='form-control' type='text' name='chatMessage'></input>
+                </span>
+                <span class='col-md-7'>
+                  <input class='btn' onclick='sendMessage(); return false;' type='submit' value='Send'></input>
+                </span>
+              </form>
+            </p>
+          <?php endif; ?>
+
+          <div id='overlay'></div>
+          <div id='overlay2'></div>
+          <div id='audioArea'></div>
         </div>
-      <?php endforeach; ?>
+      </div>
     </div>
-
-    <!-- メッセージ送信テスト -->
-    <?php if ($diag_msg): ?>
-      <p>
-        <form>
-          <span class='col-md-5'>
-            <input class='form-control' type='text' name='chatMessage'></input>
-          </span>
-          <span class='col-md-7'>
-            <input class='btn' onclick='sendMessage(); return false;' type='submit' value='Send'></input>
-          </span>
-        </form>
-      </p>
-    <?php endif; ?>
-
-    <div id='overlay'></div>
-    <div id='overlay2'></div>
-    <div id='audioArea'></div>
   </body>
 </html>
 
