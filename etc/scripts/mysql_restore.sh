@@ -1,17 +1,24 @@
 #!/bin/sh
 
-# load common setting
-. $(dirname $0)/common.sh
-
-HOST=localhost
-
-echo "Restoring MySQL databases."
-
 if [ -z $1 ]; then
   echo "Usage: $(basename $0) file"
   exit 1
 fi
 file=$1
+
+# load common setting
+. $(dirname $0)/common.sh
+
+if [ -z $MYSQL_ADMIN_USER ] ; then
+    echo "Failed to load username."
+    exit 1
+fi
+if [ -z $MYSQL_ADMIN_PASSWD ]; then
+    echo "Failed to load password."
+    exit 1
+fi
+
+echo "Restoring MySQL databases."
 
 # gunzip and cut the .gz extension if it's a gzip file
 filetype=$(file $file | awk '{print $2}')

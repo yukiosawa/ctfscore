@@ -3,7 +3,14 @@
 # load common setting
 . $(dirname $0)/common.sh
 
-HOST=localhost
+if [ -z $MYSQL_ADMIN_USER ] ; then
+    echo "Failed to load username."
+    exit 1
+fi
+if [ -z $MYSQL_ADMIN_PASSWD ]; then
+    echo "Failed to load password."
+    exit 1
+fi
 
 echo "Dumpping MySQL databases."
 
@@ -26,7 +33,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # change the permittion so that others can't read it
-chmod 700 $MYSQL_BKUP_DIR/$MYSQL_BKUP_FILE
+chmod 400 $MYSQL_BKUP_DIR/$MYSQL_BKUP_FILE
 
 if [ $? -eq 0 ]; then
   echo "+Done. Saved as $MYSQL_BKUP_DIR/$MYSQL_BKUP_FILE"

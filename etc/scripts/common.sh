@@ -1,8 +1,9 @@
 # app installed
 APP=/var/www/ctfscore
-
+# server host
+HOST=localhost
+# scripts directory
 DIR=$(dirname $0)
-cd $DIR
 
 echo "[$0 started by $(whoami)@$(hostname)]"
 
@@ -21,7 +22,7 @@ fi
 rm_password_file() {
     echo "Removing an old file: $PASSFILE"
     if [ -e $PASSFILE ]; then
-	rm $PASSFILE
+	rm -f $PASSFILE
 	echo "+Done."
     else
 	echo "+Not found."
