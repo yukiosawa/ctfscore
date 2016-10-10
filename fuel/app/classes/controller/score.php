@@ -471,8 +471,8 @@ class Controller_Score extends Controller_Template
         }
 
         $data['username'] = ($username === null) ? Auth::get_screen_name() : $username;
-        $profile = Model_Score::get_profile_detail(array($data['username']))[0];
-        if ($profile === null) {
+        $profile = Model_Score::get_profile_detail(array($data['username']));
+        if (empty($profile)) {
             Response::redirect('score/view');
         }
 
@@ -482,7 +482,7 @@ class Controller_Score extends Controller_Template
             $complete_sound_url = Model_Config::get_asset_sounds('complete_sound')[0]['url'];
         }
 
-        $data['profile'] = $profile;
+        $data['profile'] = $profile[0];
         $data['score'] = Model_Score::get_score_ranking($data['username']);
         $data['ctf_name'] = Model_Config::get_value('ctf_name');
         $data['complete_sound_url'] = $complete_sound_url;

@@ -211,7 +211,8 @@ class Model_Score extends Model
         foreach ($usernames as $username)
         {
             $userid = Model_Score::get_uid($username);
-            if (!$userid)
+            $admin_group_id = Model_Config::get_value('admin_group_id');
+            if (!$userid || count(DB::select()->from('users')->where('id', $userid)->where('group', $admin_group_id)->execute()) > 0)
             {
                 continue;
             }
@@ -255,7 +256,8 @@ class Model_Score extends Model
         foreach ($usernames as $username)
         {
             $userid = Model_Score::get_uid($username);
-            if (!$userid)
+            $admin_group_id = Model_Config::get_value('admin_group_id');
+            if (!$userid || count(DB::select()->from('users')->where('id', $userid)->where('group', $admin_group_id)->execute()) > 0)
             {
                 continue;
             }

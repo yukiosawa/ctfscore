@@ -54,9 +54,23 @@ class Controller_Admin_Test extends Controller_Template
 
     public function action_diploma($username = null)
     {
+        if ($username === null)
+        {
+            // 管理者の賞状はないので1位ユーザのデータを使う
+            $result = DB::select()->from('users')->order_by('totalpoint', 'desc')->execute()->as_array();
+            if (count($result) < 1)
+            {
+                Response::redirect('score/view');
+            }
+            else
+            {
+                Response::redirect(Uri::current().'/'.$result[0]['username']);
+            }
+        }
+
         $data['username'] = ($username === null) ? Auth::get_screen_name() : $username;
-        $profile = Model_Score::get_profile_detail(array($data['username']))[0];
-        if ($profile === null) {
+        $profile = Model_Score::get_profile_detail(array($data['username']));
+        if (empty($profile)) {
             Response::redirect('score/view');
         }
 
@@ -66,7 +80,7 @@ class Controller_Admin_Test extends Controller_Template
             $complete_sound_url = Model_Config::get_asset_sounds('complete_sound')[0]['url'];
         }
 
-        $data['profile'] = $profile;
+        $data['profile'] = $profile[0];
         $data['score'] = Model_Score::get_score_ranking($data['username']);
         $data['ctf_name'] = Model_Config::get_value('ctf_name');
         $data['complete_sound_url'] = $complete_sound_url;
