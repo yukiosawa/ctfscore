@@ -261,14 +261,6 @@ return array(
             'description' => '不正解音(ランダムに再生)',
         ),
         array(
-            'name' => 'notice_sound',
-            'type' => 'audio',
-            'is_random' => 0,
-            'sub_dir' => 'usr',
-            'filename' => '',
-            'description' => 'その他通知音(サブミット回数制限、既に回答済の時)',
-        ),
-        array(
             'name' => 'first_bonus_sound',
             'type' => 'audio',
             'is_random' => 0,
@@ -283,6 +275,22 @@ return array(
             'sub_dir' => 'usr',
             'filename' => '',
             'description' => '全問正解時の音',
+        ),
+        array(
+            'name' => 'notice_sound',
+            'type' => 'audio',
+            'is_random' => 0,
+            'sub_dir' => 'usr',
+            'filename' => '',
+            'description' => '回答時のその他通知音(サブミット回数制限、既に回答済の時)',
+        ),
+        array(
+            'name' => 'diploma_sound',
+            'type' => 'audio',
+            'is_random' => 0,
+            'sub_dir' => 'usr',
+            'filename' => '',
+            'description' => '賞状表示の音',
         ),
         array(
             'name' => 'register_sound',

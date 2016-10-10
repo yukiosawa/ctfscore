@@ -4,8 +4,8 @@
 
 <?php
 if ($sound_on) {
-    if ($complete_sound_url != '') {
-        printf('<audio src="%s" autoplay loop></audio>', $complete_sound_url);
+    if ($diploma_sound_url != '') {
+        printf('<audio src="%s" autoplay loop></audio>', $diploma_sound_url);
     }
 }
 ?>

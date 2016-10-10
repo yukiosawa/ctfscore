@@ -476,16 +476,16 @@ class Controller_Score extends Controller_Template
             Response::redirect('score/view');
         }
 
-        $complete_sound_url = '';
+        $diploma_sound_url = '';
         if (Model_Config::get_value('is_active_sound') != 0)
         {
-            $complete_sound_url = Model_Config::get_asset_sounds('complete_sound')[0]['url'];
+            $diploma_sound_url = Model_Config::get_asset_sounds('diploma_sound')[0]['url'];
         }
 
         $data['profile'] = $profile[0];
         $data['score'] = Model_Score::get_score_ranking($data['username']);
         $data['ctf_name'] = Model_Config::get_value('ctf_name');
-        $data['complete_sound_url'] = $complete_sound_url;
+        $data['diploma_sound_url'] = $diploma_sound_url;
         $data['sound_on'] = Cookie::get('sound_on', '1');
         $this->template->title = '賞状';
         $this->template->content = View::forge('score/diploma', $data);
