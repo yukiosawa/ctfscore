@@ -59,6 +59,7 @@ desktop.ini
 # confif files
 /fuel/app/config/
 .htaccess
+.mysql_password
 
 # node modules
 /nodejs/node_modules/
