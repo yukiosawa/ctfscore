@@ -20,7 +20,7 @@
 
 <?php if ($status !== '終了しました'): ?>
     <?php $countdown = Model_Config::get_value('is_active_countdown'); ?>
-    <?php if ($countdown && $end_time): ?>
+    <?php if ($countdown && !empty($end_time)): ?>
       <div id="countdown" class="row"></div>
       <script>
         $(function () {
