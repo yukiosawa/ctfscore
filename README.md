@@ -61,7 +61,10 @@ $ sudo apt-get install -y apache2 mysql-server php5 php5-mysql
 ```
 $ curl get.fuelphp.com/oil | sh
 $ oil create ctfscore
-$ sudo php /var/www/ctfscore/oil refine install
+$ cd ctfscore
+$ oil refine install
+$ cd ..
+$ rm ctfscore/public/favicon.ico
 $ sudo mv ctfscore /var/www/.
 $ sudo a2enmod rewrite
 $ sudo service apache2 restart
@@ -83,7 +86,8 @@ $ npm install socket.io-emitter
 $ git clone https://github.com/ashiina/socket.io-php-emitter.git
 $ cd socket.io-php-emitter
 $ /var/www/ctfscore/composer.phar install
-$ cd ~
+$ cd ..
+$ mkdir -p /var/www/ctfscore/nodejs
 $ sudo cp -r node_modules /var/www/ctfscore/nodejs/.
 $ sudo cp -r socket.io-php-emitter /var/www/ctfscore/nodejs/.
 ```
@@ -164,6 +168,12 @@ $ git pull
 $ cd ~
 $ sudo cp -r ctfscore/* /var/www/ctfscore/.
 ```
+
+- [参考]MySQLユーザ/パスワードを手動設定する場合  
+ctfscoreアプリケーションからDB接続するためのユーザを作成したあと、以下のファイルを修正しておく。
+    - /var/www/ctfscore/fuel/app/config/production/db.php
+    - /var/www/ctfscore/fuel/app/config/development/db.php
+    - ~/ctfscore/etc/scripts/.mysql_password (なければ作成。保守スクリプト用。)
 
 
 ## その他同梱している外部ライブラリ
