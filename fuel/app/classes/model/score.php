@@ -237,6 +237,11 @@ class Model_Score extends Model
             }
 
             $result[] = array('username' => $username, 'categories' => $categories, 'color' => array_shift($colors)['color']);
+
+            if (count($colors) == 0)
+            {
+                break;
+            }
         }
 
         return $result;
@@ -295,7 +300,6 @@ class Model_Score extends Model
         // 問題設定されている得点を列挙
         $points = Model_Puzzle::get_points();
 
-        $colors = Model_Config::get_config_chart_colors();
         foreach ($categories as $category)
         {
             foreach ($points as $point)
