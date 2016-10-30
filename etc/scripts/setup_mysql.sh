@@ -40,7 +40,7 @@ echo "MYSQL_ADMIN_PASSWD=$MYSQL_ADMIN_PASSWD"
 echo "MYSQL_ADMIN_PASSWD=$MYSQL_ADMIN_PASSWD" >> $PASSFILE
 
 # change the permittion so that others can't read it
-chmod 400 $PASSFILE
+# chmod 400 $PASSFILE
 
 # allow administrator to access via network
 mysql -u root -p$MYSQL_ROOT_PASSWD -e "GRANT ALL PRIVILEGES ON *.* TO $MYSQL_ADMIN_USER@'%' IDENTIFIED BY '$MYSQL_ADMIN_PASSWD' WITH GRANT OPTION;"
