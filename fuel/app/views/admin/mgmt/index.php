@@ -137,7 +137,11 @@
           <div id='messageArea'>
             <!-- 過去の履歴を初期表示 -->
             <?php $success = Config::get('ctfscore.answer_result.success.event'); ?>
+            <?php $max_cnt = Model_Config::get_value('mgmt_console_max_history'); ?>
+            <?php $cnt = 0; ?>
             <?php foreach ($gained_history as $value): ?>
+              <?php $cnt++; ?>
+              <?php if ($cnt > $max_cnt) break; ?>
               <div>
                 <span class='datetime'><?php echo '[' . $value['gained_at'] . '] '; ?></span>
                 <span class='<?php echo $success; ?>'>

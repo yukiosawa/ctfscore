@@ -120,6 +120,12 @@ return array(
               'value' => 10,
               'description' => 'サブミット回数の制限値[回]',
         ),
+        array(
+              'type' => 'history',
+              'name' => 'mgmt_console_max_history',
+              'value' => 30,
+              'description' => '管理コンソールに初期表示するサブミット履歴の最大数[件]',
+        ),
 
         // レビューに関する設定
         array(
