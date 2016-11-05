@@ -4,7 +4,7 @@ class Model_Hint extends Model
 {
     public static function get_hints($puzzle_id, $userid = null)
     {
-        $query = DB::select(DB::expr('hints.*,users.username,puzzles.category,puzzles.title'))
+        $query = DB::select(DB::expr('hints.*,users.username,puzzles.category_id,puzzles.title'))
             ->from('hints')
             ->join('users', 'LEFT')->on('hints.uid', '=', 'users.id')
             ->join('puzzles', 'LEFT')->on('hints.puzzle_id', '=', 'puzzles.puzzle_id')
