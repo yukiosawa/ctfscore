@@ -222,6 +222,10 @@ class Controller_Score extends Controller_Template
                         if ($is_first_winner)
                         {
                             $sound_url = Model_Config::get_asset_sounds('first_bonus_sound')[0]['url'];
+                            if (empty($sound_url))
+                            {
+                                $sound_url = !empty($msg['sound']['url']) ? $msg['sound']['url'] : '';
+                            }
                         }
                         else
                         {
