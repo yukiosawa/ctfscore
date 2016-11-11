@@ -145,7 +145,8 @@
               <div>
                 <span class='datetime'><?php echo '[' . $value['gained_at'] . '] '; ?></span>
                 <span class='<?php echo $success; ?>'>
-                  <?php echo $value['username'] . ' は #' . $value['puzzle_id'] . ':' . $value['title'] . ' を解きました！ ['.$value['point'].'点 ('.$value['bonus_point'].'点)]'; ?>
+                  <?php $bonus = $value['has_bonus'] == 1 ? $value['bonus_point'] : 0; ?>
+                  <?php echo $value['username'] . ' は #' . $value['puzzle_id'] . ':' . $value['title'] . ' を解きました！ ['.$value['point'].'点 ('.$bonus.'点)]'; ?>
                 </span>
               </div>
             <?php endforeach; ?>

@@ -241,7 +241,8 @@ class Controller_Score extends Controller_Template
                     // 管理画面への通知メッセージ
                     $gained = Model_History::get_gained_history($userid, true)[0];
                     $title = $gained['title'];
-                    $mgmt_msg = $username.' は #'.$puzzle_id.':'.$title.' を解きました！ ['.$gained['point'].'点 ('.$gained['bonus_point'].'点)]';
+                    $bonus = $gained['has_bonus'] == 1 ? $gained['bonus_point'] : 0;
+                    $mgmt_msg = $username.' は #'.$puzzle_id.':'.$title.' を解きました！ ['.$gained['point'].'点 ('.$bonus.'点)]';
                     
                     // レベルアップ
                     if ($levels)
