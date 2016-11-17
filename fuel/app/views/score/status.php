@@ -20,12 +20,12 @@
 
 <?php if ($status !== '終了しました'): ?>
     <?php $countdown = Model_Config::get_value('is_active_countdown'); ?>
-    <?php if ($countdown && !empty($end_time)): ?>
+    <?php if ($countdown && !empty($end_time) && !empty($start_time)): ?>
       <div id="countdown" class="row"></div>
       <script>
         $(function () {
             // 秒 -> ミリ秒
-            startCountdown(<?php echo strtotime($end_time) * 1000; ?>);
+            startCountdown(<?php echo strtotime($status == '開始前です' ? $start_time : $end_time) * 1000; ?>);
         });
       </script>
     <?php endif; ?>
