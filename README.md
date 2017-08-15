@@ -77,13 +77,6 @@ $ sudo apt-get install -y nodejs npm
 $ sudo npm install n -g
 $ sudo n stable
 $ sudo apt-get purge -y nodejs npm
-
-
-####削除
-$ sudo update-alternatives --install /usr/bin/node nodejs /usr/bin/nodejs 100
-####削除
-
-
 $ npm install socket.io
 $ find node_modules -name socket.io.js | sudo xargs -i cp -p {} /var/www/ctfscore/public/assets/js/.
 ```
