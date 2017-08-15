@@ -1,6 +1,7 @@
 ctfscore
 ========
 CTFのスコアサーバです。
+[Docker版](https://github.com/yukiosawa/docker-ctfscore)でお手軽に実行することもできます。
 
 ## 説明
 CTFスコアサーバとしての基本的な機能のほか、CTFを楽しく開催するための便利機能もつけています。
