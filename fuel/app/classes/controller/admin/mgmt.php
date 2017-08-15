@@ -27,6 +27,7 @@ class Controller_Admin_Mgmt extends Controller
 
         $data['diag_msg'] = $diag_msg;
         $data['gained_history'] = Model_History::get_gained_history();
+        $data['status'] = Model_Score::get_ctf_time_status();
         return View::forge('admin/mgmt/index', $data);
     }
 }

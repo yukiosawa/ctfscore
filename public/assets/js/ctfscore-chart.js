@@ -106,6 +106,7 @@ function get_chartjs_data(data)
 function draw_chartjs(chart_data)
 {
     Chart.defaults.global.responsive = true;
+    Chart.defaults.global.defaultFontColor = '#222222';
 //    Chart.defaults.global.defaultFontSize = 14;
     var ctx = document.getElementById("myChart").getContext("2d");
     var myLineChart = new Chart(ctx, {

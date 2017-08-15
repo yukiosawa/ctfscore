@@ -11,26 +11,25 @@
     </thead>
     <tbody>
         <tr>
-           <td class="text-center lead"><?php echo empty($start_time) ? 'N/A' : $start_time; ?></td>
-           <td class="text-center lead"><?php echo empty($end_time) ? 'N/A' : $end_time; ?></td>
+           <td class="text-center lead"><?php echo empty($status['start_time']) ? 'N/A' : $status['start_time']; ?></td>
+           <td class="text-center lead"><?php echo empty($status['end_time']) ? 'N/A' : $status['end_time']; ?></td>
        </tr>
     </tbody>
   </table>
 </div>
 
-<?php if ($status !== '終了しました'): ?>
+<?php if ($status['ended'] != true): ?>
     <?php $countdown = Model_Config::get_value('is_active_countdown'); ?>
-    <?php if ($countdown && !empty($end_time) && !empty($start_time)): ?>
+    <?php if ($countdown && !empty($status['end_time']) && !empty($status['start_time'])): ?>
       <div id="countdown" class="row"></div>
       <script>
         $(function () {
             // 秒 -> ミリ秒
-            startCountdown(<?php echo strtotime($status == '開始前です' ? $start_time : $end_time) * 1000; ?>);
+            startCountdown(<?php echo strtotime($status['before'] ? $status['start_time'] : $status['end_time']) * 1000; ?>);
         });
       </script>
     <?php endif; ?>
     <br>
+<?php else: ?>
+    <p class="lead text-center"><?php echo '終了しました'; ?></p>
 <?php endif; ?>
-<div class="row">
-    <p class="lead text-center"><?php echo $status; ?></p>
-</div>

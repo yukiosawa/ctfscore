@@ -31,29 +31,7 @@ class Controller_Score extends Controller_Template
     // CTFの実施状況
     public function action_status()
     {
-        $status = Model_Score::get_ctf_time_status();
-        if ($status['before'])
-        {
-            $data['status'] = '開始前です';
-        }
-        else if ($status['running'])
-        {
-            $data['status'] = '実施中です';
-        }
-        else if ($status['ended'])
-        {
-            $data['status'] = '終了しました';
-        }
-        else if ($status['no_use'])
-        {
-            $data['status'] = '実施中です';
-        }
-        else
-        {
-            $data['status'] = '不明';
-        }
-        $data['start_time'] = $status['start_time'];
-        $data['end_time'] = $status['end_time'];
+        $data['status'] = Model_Score::get_ctf_time_status();
         $this->template->title = "実施状況";
         $this->template->content = View::forge('score/status', $data);
         $this->template->footer = '';

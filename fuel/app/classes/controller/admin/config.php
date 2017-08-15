@@ -394,10 +394,7 @@ class Controller_Admin_Config extends Controller_Template
                 if ($result)
                 {
                     // 成功画面へ転送
-                    $status = Model_Score::get_ctf_time_status();
-                    $data['start_time'] = $status['start_time'];
-                    $data['end_time'] = $status['end_time'];
-                    $data['status'] = '更新しました。';
+                    $data['status'] = Model_Score::get_ctf_time_status();
                     $this->template->title = "Updated";
                     $this->template->content = View::forge('score/status', $data);
                     $this->template->footer = View::forge('admin/config/footer');
@@ -430,15 +427,9 @@ class Controller_Admin_Config extends Controller_Template
         // 入力パラメータチェック
         Controller_Auth::checkCSRF();
 
-        if (Model_Config::delete_time() < 1)
-        {
-            $data['status'] = '削除に失敗しました。';
-        }
-        else
-        {
-            $data['status'] = '削除しました。';
-        }
+        Model_Config::delete_time();
 
+        $data['status'] = Model_Score::get_ctf_time_status();
         $this->template->title = 'Delete';
         $this->template->content = View::forge('score/status', $data);
         $this->template->footer = View::forge('admin/config/footer');

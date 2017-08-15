@@ -118,6 +118,7 @@ function get_chartjs_progress_data(raw_data)
 function draw_chartjs_progress(chart_data)
 {
     Chart.defaults.global.responsive = true;
+    Chart.defaults.global.defaultFontColor = '#222222';
 //    Chart.defaults.global.defaultFontSize = 14;
     var ctx = document.getElementById("myChart").getContext("2d");
     var myRadarChart = new Chart(ctx, {

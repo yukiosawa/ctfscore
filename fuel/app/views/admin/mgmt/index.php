@@ -4,6 +4,7 @@
     <title>管理コンソール</title>
     <?php echo Asset::css('bootstrap.css'); ?>
     <?php echo Asset::css('ctfscore.css'); ?>
+    <?php echo Asset::css('flipclock.css'); ?>
     <?php echo Asset::js('jquery-2.2.4.min.js'); ?>
     <?php echo Asset::js('socket.io.js'); ?>
     <?php echo Asset::css('animate.css'); ?>
@@ -133,6 +134,9 @@
           <?php if ($logo_image): ?>
             <img src="<?php echo $logo_image; ?>" class="img-responsive" />
           <?php endif; ?>
+
+          <!-- Countdown -->
+          <?php echo render('score/status', array('status' => $status)); ?>
 
           <div id='messageArea'>
             <!-- 過去の履歴を初期表示 -->
