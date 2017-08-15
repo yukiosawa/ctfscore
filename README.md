@@ -43,7 +43,7 @@ CTFスコアサーバとしての基本的な機能のほか、CTFを楽しく�
 
 
 ## 環境構築
-- Ubuntu 14.04 LTSで検証済み
+- Ubuntu 14.04 LTS, Raspbian Jessie で検証済み
 
 - 事前準備
 ```
@@ -59,7 +59,7 @@ $ sudo apt-get install -y apache2 mysql-server php5 php5-mysql
 
 - FuelPHP
 ```
-$ curl get.fuelphp.com/oil | sh
+$ curl https://get.fuelphp.com:443/oil | sh
 $ oil create ctfscore
 $ cd ctfscore
 $ oil refine install
@@ -71,11 +71,21 @@ $ sudo service apache2 restart
 ```
 
 - node.js and socket.io
+ubuntuリポジトリにあるnodejsはバージョンが低いので、nを使って最新版nodejsを導入。
 ```
 $ sudo apt-get install -y nodejs npm
+$ sudo npm install n -g
+$ sudo n stable
+$ sudo apt-get purge -y nodejs npm
+
+
+####削除
 $ sudo update-alternatives --install /usr/bin/node nodejs /usr/bin/nodejs 100
+####削除
+
+
 $ npm install socket.io
-$ sudo cp node_modules/socket.io/node_modules/socket.io-client/socket.io.js /var/www/ctfscore/public/assets/js/.
+$ find node_modules -name socket.io.js | sudo xargs -i cp -p {} /var/www/ctfscore/public/assets/js/.
 ```
 
 - socket.io-php-emitter
@@ -135,7 +145,7 @@ $ node /var/www/ctfscore/nodejs/app.js &
     - `ログイン -> 新規ユーザ`で新規ユーザ登録する。初めて作成したユーザには自動的に管理者権限が付与される。
 
 - エラーメッセージを非表示に  
-    - `/var/www/ctfscore/public/.htaccess`の以下の行をコメントアウトして本番環境設定にする。
+    - `/var/www/ctfscore/public/.htaccess`の以下の行を有効化して本番環境設定にする(コメントアウトされているので先頭の#を削除)。
     ```
     SetEnv FUEL_ENV production
     ```
